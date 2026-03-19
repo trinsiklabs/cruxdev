@@ -15,6 +15,7 @@ CruxDev is an autonomous convergence framework for AI-driven development. It ins
 4. **Two consecutive independent clean passes = convergence.** One clean pass is not convergence (anchoring bias).
 5. **Verify all status claims empirically.** Coverage numbers come from tools, not memory. Checkbox claims are verified before marking.
 6. **Atomic writes for all state files.** Write-then-rename for JSON, JSONL, and any critical data.
+7. **LLM MINIMIZATION.** If it can be code, it must be code. The engine owns all loops, counters, timeouts, and termination. The LLM is a tool the engine calls for language understanding tasks only. Enforced by architecture tests in `tests/test_architecture.py` and CI.
 
 ## Methodology
 
