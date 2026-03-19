@@ -34,10 +34,16 @@ def state_path(convergence_id: str) -> str:
     return os.path.join(_state_dir, f"{convergence_id}.json")
 
 
-def get_provider(provider_name: str = "stub") -> LLMDispatcher:
+def get_provider(provider_name: str = "stub", **kwargs) -> LLMDispatcher:
     """Get an LLM provider by name. Default is stub for testing."""
     if provider_name == "stub":
         return StubProvider(mode=StubMode.CLEAN)
+    if provider_name == "anthropic":
+        from .dispatch.providers.anthropic import AnthropicProvider
+        return AnthropicProvider(**kwargs)
+    if provider_name == "ollama":
+        from .dispatch.providers.ollama import OllamaProvider
+        return OllamaProvider(**kwargs)
     raise ValueError(f"Unknown provider: {provider_name}")
 
 

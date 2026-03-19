@@ -88,6 +88,18 @@ def test_get_provider_stub():
     assert p is not None
 
 
+def test_get_provider_anthropic():
+    p = mcp_server.get_provider("anthropic", api_key="sk-test")
+    from src.dispatch.providers.anthropic import AnthropicProvider
+    assert isinstance(p, AnthropicProvider)
+
+
+def test_get_provider_ollama():
+    p = mcp_server.get_provider("ollama")
+    from src.dispatch.providers.ollama import OllamaProvider
+    assert isinstance(p, OllamaProvider)
+
+
 def test_get_provider_unknown():
     with pytest.raises(ValueError, match="Unknown provider"):
         mcp_server.get_provider("nonexistent")
