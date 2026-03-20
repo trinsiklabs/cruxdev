@@ -30,7 +30,22 @@ STATE_DIR = os.path.join(CRUXDEV_ROOT, ".cruxdev", "convergence_state")
 
 # --- Server ---
 
-mcp = FastMCP("cruxdev")
+mcp = FastMCP(
+    "cruxdev",
+    instructions="""CruxDev is an autonomous convergence engine. It drives code through
+audit-fix-re-audit loops until two consecutive independent clean passes are achieved.
+
+QUICK START: When the user says "converge [plan]":
+1. Call start_convergence(plan_file) — engine creates state, returns first task
+2. Loop: call convergence_next_task(id) to get what to do next
+3. Execute the task (read files, audit code, fix issues, run tests)
+4. Call convergence_submit_result(id, findings_json) to report back
+5. Repeat 2-4 until task_type is "done" or "escalated"
+DO NOT decide when to stop — the engine decides.
+
+For planning: call get_methodology() first, then create_plan_template(goal).
+For adoption: call get_adoption_process() for step-by-step instructions.""",
+)
 
 os.makedirs(STATE_DIR, exist_ok=True)
 
@@ -44,10 +59,18 @@ def _state_path(convergence_id: str) -> str:
 
 @mcp.tool()
 def get_methodology() -> str:
-    """Get the CruxDev development methodology.
+    """Get the CruxDev development methodology — read this before planning or converging.
 
-    Returns the full development patterns document that guides
-    how to plan, execute, and converge work autonomously.
+    Returns the full DEVELOPMENT_PATTERNS_CRUXDEV.md document containing:
+    - The autonomous lifecycle (brainstorming → plan → converge → report)
+    - Safety gates (build/test gate, coverage gate, 3-failure rollback, 15-min timeout)
+    - Convergence rules (two consecutive independent clean passes)
+    - Audit dimensions for code (8) and documentation (5)
+
+    Call this when:
+    - Starting a new project or feature
+    - Before creating a build plan
+    - When you need to understand CruxDev's methodology
     """
     path = os.path.join(CRUXDEV_ROOT, "DEVELOPMENT_PATTERNS_CRUXDEV.md")
     try:
@@ -59,10 +82,19 @@ def get_methodology() -> str:
 
 @mcp.tool()
 def get_adoption_process() -> str:
-    """Get the CruxDev adoption process for new projects.
+    """Get step-by-step instructions for adopting a project into CruxDev.
 
-    Returns step-by-step instructions for adopting any project
-    into the Crux/CruxDev ecosystem.
+    Returns ADOPTION_PROCESS.md — a complete guide covering:
+    - Installing Crux (intelligence layer)
+    - Installing CruxDev (convergence engine)
+    - Configuring test commands and coverage enforcement
+    - Creating the first build plan
+    - Running the first convergence
+
+    Call this when:
+    - Setting up CruxDev on a new project for the first time
+    - The user asks how to get started with CruxDev
+    - You need the adoption checklist
     """
     path = os.path.join(CRUXDEV_ROOT, "ADOPTION_PROCESS.md")
     try:
@@ -72,26 +104,66 @@ def get_adoption_process() -> str:
         return "ADOPTION_PROCESS.md not found at " + path
 
 
+@mcp.tool()
+def install_cruxdev(project_dir: str = ".") -> str:
+    """Install CruxDev MCP server into a project.
+
+    Adds the cruxdev MCP server to the project's .claude/mcp.json.
+    Preserves any existing MCP servers (like Crux).
+    Creates .cruxdev/ directory for convergence state.
+
+    After installation, restart Claude Code to activate the new tools.
+
+    Args:
+        project_dir: Path to the project to install into (default: current directory)
+    """
+    from .install import install
+    result = install(project_dir)
+    return json.dumps(result, indent=2)
+
+
 # --- Planning tools ---
 
 
 @mcp.tool()
 def create_plan_template(goal: str) -> str:
-    """Generate a structured build plan template for a given goal.
+    """Generate a build plan template — fill in the phases and checklists.
 
-    Returns a markdown plan with phases, checklists, test commands,
-    and convergence criteria — ready for you to fill in.
+    Returns a markdown plan skeleton with:
+    - Title and goal from your input
+    - Phase structure with numbered checklists
+    - Test command placeholder
+    - Convergence criteria section
+
+    After filling in the template, call validate_plan_structure() to check
+    the plan has everything the convergence engine needs.
+
+    Args:
+        goal: What you want to build (e.g., "Migrate auth to OAuth2",
+              "Add WebSocket support", "Refactor database layer")
     """
     return get_plan_template(goal)
 
 
 @mcp.tool()
 def validate_plan_structure(plan_file: str) -> str:
-    """Validate a build plan's structure for convergence.
+    """Check if a build plan has the structure the engine needs to converge it.
 
-    Checks that the plan has: title, phases, checklists, test commands,
-    convergence criteria. Returns errors and warnings.
-    Does NOT evaluate plan quality — that's your job.
+    Validates (errors = must fix):
+    - Has a title (# heading)
+    - Has checklist items (- [ ] task)
+    - Not too short (> 50 chars)
+
+    Warns (should fix):
+    - No numbered phases (## Phase N)
+    - No test command references
+    - No convergence criteria
+
+    Returns JSON with {valid: bool, errors: [...], warnings: [...]}.
+    Fix all errors before calling start_convergence().
+
+    Args:
+        plan_file: Absolute path to the build plan markdown file
     """
     result = validate_plan(plan_file)
     return json.dumps(result.to_dict(), indent=2)
@@ -109,19 +181,29 @@ def start_convergence(
     doc_files: str = "",
     test_command: str = "",
 ) -> str:
-    """Start a convergence run. Returns convergence_id and first task.
+    """Start converging a build plan. Returns the first task for you to execute.
 
-    The engine creates state and tells you what to do first.
-    Call get_next_task() after completing each task.
-    Call submit_result() to report findings.
+    This begins the convergence loop. The engine will guide you through:
+    1. Plan auditing (is the plan complete and feasible?)
+    2. Code auditing (8 dimensions: correctness, security, tests, etc.)
+    3. Doc auditing (5 dimensions: accuracy, completeness, etc.)
+    4. E2E testing (run the test suite)
+    5. Convergence (two consecutive clean passes)
+
+    After calling this, enter the convergence loop:
+    - Read the returned task
+    - Execute it (audit files, fix issues, run tests)
+    - Call convergence_submit_result() with your findings
+    - Call convergence_next_task() to get the next task
+    - Repeat until task_type is "done" or "escalated"
 
     Args:
         plan_file: Path to the build plan markdown file
-        timeout_minutes: Max time for entire convergence (default 120)
-        max_rounds: Max audit rounds per phase (default 5)
-        source_files: Comma-separated list of source files to audit
-        doc_files: Comma-separated list of doc files to audit
-        test_command: Test command (e.g. "python3 -m pytest tests/")
+        timeout_minutes: Max time for entire convergence (default 120 = 2 hours)
+        max_rounds: Max audit rounds per phase before escalation (default 5)
+        source_files: Comma-separated source files to audit (e.g. "src/main.py,src/util.py")
+        doc_files: Comma-separated doc files to audit (e.g. "README.md,CHANGELOG.md")
+        test_command: Shell command to run tests (e.g. "python3 -m pytest tests/ -v")
     """
     convergence_id = str(uuid.uuid4())[:8]
     state = ConvergenceState(
@@ -152,10 +234,25 @@ def convergence_next_task(
     doc_files: str = "",
     test_command: str = "",
 ) -> str:
-    """Get the next task the engine wants you to do.
+    """Get the next task from the convergence engine.
 
-    Call this after completing a task and submitting results.
-    The engine decides what's next based on convergence state.
+    Call this after submitting results from the previous task.
+    The engine checks convergence state (rounds, clean passes, timeouts)
+    and returns one of:
+    - "audit": Read and audit files on specific dimensions
+    - "fix": Fix a specific finding
+    - "test": Run the test suite
+    - "write": Create or update a file
+    - "done": Convergence complete — two clean passes achieved!
+    - "escalated": Engine stopped — timeout, max rounds, or repeated failures
+
+    When you get "done" or "escalated", the loop is over.
+
+    Args:
+        convergence_id: The ID returned by start_convergence()
+        source_files: Override source files (comma-separated)
+        doc_files: Override doc files (comma-separated)
+        test_command: Override test command
     """
     path = _state_path(convergence_id)
     state = load_state(path)
@@ -180,15 +277,25 @@ def convergence_submit_result(
     convergence_id: str,
     findings_json: str = "[]",
 ) -> str:
-    """Submit audit/fix/test results back to the engine.
+    """Report your audit/fix/test results back to the convergence engine.
 
-    Pass findings as a JSON array:
-    [{"id": "f1", "file": "a.py", "dimension": "correctness",
-      "severity": "high", "description": "...", "suggested_fix": "...",
-      "fixed": true}]
+    The engine processes your findings, updates counters, and checks:
+    - Did this round have zero findings? (increments clean pass counter)
+    - Have we hit two consecutive clean passes? (convergence!)
+    - Are findings increasing round over round? (net-negative → escalate)
+    - Has the same finding failed 3 times? (rollback → escalate)
 
-    For clean passes (no findings), pass "[]".
-    The engine updates state, checks convergence, and tells you what's next.
+    For a CLEAN PASS (no issues found): pass "[]"
+    For FINDINGS: pass a JSON array like:
+    [{"id": "f1", "file": "src/main.py", "dimension": "correctness",
+      "severity": "high", "description": "Off-by-one in loop",
+      "suggested_fix": "Change < to <=", "fixed": true}]
+
+    Set "fixed": true if you already fixed it, false if not.
+
+    Args:
+        convergence_id: The ID from start_convergence()
+        findings_json: JSON array of findings, or "[]" for clean pass
     """
     path = _state_path(convergence_id)
     state = load_state(path)
@@ -211,7 +318,12 @@ def convergence_submit_result(
 
 @mcp.tool()
 def convergence_status(convergence_id: str) -> str:
-    """Check the current status of a convergence run."""
+    """Check the current status of a convergence run.
+
+    Returns: phase, round number, consecutive clean passes,
+    total findings, total fixed, elapsed time, and whether
+    the convergence is terminal (done or escalated).
+    """
     path = _state_path(convergence_id)
     state = load_state(path)
 
@@ -230,7 +342,7 @@ def convergence_status(convergence_id: str) -> str:
 
 @mcp.tool()
 def convergence_cancel(convergence_id: str) -> str:
-    """Cancel a convergence run, preserving state."""
+    """Cancel a convergence run. State is preserved — you can review what happened."""
     path = _state_path(convergence_id)
     state = load_state(path)
     state.phase = ConvergencePhase.ESCALATED

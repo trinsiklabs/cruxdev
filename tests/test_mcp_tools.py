@@ -204,6 +204,13 @@ def test_list_convergences_empty_state_dir():
         assert result == []
 
 
+def test_install_cruxdev_tool(tmp_path):
+    from src.mcp_server import install_cruxdev
+    result = json.loads(install_cruxdev(str(tmp_path)))
+    assert result["status"] == "installed"
+    assert os.path.exists(os.path.join(str(tmp_path), ".claude", "mcp.json"))
+
+
 def test_convergence_next_task_with_files(tmp_path):
     plan = tmp_path / "plan.md"
     plan.write_text("# Plan\n")
