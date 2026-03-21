@@ -258,6 +258,53 @@ def test_task_to_dict():
     assert d["metadata"] == {"round": 1}
 
 
+def test_plan_audit_recommends_fast_tier(tmp_path):
+    state = ConvergenceState(plan_file="plan.md", phase=ConvergencePhase.PLAN_AUDITING)
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+    task = get_next_task(state, path)
+    assert task.recommended_tier == "fast"
+
+
+def test_code_audit_recommends_standard_tier(tmp_path):
+    state = ConvergenceState(plan_file="plan.md", phase=ConvergencePhase.CODE_AUDITING)
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+    task = get_next_task(state, path)
+    assert task.recommended_tier == "standard"
+
+
+def test_doc_audit_recommends_fast_tier(tmp_path):
+    state = ConvergenceState(plan_file="plan.md", phase=ConvergencePhase.DOC_AUDITING)
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+    task = get_next_task(state, path)
+    assert task.recommended_tier == "fast"
+
+
+def test_e2e_test_recommends_fast_tier(tmp_path):
+    state = ConvergenceState(plan_file="plan.md", phase=ConvergencePhase.E2E_TESTING)
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+    task = get_next_task(state, path)
+    assert task.recommended_tier == "fast"
+
+
+def test_planning_recommends_standard_tier(tmp_path):
+    state = ConvergenceState(plan_file="plan.md", phase=ConvergencePhase.PLANNING)
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+    task = get_next_task(state, path)
+    assert task.recommended_tier == "standard"
+
+
+def test_task_to_dict_with_tier():
+    from src.engine.task_router import Task
+    t = Task(task_type="audit", description="d", files=[], dimensions=[], recommended_tier="fast")
+    d = t.to_dict()
+    assert d["recommended_tier"] == "fast"
+
+
 def test_task_to_dict_minimal():
     from src.engine.task_router import Task
     t = Task(task_type="done", description="done", files=[], dimensions=[])

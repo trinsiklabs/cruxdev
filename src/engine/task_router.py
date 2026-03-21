@@ -33,6 +33,23 @@ CODE_DIMENSIONS = ["correctness", "completeness", "edge_cases", "error_handling"
 DOC_DIMENSIONS = ["accuracy", "completeness", "consistency", "clarity", "currency"]
 
 
+# Task type → recommended model tier
+TASK_MODEL_TIERS: dict[str, str] = {
+    "audit": "standard",
+    "fix": "standard",
+    "test": "fast",
+    "write": "standard",
+}
+
+# Phase-specific overrides
+PHASE_MODEL_TIERS: dict[str, str] = {
+    "plan_auditing": "fast",
+    "code_auditing": "standard",
+    "doc_auditing": "fast",
+    "e2e_testing": "fast",
+}
+
+
 @dataclass
 class Task:
     """A task for Claude Code to execute."""
@@ -43,6 +60,7 @@ class Task:
     finding: Optional[dict] = None
     test_command: Optional[list[str]] = None
     metadata: Optional[dict] = None
+    recommended_tier: Optional[str] = None  # e.g., "fast", "standard", "frontier"
 
     def to_dict(self) -> dict:
         d = {
@@ -57,6 +75,8 @@ class Task:
             d["test_command"] = self.test_command
         if self.metadata:
             d["metadata"] = self.metadata
+        if self.recommended_tier:
+            d["recommended_tier"] = self.recommended_tier
         return d
 
 
@@ -103,10 +123,14 @@ def get_next_task(
         return get_next_task(state, state_path)
 
     # Phase-specific tasks
+    # Determine model tier for this phase
+    phase_tier = PHASE_MODEL_TIERS.get(state.phase.value)
+
     if state.phase == ConvergencePhase.PLANNING:
         return Task(
             task_type="write",
             description="Create or refine the build plan. Follow the methodology from get_methodology().",
+            recommended_tier=TASK_MODEL_TIERS.get("write"),
             files=[state.plan_file],
             dimensions=[],
         )
@@ -123,6 +147,7 @@ def get_next_task(
             description=f"Audit the plan (round {state.round}). Check for gaps, risks, missing steps.",
             files=[state.plan_file],
             dimensions=PLAN_DIMENSIONS,
+            recommended_tier=phase_tier or "fast",
         )
 
     if state.phase == ConvergencePhase.VIABILITY:
@@ -153,6 +178,7 @@ def get_next_task(
             files=files,
             dimensions=CODE_DIMENSIONS,
             test_command=test_command,
+            recommended_tier=phase_tier or "standard",
         )
 
     if state.phase == ConvergencePhase.DOC_AUDITING:
@@ -168,6 +194,7 @@ def get_next_task(
             description=f"Audit documentation (round {state.round}). Check accuracy, completeness, consistency.",
             files=files,
             dimensions=DOC_DIMENSIONS,
+            recommended_tier=phase_tier or "fast",
         )
 
     if state.phase == ConvergencePhase.E2E_TESTING:
@@ -183,6 +210,7 @@ def get_next_task(
             files=[],
             dimensions=[],
             test_command=test_command,
+            recommended_tier=phase_tier or "fast",
         )
 
     if state.phase == ConvergencePhase.PATTERNS_UPDATE:
