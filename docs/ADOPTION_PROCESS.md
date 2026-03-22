@@ -110,9 +110,10 @@ Create `.claude/CLAUDE.md` following these principles. Every CLAUDE.md must cont
 **Methodology** — Reference to patterns and playbook:
 ```
 Read ADOPTION_PROCESS.md for current adoption state.
-Methodology: /Users/user/personal/cruxdev/DEVELOPMENT_PATTERNS_CRUXDEV.md
-Playbook: /Users/user/personal/cruxdev/ADOPTION_PLAYBOOK.md
-E2E patterns: /Users/user/personal/cruxdev/E2E_TEST_PATTERNS.md
+Methodology: /Users/user/personal/cruxdev/docs/DEVELOPMENT_PATTERNS_CRUXDEV.md
+Playbook: /Users/user/personal/cruxdev/docs/ADOPTION_PLAYBOOK.md
+E2E patterns: /Users/user/personal/cruxdev/docs/E2E_TEST_PATTERNS.md
+Website planning: /Users/user/personal/cruxdev/docs/WEBSITE_PLANNING.md
 ```
 
 **Project Structure** — Accurate directory tree with purposes.
@@ -136,7 +137,46 @@ Also update CI configuration to enforce the gate on every PR/push.
 
 ---
 
-## Step 5: Run the Adoption Playbook
+## Step 5: Website Planning (If Applicable)
+
+If this project includes a website or web application, apply the website planning methodology before or alongside code convergence.
+
+### When This Applies
+
+- The project has a marketing site, docs site, or landing page
+- The project has a web application with user-facing UI
+- The project will need a website in the future (plan now, build later)
+
+### What to Do
+
+1. **Read the methodology**: `/Users/user/personal/cruxdev/docs/WEBSITE_PLANNING.md`
+2. **Read the SEO/GEO reference**: `/Users/user/personal/cruxdev/docs/SEO_AND_GEO_REFERENCE.md`
+3. **Create a website build plan**: Use `/plan "Website for [project name]"` or create manually in `build_plans/BUILD_PLAN_NNN_WEBSITE.md`
+4. **Audit existing site** (if one exists) against WEBSITE_PLANNING.md:
+   - Phase 5 (SEO): structured data, meta tags, sitemap, llms.txt, robots.txt
+   - Phase 8 (Performance): Core Web Vitals, image optimization, JS budget
+   - Phase 10 (QA): accessibility (WCAG 2.1 AA), cross-browser, security headers
+   - Appendix A (Legal): privacy policy, cookie consent, accessibility statement
+5. **Converge the website plan**: `/converge build_plans/BUILD_PLAN_NNN_WEBSITE.md`
+
+### Minimum Website Standards (All CruxDev Projects)
+
+Every project website must have:
+- [ ] Unique `<title>` and `<meta description>` on every page
+- [ ] Open Graph and Twitter Card meta tags
+- [ ] Schema.org structured data (at minimum: `WebSite`, page-appropriate types)
+- [ ] `/llms.txt` for AI visibility
+- [ ] `/robots.txt` allowing AI crawlers
+- [ ] XML sitemap
+- [ ] WCAG 2.1 AA accessibility compliance
+- [ ] Core Web Vitals: LCP < 2.5s, INP < 200ms, CLS < 0.1
+- [ ] HTTPS with security headers (CSP, HSTS)
+- [ ] Responsive/mobile-first design
+- [ ] Privacy policy (if collecting any data)
+
+---
+
+## Step 6: Run the Adoption Playbook
 
 Infrastructure is installed (Phase 1 of ADOPTION_PLAYBOOK.md). Now execute the remaining phases.
 
@@ -232,6 +272,8 @@ The playbook is stack-agnostic. Adapt these concepts to your stack:
 | Crux (core) | `/Users/user/personal/crux` |
 | Crux CLI | `/Users/user/personal/crux/bin/crux` |
 | CruxDev | `/Users/user/personal/cruxdev` |
-| Methodology | `/Users/user/personal/cruxdev/DEVELOPMENT_PATTERNS_CRUXDEV.md` |
-| Adoption Playbook | `/Users/user/personal/cruxdev/ADOPTION_PLAYBOOK.md` |
-| E2E Patterns | `/Users/user/personal/cruxdev/E2E_TEST_PATTERNS.md` |
+| Methodology | `/Users/user/personal/cruxdev/docs/DEVELOPMENT_PATTERNS_CRUXDEV.md` |
+| Adoption Playbook | `/Users/user/personal/cruxdev/docs/ADOPTION_PLAYBOOK.md` |
+| E2E Patterns | `/Users/user/personal/cruxdev/docs/E2E_TEST_PATTERNS.md` |
+| Website Planning | `/Users/user/personal/cruxdev/docs/WEBSITE_PLANNING.md` |
+| SEO/GEO Reference | `/Users/user/personal/cruxdev/docs/SEO_AND_GEO_REFERENCE.md` |

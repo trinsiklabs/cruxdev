@@ -84,7 +84,12 @@
       "WebFetch(domain:www.semrush.com)",
       "WebFetch(domain:www.nngroup.com)",
       "WebFetch(domain:webproject.guide)",
-      "WebFetch(domain:www.vsourz.com)"
+      "WebFetch(domain:www.vsourz.com)",
+      "Bash(mkdir -p /Users/user/personal/runcrux-io)",
+      "Read(//Users/user/personal/**)",
+      "Bash(npm create:*)",
+      "Bash(npx astro:*)",
+      "Bash(npm run:*)"
     ]
   }
 }
