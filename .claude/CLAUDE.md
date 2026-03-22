@@ -19,7 +19,7 @@ CruxDev is an autonomous convergence framework for AI-driven development. It ins
 
 ## Methodology
 
-Read DEVELOPMENT_PATTERNS_CRUXDEV.md at the start of any planning session. It contains the full autonomous lifecycle:
+Read `docs/DEVELOPMENT_PATTERNS_CRUXDEV.md` at the start of any planning session. It contains the full autonomous lifecycle:
 - Brainstorming gate → Plan → Converge plan → Execute with safety gates → Converge code+docs → Update patterns → Report
 
 ## Test Commands
@@ -37,19 +37,18 @@ python3 -m pytest tests/ -v --tb=short
 ```
 cruxdev/
 ├── src/                    # Source code (Python)
-├── tests/                  # Test files
-├── engine/                 # Convergence engine specs (markdown)
-├── skills/                 # Skill definitions (markdown)
-├── adapters/               # Platform adapters
-│   └── claude-code/        # Claude Code integration
-├── templates/              # Reusable templates
+│   ├── engine/             # Convergence engine (state, loops, routing)
+│   ├── dispatch/           # LLM dispatch (providers, schema, validation)
+│   ├── graph/              # Dependency graph
+│   ├── mcp_server.py       # FastMCP server (10 tools)
+│   └── install.py          # Project installation
+├── tests/                  # Test files (314 tests, 100% coverage)
+├── docs/                   # All documentation
+├── build_plans/            # All build plans (current and historical)
 ├── .claude/
-│   └── CLAUDE.md           # This file
-├── pyproject.toml          # Python project config
-├── CRUXDEV.md              # Bootstrap prompt (<2k tokens)
-├── CruxDev.md              # Design document
-├── CRUX_ECOSYSTEM_PLAN.md  # Master plan
-└── DEVELOPMENT_PATTERNS_CRUXDEV.md  # Methodology
+│   ├── CLAUDE.md           # This file
+│   └── commands/           # Slash commands (/converge, /plan, /adopt, /status)
+└── pyproject.toml          # Python project config
 ```
 
 ## Safety Gates
@@ -70,8 +69,15 @@ cruxdev/
 
 | File | Purpose |
 |------|---------|
-| `DEVELOPMENT_PATTERNS_CRUXDEV.md` | Full development methodology — read for any planning work |
-| `CRUX_ECOSYSTEM_PLAN.md` | Master plan — what to build, in what order |
-| `CruxDev.md` | Design document — architecture, skills, engine specs |
-| `E2E_TEST_PATTERNS.md` | E2E test convergence methodology — four convergence loops |
-| `DEVELOPMENT_PATTERNS.md` | Original methodology (human-driven) — reference only |
+| `docs/DEVELOPMENT_PATTERNS_CRUXDEV.md` | Full development methodology — read for any planning work |
+| `docs/ADOPTION_PROCESS.md` | How to adopt a project into CruxDev |
+| `docs/ADOPTION_PLAYBOOK.md` | Detailed 9-phase adoption playbook |
+| `docs/CruxDev.md` | Design document — architecture, engine specs |
+| `docs/SESSION_UPGRADE.md` | Guide for leveling up active sessions |
+| `build_plans/CRUX_ECOSYSTEM_PLAN.md` | Master plan — what to build, in what order |
+
+## Conventions
+
+- **All documentation** lives in `docs/`. Not root.
+- **All build plans** live in `build_plans/`. Not root. Named `BUILD_PLAN_NNN_SLUG.md`.
+- These conventions apply to every CruxDev-managed project.

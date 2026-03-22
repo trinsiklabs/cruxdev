@@ -23,7 +23,7 @@ Call `create_plan_template($ARGUMENTS)` to get a plan skeleton.
 3. Add checklist items (`- [ ]`) for every task
 4. Add test commands
 5. Add convergence criteria
-6. Write the plan to a file: `BUILD_PLAN_NNN_<slug>.md`
+6. Write the plan to: `build_plans/BUILD_PLAN_NNN_<slug>.md` (all build plans live in `build_plans/`)
 
 ### Step 4: Validate
 

@@ -55,7 +55,8 @@
       "Bash(do sed:*)",
       "Bash(xargs sed:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git mv:*)"
     ]
   }
 }

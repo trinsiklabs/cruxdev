@@ -1,8 +1,11 @@
 # CruxDev: Autonomous Convergence Framework for AI-Driven Development
 
-**Version:** 0.1.0 (Design Document)
+**Version:** 0.2.0 (Design Document — partially implemented)
 **Created:** 2026-03-18
-**Status:** DESIGN PHASE
+**Last Updated:** 2026-03-22
+**Status:** DESIGN PHASE — engine core is shipped, skills system is not yet built
+
+> **Implementation status:** The convergence engine (state machine, LLM dispatch, convergence loops, MCP server, dependency graph, subagent coordination) is implemented in `src/` with 314 tests and 100% coverage. The skills system, adapters, and templates described in this document are design concepts not yet built. For what's actually shipped, see `src/` and the test suite. For the actual project structure, see `.claude/CLAUDE.md`.
 
 ---
 

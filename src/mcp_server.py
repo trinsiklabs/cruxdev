@@ -72,7 +72,7 @@ def get_methodology() -> str:
     - Before creating a build plan
     - When you need to understand CruxDev's methodology
     """
-    path = os.path.join(CRUXDEV_ROOT, "DEVELOPMENT_PATTERNS_CRUXDEV.md")
+    path = os.path.join(CRUXDEV_ROOT, "docs", "DEVELOPMENT_PATTERNS_CRUXDEV.md")
     try:
         with open(path) as f:
             return f.read()
@@ -96,7 +96,7 @@ def get_adoption_process() -> str:
     - The user asks how to get started with CruxDev
     - You need the adoption checklist
     """
-    path = os.path.join(CRUXDEV_ROOT, "ADOPTION_PROCESS.md")
+    path = os.path.join(CRUXDEV_ROOT, "docs", "ADOPTION_PROCESS.md")
     try:
         with open(path) as f:
             return f.read()

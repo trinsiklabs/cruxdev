@@ -62,14 +62,23 @@ List all available modes: `/Users/user/personal/crux/bin/crux modes`
 
 ---
 
-## Step 2: Install CruxDev (Convergence Methodology)
+## Step 2: Install CruxDev (Convergence Engine)
 
-CruxDev provides the autonomous convergence engine — planning, auditing, and convergence loops.
+CruxDev provides the autonomous convergence engine — planning, auditing, and convergence loops via MCP.
 
-```bash
-# Copy CruxDev framework into the project
-cp -r /Users/user/personal/cruxdev/.cruxdev . 2>/dev/null || true
+```python
+import sys
+sys.path.insert(0, "/Users/user/personal/cruxdev")
+from src.install import install
+
+result = install(".")  # Installs into current project
+for item in result["items"]:
+    print(f"  ✓ {item}")
 ```
+
+This adds the `cruxdev` MCP server to `.claude/mcp.json` and creates `.cruxdev/` for convergence state. **Restart Claude Code** to activate.
+
+After restart, you have 10 MCP tools including `/converge`, `/plan`, `/adopt`, `/status`.
 
 ---
 
