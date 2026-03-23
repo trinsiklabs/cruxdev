@@ -89,7 +89,8 @@
       "Read(//Users/user/personal/**)",
       "Bash(npm create:*)",
       "Bash(npx astro:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }
