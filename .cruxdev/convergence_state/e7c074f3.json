@@ -1,7 +1,7 @@
 {
   "plan_file": "/Users/user/personal/cruxcli/BUILD_PLAN_001_HARD_FORK.md",
-  "phase": "code_auditing",
-  "round": 0,
+  "phase": "escalated",
+  "round": 1,
   "max_rounds": 5,
   "consecutive_clean": 0,
   "convergence_threshold": 2,
@@ -121,9 +121,35 @@
       ],
       "findings_fixed": 1,
       "timestamp": 1774300300.2028549
+    },
+    {
+      "round": 0,
+      "phase": "code_auditing",
+      "findings": [
+        {
+          "id": "f5",
+          "file": "packages/opencode/src/session/token-budget.ts",
+          "dimension": "edge_cases",
+          "severity": "high",
+          "description": "Division by zero if config.budget is 0",
+          "suggested_fix": "Guard: config.budget > 0 ? used / config.budget : 0",
+          "fixed": true
+        },
+        {
+          "id": "f6",
+          "file": "packages/opencode/script/postinstall.mjs",
+          "dimension": "correctness",
+          "severity": "high",
+          "description": "async main() called without await \u2014 script may exit before async ops complete, errors not caught",
+          "suggested_fix": "Changed to main().catch() pattern",
+          "fixed": true
+        }
+      ],
+      "findings_fixed": 2,
+      "timestamp": 1774300421.0294101
     }
   ],
-  "escalation_reason": null,
+  "escalation_reason": "code_auditing_net_negative",
   "created_at": 1774299980.624136,
-  "updated_at": 1774300306.253427
+  "updated_at": 1774300426.302994
 }
