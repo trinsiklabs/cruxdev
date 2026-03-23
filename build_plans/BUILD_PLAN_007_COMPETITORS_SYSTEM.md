@@ -94,7 +94,7 @@
 ### 4A. Monitoring Loop
 
 ```
-Quarterly:
+Daily:
   1. Re-run discovery (Phase 1 of COMPETITORS_PATTERN.md)
   2. Refresh all official competitors
   3. Verify all links
@@ -118,7 +118,8 @@ When gap analysis identifies a new "must close" gap:
    - Proposed implementation approach
    - Success criteria
 3. Plan added to gap closure queue in COMPETITORS.md
-4. User notified of new plan (not auto-executed — user approves before convergence)
+4. Engine auto-executes the plan via `/converge` — no user approval needed
+5. Post-convergence: COMPETITORS.md updated, comparison pages refreshed, deployed
 
 ### Checklist — Phase 4
 

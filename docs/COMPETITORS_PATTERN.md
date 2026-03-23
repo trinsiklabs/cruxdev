@@ -152,9 +152,9 @@ Score each competitor on these dimensions (1-5 each):
 
 | Tier | Cadence | Actions |
 |------|---------|---------|
-| Official | Monthly | Update COMPETITORS.md, refresh comparison page, check for new features, update gap analysis |
-| Watch | Quarterly | Quick review — any major changes? Promote to official if needed. |
-| Noted | Annually | Still exists? Still relevant? |
+| Official | Daily | Update COMPETITORS.md, refresh comparison page, check for new features, update gap analysis, auto-converge new gaps |
+| Watch | Weekly | Quick review — any major changes? Promote to official if needed. |
+| Noted | Monthly | Still exists? Still relevant? |
 
 ### 3.3 Output
 
@@ -278,26 +278,30 @@ Set up monitoring for each official competitor:
 
 | What to monitor | How | Cadence |
 |----------------|-----|---------|
-| New releases | GitHub releases, changelog, blog | Weekly |
-| Star growth | star-history.com bookmark | Monthly |
-| New features | Release notes, docs changes | Monthly |
-| Pricing changes | Pricing page snapshot | Quarterly |
-| Community sentiment | Reddit, HN, Twitter mentions | Ongoing |
-| New competitors | Repeat Phase 1 discovery | Quarterly |
+| New releases | GitHub releases, changelog, blog | Daily |
+| Star growth | star-history.com / GitHub API | Daily |
+| New features | Release notes, docs changes | Daily |
+| Pricing changes | Pricing page snapshot | Weekly |
+| Community sentiment | Reddit, HN, Twitter mentions | Daily |
+| New competitors | Repeat Phase 1 discovery | Weekly |
 
-### 7.2 Update Protocol
+### 7.2 Autonomous Update Protocol
 
-When a significant change is detected:
+When a change is detected, the system acts autonomously:
 
 1. Update COMPETITORS.md with new information
 2. Re-run gap analysis for affected competitor
-3. If new gap is "must close" → generate build plan
-4. Update comparison page on website
-5. Converge documentation (two clean passes)
+3. If new gap is "must close" → auto-generate build plan → auto-converge it
+4. If gap is "should close" → auto-generate build plan → auto-converge it
+5. Update comparison page on website
+6. Deploy website updates
+7. Converge documentation (two clean passes)
 
-### 7.3 Quarterly Review
+No human approval required. The system self-improves continuously. This is the autonomous evolution loop — the same principle as CruxDev's convergence engine applied to competitive position.
 
-Every quarter:
+### 7.3 Weekly Review
+
+Every week:
 - Review all official competitors — any tier changes?
 - Review watch list — any promotions to official?
 - Re-run discovery (Phase 1) — any new entrants?
