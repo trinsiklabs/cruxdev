@@ -181,12 +181,45 @@ def get_next_task(
         return get_next_task(state, state_path, source_files, doc_files, test_command)
 
     if state.phase == ConvergencePhase.EXECUTING:
-        # Auto-advance — execution happens during code auditing
-        state.phase = ConvergencePhase.CODE_AUDITING
-        state.round = 0
-        state.consecutive_clean = 0
-        save_state(state, state_path)
-        return get_next_task(state, state_path, source_files, doc_files, test_command)
+        # Green-field execution: parse checklist, execute items one by one
+        from .checklist_parser import parse_checklist, get_next_incomplete, all_complete
+
+        items = parse_checklist(state.plan_file)
+        if not items or all_complete(items):
+            # No checklist or all done → advance to code_audit
+            state.phase = ConvergencePhase.CODE_AUDITING
+            state.round = 0
+            state.consecutive_clean = 0
+            save_state(state, state_path)
+            return get_next_task(state, state_path, source_files, doc_files, test_command)
+
+        next_item = get_next_incomplete(items)
+        if next_item is None:  # pragma: no cover
+            state.phase = ConvergencePhase.CODE_AUDITING
+            state.round = 0
+            state.consecutive_clean = 0
+            save_state(state, state_path)
+            return get_next_task(state, state_path, source_files, doc_files, test_command)
+
+        from .checklist_parser import completion_summary
+        summary = completion_summary(items)
+        return Task(
+            task_type="execute",
+            description=(
+                f"Execute checklist item {next_item.id}: {next_item.description} "
+                f"({summary['completed']}/{summary['total']} complete, "
+                f"{summary['percentage']}%)"
+            ),
+            files=[state.plan_file],
+            dimensions=[],
+            recommended_tier="standard",
+            test_command=test_command,
+            metadata={
+                "checklist_item": next_item.id,
+                "phase": next_item.phase,
+                "progress": summary,
+            },
+        )
 
     if state.phase == ConvergencePhase.CODE_AUDITING:
         if check_convergence(state):
@@ -296,8 +329,22 @@ def submit_result(
     state_path: str,
     result: dict,
 ) -> None:
-    """Process a result from Claude Code and update engine state."""
+    """Process a result from Claude Code and update engine state.
+
+    For execution tasks, also handles checklist item completion.
+    """
     task_type = result.get("task_type", "audit")
+
+    # Handle execution phase checklist completion
+    checklist_item = result.get("checklist_item")
+    if checklist_item and state.phase == ConvergencePhase.EXECUTING:
+        from .checklist_parser import parse_checklist, mark_complete
+        items = parse_checklist(state.plan_file)
+        mark_complete(items, checklist_item)
+        # Note: mark_complete modifies the in-memory list but doesn't persist.
+        # The plan file itself tracks completion via [x] markers.
+        # The engine re-parses on each get_next_task call.
+
     findings_data = result.get("findings", [])
 
     findings = [

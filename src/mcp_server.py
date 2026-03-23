@@ -187,10 +187,11 @@ def start_convergence(
     This begins the convergence loop. The engine will guide you through:
     1. Plan auditing (is the plan complete and feasible?)
     2. Document alignment (does the plan conform to product docs and decisions?)
-    3. Code auditing (8 dimensions: correctness, security, tests, etc.)
-    3. Doc auditing (5 dimensions: accuracy, completeness, etc.)
-    4. E2E testing (run the test suite)
-    5. Convergence (two consecutive clean passes)
+    3. Execution (green-field: build each checklist item, write code + tests)
+    4. Code auditing (8 dimensions: correctness, security, tests, etc.)
+    5. Doc auditing (5 dimensions: accuracy, completeness, etc.)
+    6. E2E testing (run the test suite)
+    7. Convergence (two consecutive clean passes)
 
     After calling this, enter the convergence loop:
     - Read the returned task
@@ -242,6 +243,8 @@ def convergence_next_task(
     The engine checks convergence state (rounds, clean passes, timeouts)
     and returns one of:
     - "audit": Read and audit files on specific dimensions
+    - "doc_align": Verify plan conforms to product docs
+    - "execute": Build a checklist item (green-field: write code + tests)
     - "fix": Fix a specific finding
     - "test": Run the test suite
     - "write": Create or update a file

@@ -69,7 +69,8 @@ class ConvergenceRunner:
             pass
 
         elif phase == ConvergencePhase.EXECUTING:
-            # Execution phase — advance (code changes happen during audit)
+            # Green-field execution — task router handles checklist parsing
+            # For direct (non-MCP) execution, run plan convergence as proxy
             pass
 
         elif phase == ConvergencePhase.CODE_AUDITING:

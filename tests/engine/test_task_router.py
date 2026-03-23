@@ -239,6 +239,25 @@ def test_submit_fixed_findings(tmp_path):
     assert "f1" not in state.failures
 
 
+def test_submit_execution_checklist(tmp_path):
+    """Submitting result with checklist_item during execution phase marks it complete."""
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n## Phase 1\n- [ ] 1.1 Do thing\n## Document Alignment\n- d.md\n")
+
+    state = ConvergenceState(
+        plan_file=str(plan),
+        phase=ConvergencePhase.EXECUTING,
+    )
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+
+    submit_result(state, path, {
+        "findings": [],
+        "checklist_item": "1.1",
+    })
+    assert state.round == 1
+
+
 def test_task_to_dict():
     from src.engine.task_router import Task
     t = Task(

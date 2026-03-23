@@ -25,6 +25,8 @@ Repeat until done:
 1. Call `convergence_next_task(convergence_id)` to get your task
 2. Read the task:
    - **"audit"**: Read the listed files. Check each dimension listed. Report findings as JSON.
+   - **"doc_align"**: Read each alignment doc listed in metadata. Verify the plan conforms to it.
+   - **"execute"**: Build the checklist item (green-field). Write code, write tests, run tests. The metadata includes `checklist_item` ID and progress.
    - **"fix"**: Fix the specific finding. Run tests if test_command is provided.
    - **"test"**: Run the test command. Report pass/fail.
    - **"write"**: Write or update the specified file.
