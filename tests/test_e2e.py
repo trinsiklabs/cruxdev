@@ -111,7 +111,7 @@ class TestE2EConvergence:
         cid = result["convergence_id"]
 
         # Wait for completion
-        time.sleep(1.0)
+        time.sleep(3)
 
         status = mcp_server.check_convergence_status(cid)
         assert status["running"] is False

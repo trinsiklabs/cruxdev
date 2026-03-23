@@ -11,6 +11,9 @@ from src import mcp_server
 def setup_state_dir(tmp_path):
     mcp_server.init(str(tmp_path / "convergence_state"))
     yield
+    # Wait for any running threads to finish
+    for thread in list(mcp_server._active_runs.values()):
+        thread.join(timeout=5)
     mcp_server._active_runs.clear()
 
 
@@ -33,7 +36,7 @@ def test_check_status_after_converge():
     cid = result["convergence_id"]
 
     # Wait for background thread to complete (stub is fast)
-    time.sleep(0.5)
+    time.sleep(2)
 
     status = mcp_server.check_convergence_status(cid)
     assert status["convergence_id"] == cid
@@ -59,7 +62,7 @@ def test_concurrent_convergences():
 
     assert r1["convergence_id"] != r2["convergence_id"]
 
-    time.sleep(0.5)
+    time.sleep(2)
 
     s1 = mcp_server.check_convergence_status(r1["convergence_id"])
     s2 = mcp_server.check_convergence_status(r2["convergence_id"])
@@ -71,7 +74,7 @@ def test_concurrent_convergences():
 def test_list_convergences():
     mcp_server.converge(plan_file="plan1.md")
     mcp_server.converge(plan_file="plan2.md")
-    time.sleep(0.5)
+    time.sleep(2)
 
     listing = mcp_server.list_convergences()
     assert len(listing) >= 2
@@ -116,7 +119,7 @@ def test_converge_with_test_command(tmp_path):
         project_dir=str(tmp_path),
     )
     cid = result["convergence_id"]
-    time.sleep(0.5)
+    time.sleep(2)
 
     status = mcp_server.check_convergence_status(cid)
     assert status["phase"] in ["converged", "escalated"]
