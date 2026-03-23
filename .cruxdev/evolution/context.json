@@ -1,0 +1,32 @@
+{
+  "project": "cruxdev",
+  "cycle_count": 7,
+  "current_cycle": {
+    "cycle_id": 7,
+    "started_at": 1774300344.659073,
+    "completed_at": 1774300344.689694,
+    "beat": "complete",
+    "gathered": [
+      "22 changes, 0 issues, 0 inbox messages"
+    ],
+    "evaluated": [],
+    "integrated": [],
+    "posted": [
+      "changelog: /Users/user/personal/cruxdev/.cruxdev/evolution/posts/20260323-171224-changelog_entry.md",
+      "x_post: /Users/user/personal/cruxdev/.cruxdev/evolution/posts/20260323-171224-x_post.md"
+    ],
+    "engaged": [],
+    "error": null
+  },
+  "last_completed_at": 1774300344.689697,
+  "protected_files": [
+    "CLAUDE.md",
+    ".claude/CLAUDE.md",
+    "LICENSE",
+    "README.md",
+    "src/engine/convergence.py",
+    "src/engine/state.py",
+    "src/bus/broker.py"
+  ],
+  "north_star_goals": []
+}

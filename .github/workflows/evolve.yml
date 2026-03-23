@@ -1,0 +1,73 @@
+name: Autonomous Evolution
+
+on:
+  schedule:
+    # Run daily at 6 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (no code changes)'
+        required: false
+        default: 'true'
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Install dependencies
+        run: |
+          pip install pydantic anthropic httpx mcp
+
+      - name: Run evolution cycle
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python -c "
+          from src.evolution.orchestrator import EvolutionOrchestrator
+
+          dry_run = '${{ github.event.inputs.dry_run || 'true' }}' == 'true'
+
+          orch = EvolutionOrchestrator(
+              project_dir='.',
+              project_name='cruxdev',
+              github_repo='trinsiklabs/cruxdev',
+              dry_run=dry_run,
+          )
+
+          cycle = orch.run_cycle()
+
+          print(f'Cycle #{cycle.cycle_id} complete')
+          print(f'Beat: {cycle.beat}')
+          print(f'Gathered: {cycle.gathered}')
+          print(f'Evaluated: {len(cycle.evaluated)} items')
+          print(f'Integrated: {len(cycle.integrated)} changes')
+          print(f'Posted: {len(cycle.posted)} posts')
+          print(f'Engaged: {len(cycle.engaged)} actions')
+          if cycle.error:
+              print(f'Error: {cycle.error}')
+          "
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -q --tb=short --cov=src --cov-fail-under=100
+
+      - name: Commit evolution results
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name "CruxDev Evolution"
+          git config user.email "evolution@cruxdev.dev"
+          git add -A
+          git diff --staged --quiet || git commit -m "evolution: autonomous cycle $(date +%Y%m%d)"
+          git push
