@@ -98,9 +98,9 @@ def test_validate_checked_items(tmp_path):
     assert result.valid
 
 
-def test_validate_missing_alignment(tmp_path):
+def test_validate_missing_alignment_warns(tmp_path):
     plan = tmp_path / "plan.md"
-    plan.write_text("# Plan\n## Phase 1\n- [ ] item\npytest\nconvergence\n")
+    plan.write_text("# Build Plan for Testing Alignment\n\n## Phase 1: Setup\n\n- [ ] 1.1 Do the first task\n- [ ] 1.2 Run pytest to verify everything works\n\n## Convergence\n\nTwo consecutive clean passes required.\n")
     result = validate_plan(str(plan))
-    assert not result.valid
-    assert any("Document Alignment" in e for e in result.errors)
+    assert result.valid  # Warning, not error — new projects may not have docs
+    assert any("Document Alignment" in w for w in result.warnings)

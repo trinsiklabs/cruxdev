@@ -153,14 +153,24 @@ def get_next_task(
         )
 
     if state.phase == ConvergencePhase.DOC_ALIGNMENT:
+        # Extract alignment docs from the plan file
+        alignment_docs = _extract_alignment_docs(state.plan_file)
+
+        # No alignment docs → auto-advance (new project, nothing to align against)
+        if not alignment_docs:
+            state.phase = ConvergencePhase.VIABILITY
+            state.round = 0
+            state.consecutive_clean = 0
+            save_state(state, state_path)
+            return get_next_task(state, state_path, source_files, doc_files, test_command)
+
         if check_convergence(state):
             state.phase = ConvergencePhase.VIABILITY
             state.round = 0
             state.consecutive_clean = 0
             save_state(state, state_path)
             return get_next_task(state, state_path, source_files, doc_files, test_command)
-        # Extract alignment docs from the plan file
-        alignment_docs = _extract_alignment_docs(state.plan_file)
+
         return Task(
             task_type="doc_align",
             description=(

@@ -60,9 +60,10 @@ def validate_plan(plan_path: str) -> PlanValidationResult:
 
     # Must have Document Alignment section
     if not re.search(r"##\s+Document Alignment", content, re.IGNORECASE):
-        result.errors.append(
-            "Plan must have a '## Document Alignment' section listing product docs "
-            "and memory files the plan must conform to"
+        result.warnings.append(
+            "Plan has no '## Document Alignment' section. If this project has product docs "
+            "or memory files with decisions the plan must respect, list them. "
+            "For new projects with no existing docs, add the section with 'None — new project'."
         )
 
     # Check for empty plan
@@ -117,6 +118,10 @@ def get_plan_template(goal: str) -> str:
 
 ### Memory Files (captured decisions this plan must respect):
 - [path/to/memory_file.md] — [what decision it captures]
+
+<!-- For new projects with no existing docs, replace the lists above with:
+     None — new project, no existing product docs or decisions to align against.
+     The engine will skip the document alignment phase. -->
 
 ---
 
