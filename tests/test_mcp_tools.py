@@ -208,7 +208,7 @@ def test_install_cruxdev_tool(tmp_path):
     from src.mcp_server import install_cruxdev
     result = json.loads(install_cruxdev(str(tmp_path)))
     assert result["status"] == "installed"
-    assert os.path.exists(os.path.join(str(tmp_path), ".claude", "mcp.json"))
+    assert os.path.exists(os.path.join(str(tmp_path), ".mcp.json"))
 
 
 def test_convergence_next_task_with_files(tmp_path):

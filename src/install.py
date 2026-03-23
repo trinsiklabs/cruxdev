@@ -30,11 +30,10 @@ def install(project_dir: str = ".") -> dict:
     Returns dict with status and what was done.
     """
     project_dir = os.path.abspath(project_dir)
-    claude_dir = os.path.join(project_dir, ".claude")
-    mcp_json_path = os.path.join(claude_dir, "mcp.json")
+    # Claude Code reads MCP config from .mcp.json at project root (not .claude/mcp.json)
+    mcp_json_path = os.path.join(project_dir, ".mcp.json")
     state_dir = os.path.join(project_dir, ".cruxdev")
 
-    os.makedirs(claude_dir, exist_ok=True)
     os.makedirs(state_dir, exist_ok=True)
 
     # Load existing config or create new
@@ -62,7 +61,7 @@ def install(project_dir: str = ".") -> dict:
 
     items = [
         f"Created .cruxdev/ in {project_dir}",
-        f"Added cruxdev to .claude/mcp.json",
+        f"Added cruxdev to .mcp.json",
         f"CruxDev root: {CRUXDEV_ROOT}",
         f"Python: {get_python_path()}",
     ]
@@ -80,15 +79,15 @@ def install(project_dir: str = ".") -> dict:
 
 
 def uninstall(project_dir: str = ".") -> dict:
-    """Remove CruxDev from a project's .claude/mcp.json.
+    """Remove CruxDev from a project's .mcp.json.
 
     Does not delete .cruxdev/ state — preserves convergence history.
     """
     project_dir = os.path.abspath(project_dir)
-    mcp_json_path = os.path.join(project_dir, ".claude", "mcp.json")
+    mcp_json_path = os.path.join(project_dir, ".mcp.json")
 
     if not os.path.exists(mcp_json_path):
-        return {"status": "not_installed", "message": "No .claude/mcp.json found"}
+        return {"status": "not_installed", "message": "No .mcp.json found"}
 
     with open(mcp_json_path) as f:
         config = json.load(f)

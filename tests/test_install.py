@@ -12,7 +12,7 @@ def test_install_fresh_project(tmp_path):
     result = install(str(tmp_path))
     assert result["status"] == "installed"
 
-    mcp_path = tmp_path / ".claude" / "mcp.json"
+    mcp_path = tmp_path / ".mcp.json"
     assert mcp_path.exists()
 
     with open(mcp_path) as f:
@@ -23,9 +23,7 @@ def test_install_fresh_project(tmp_path):
 
 
 def test_install_preserves_existing_servers(tmp_path):
-    claude_dir = tmp_path / ".claude"
-    claude_dir.mkdir()
-    mcp_path = claude_dir / "mcp.json"
+    mcp_path = tmp_path / ".mcp.json"
     mcp_path.write_text(json.dumps({
         "mcpServers": {
             "crux": {"command": "python", "args": ["-m", "crux_server"]},
@@ -51,17 +49,16 @@ def test_install_idempotent(tmp_path):
     install(str(tmp_path))
     install(str(tmp_path))
 
-    mcp_path = tmp_path / ".claude" / "mcp.json"
+    mcp_path = tmp_path / ".mcp.json"
     with open(mcp_path) as f:
         config = json.load(f)
-    # Should still have exactly one cruxdev entry
     assert "cruxdev" in config["mcpServers"]
 
 
 def test_install_has_correct_config(tmp_path):
     install(str(tmp_path))
 
-    mcp_path = tmp_path / ".claude" / "mcp.json"
+    mcp_path = tmp_path / ".mcp.json"
     with open(mcp_path) as f:
         config = json.load(f)
 
@@ -76,7 +73,7 @@ def test_uninstall(tmp_path):
     result = uninstall(str(tmp_path))
     assert result["status"] == "uninstalled"
 
-    mcp_path = tmp_path / ".claude" / "mcp.json"
+    mcp_path = tmp_path / ".mcp.json"
     with open(mcp_path) as f:
         config = json.load(f)
     assert "cruxdev" not in config["mcpServers"]
@@ -88,9 +85,7 @@ def test_uninstall_not_installed(tmp_path):
 
 
 def test_uninstall_not_in_config(tmp_path):
-    claude_dir = tmp_path / ".claude"
-    claude_dir.mkdir()
-    (claude_dir / "mcp.json").write_text(json.dumps({"mcpServers": {}}))
+    (tmp_path / ".mcp.json").write_text(json.dumps({"mcpServers": {}}))
 
     result = uninstall(str(tmp_path))
     assert result["status"] == "not_installed"
