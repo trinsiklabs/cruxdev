@@ -74,10 +74,14 @@ cruxdev/
 | `docs/ADOPTION_PLAYBOOK.md` | Detailed 9-phase adoption playbook |
 | `docs/CruxDev.md` | Design document — architecture, engine specs |
 | `docs/SESSION_UPGRADE.md` | Guide for leveling up active sessions |
+| `docs/WEBSITE_PLANNING.md` | Universal website planning methodology |
+| `docs/COMPETITORS_PATTERN.md` | Competitive intelligence methodology |
 | `build_plans/CRUX_ECOSYSTEM_PLAN.md` | Master plan — what to build, in what order |
 
 ## Conventions
 
 - **All documentation** lives in `docs/`. Not root.
 - **All build plans** live in `build_plans/`. Not root. Named `BUILD_PLAN_NNN_SLUG.md`.
+- **Every project with competitors** has `docs/COMPETITORS.md`.
+- **Every project with a website** has `docs/DEPLOYMENT.md`.
 - These conventions apply to every CruxDev-managed project.
