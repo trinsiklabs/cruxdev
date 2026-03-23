@@ -91,6 +91,26 @@ def test_uninstall_not_in_config(tmp_path):
     assert result["status"] == "not_installed"
 
 
+def test_install_with_corrupt_settings(tmp_path):
+    claude_dir = tmp_path / ".claude"
+    claude_dir.mkdir()
+    (claude_dir / "settings.local.json").write_text("not json")
+    result = install(str(tmp_path))
+    assert result["status"] == "installed"
+
+
+def test_install_adds_hook(tmp_path):
+    result = install(str(tmp_path))
+    settings_path = tmp_path / ".claude" / "settings.local.json"
+    assert settings_path.exists()
+    import json
+    with open(settings_path) as f:
+        settings = json.load(f)
+    assert "hooks" in settings
+    assert "PostToolUse" in settings["hooks"]
+    assert len(settings["hooks"]["PostToolUse"]) >= 1
+
+
 def test_uninstall_preserves_cruxdev_state(tmp_path):
     install(str(tmp_path))
     state_dir = tmp_path / ".cruxdev"

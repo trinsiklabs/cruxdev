@@ -59,9 +59,36 @@ def install(project_dir: str = ".") -> dict:
     with open(mcp_json_path, "w") as f:
         json.dump(existing, f, indent=2)
 
+    # Install session bus hook for push notifications
+    project_name = os.path.basename(project_dir)
+    hook_script = os.path.join(CRUXDEV_ROOT, "src", "bus", "hook_runner.py")
+    settings_path = os.path.join(project_dir, ".claude", "settings.local.json")
+    os.makedirs(os.path.dirname(settings_path), exist_ok=True)
+
+    settings = {}
+    if os.path.exists(settings_path):
+        with open(settings_path) as f:
+            try:
+                settings = json.load(f)
+            except json.JSONDecodeError:
+                settings = {}
+
+    hooks = settings.get("hooks", {})
+    post_tool = hooks.get("PostToolUse", [])
+
+    # Add bus hook if not already present
+    hook_cmd = f"{get_python_path()} {hook_script} {project_name}"
+    if not any(hook_cmd in str(h) for h in post_tool):
+        post_tool.append({"command": hook_cmd})
+        hooks["PostToolUse"] = post_tool
+        settings["hooks"] = hooks
+        with open(settings_path, "w") as f:
+            json.dump(settings, f, indent=2)
+
     items = [
         f"Created .cruxdev/ in {project_dir}",
         f"Added cruxdev to .mcp.json",
+        f"Added session bus hook to .claude/settings.local.json",
         f"CruxDev root: {CRUXDEV_ROOT}",
         f"Python: {get_python_path()}",
     ]

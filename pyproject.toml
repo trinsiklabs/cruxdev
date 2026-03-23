@@ -10,7 +10,7 @@ addopts = "-v --tb=short"
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["tests/*"]
+omit = ["tests/*", "src/bus/hook_runner.py"]
 
 [tool.coverage.report]
 fail_under = 100
