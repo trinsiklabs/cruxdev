@@ -1,0 +1,45 @@
+{
+  "plan_file": "/Users/user/.claude/plans/eager-fluttering-trinket.md",
+  "phase": "executing",
+  "round": 0,
+  "max_rounds": 5,
+  "consecutive_clean": 0,
+  "convergence_threshold": 2,
+  "failures": {},
+  "max_failures": 3,
+  "deadline": 1774288190.632185,
+  "timeout_per_task": 900.0,
+  "history": [
+    {
+      "round": 0,
+      "phase": "planning",
+      "findings": [],
+      "findings_fixed": 0,
+      "timestamp": 1774259401.7019122
+    },
+    {
+      "round": 1,
+      "phase": "planning",
+      "findings": [],
+      "findings_fixed": 0,
+      "timestamp": 1774259410.13824
+    },
+    {
+      "round": 0,
+      "phase": "plan_auditing",
+      "findings": [],
+      "findings_fixed": 0,
+      "timestamp": 1774259427.473165
+    },
+    {
+      "round": 1,
+      "phase": "plan_auditing",
+      "findings": [],
+      "findings_fixed": 0,
+      "timestamp": 1774259434.903987
+    }
+  ],
+  "escalation_reason": null,
+  "created_at": 1774259390.6321971,
+  "updated_at": 1774259442.846504
+}

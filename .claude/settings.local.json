@@ -98,7 +98,8 @@
       "Bash(pkill -9 -f pytest)",
       "Bash(pkill -9 -f pipenv)",
       "Bash(/opt/homebrew/opt/python@3.14/libexec/bin/python3.14 -m pytest tests/engine/ tests/dispatch/ tests/improvement/ tests/test_architecture.py tests/test_install.py tests/test_mcp_tools.py -q --tb=short --cov=src --cov-report=term-missing)",
-      "Bash(/opt/homebrew/opt/python@3.14/bin/python3.14 -m pytest tests/engine/ tests/dispatch/ tests/improvement/ tests/test_architecture.py tests/test_install.py tests/test_mcp_tools.py -q --cov=src --cov-report=term-missing --cov-fail-under=100)"
+      "Bash(/opt/homebrew/opt/python@3.14/bin/python3.14 -m pytest tests/engine/ tests/dispatch/ tests/improvement/ tests/test_architecture.py tests/test_install.py tests/test_mcp_tools.py -q --cov=src --cov-report=term-missing --cov-fail-under=100)",
+      "Bash(git push:*)"
     ]
   }
 }
