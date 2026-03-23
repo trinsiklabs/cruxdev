@@ -66,6 +66,13 @@ def validate_plan(plan_path: str) -> PlanValidationResult:
             "For new projects with no existing docs, add the section with 'None — new project'."
         )
 
+    # Should have post-execution convergence section
+    if not re.search(r"Post-Execution Convergence|Documentation convergence|Website convergence", content, re.IGNORECASE):
+        result.warnings.append(
+            "Plan has no post-execution convergence checklist. Every plan should include: "
+            "documentation convergence, website convergence, deployment, patterns update, inbox check."
+        )
+
     # Check for empty plan
     if len(content.strip()) < 50:
         result.errors.append("Plan is too short (< 50 characters)")
@@ -132,10 +139,20 @@ def get_plan_template(goal: str) -> str:
 [test command here]
 ```
 
+## Post-Execution Convergence (Mandatory)
+
+- [ ] Documentation convergence: audit all docs against code, two clean passes
+- [ ] Website convergence (if applicable): update metrics, audit content accuracy, two clean passes
+- [ ] Deployment (if applicable): deploy per docs/DEPLOYMENT.md
+- [ ] Patterns update: capture learnings if novel
+- [ ] Inbox check: process messages from other sessions
+
 ## Convergence Criteria
 
-- All checklist items complete
+- All checklist items complete (including post-execution items above)
 - All tests pass
 - Coverage ≥ 100%
 - Two consecutive clean audit passes
+- Documentation verified against code
+- Website metrics current (if applicable)
 """
