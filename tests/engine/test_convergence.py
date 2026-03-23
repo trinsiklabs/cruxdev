@@ -114,6 +114,68 @@ def test_check_max_rounds_exceeded():
     assert check_max_rounds(s) is True
 
 
+def test_check_max_rounds_execution_phase_auto_scales(tmp_path):
+    """Execution phase scales max_rounds to 2x checklist items."""
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n## Phase 1\n" + "".join(
+        f"- [ ] 1.{i} Item {i}\n" for i in range(20)
+    ))
+    s = ConvergenceState(
+        plan_file=str(plan),
+        phase=ConvergencePhase.EXECUTING,
+        round=10,
+        max_rounds=5,
+    )
+    # 20 items * 2 = 40 limit. Round 10 < 40 → not exceeded
+    assert check_max_rounds(s) is False
+
+
+def test_check_max_rounds_execution_phase_escalates_at_2x(tmp_path):
+    """Execution escalates at max(2x total items, max_rounds)."""
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n## Phase 1\n- [ ] 1.1 Item\n- [ ] 1.2 Item\n")
+    s = ConvergenceState(
+        plan_file=str(plan),
+        phase=ConvergencePhase.EXECUTING,
+        round=5,  # max(2*2, 5) = 5 → at limit
+        max_rounds=5,
+    )
+    assert check_max_rounds(s) is True
+
+
+def test_check_max_rounds_execution_no_plan_uses_default():
+    """If plan file missing, execution uses max(max_rounds*2, max_rounds) = max_rounds*2."""
+    s = ConvergenceState(
+        plan_file="/nonexistent.md",
+        phase=ConvergencePhase.EXECUTING,
+        round=10,  # max(5*2, 5) = 10
+        max_rounds=5,
+    )
+    assert check_max_rounds(s) is True
+
+
+def test_check_max_rounds_viability_uses_3():
+    """Viability phase caps at 3 rounds."""
+    s = ConvergenceState(
+        plan_file="p.md",
+        phase=ConvergencePhase.VIABILITY,
+        round=3,
+        max_rounds=10,
+    )
+    assert check_max_rounds(s) is True
+
+
+def test_check_max_rounds_patterns_update_uses_3():
+    """Patterns update phase caps at 3 rounds."""
+    s = ConvergenceState(
+        plan_file="p.md",
+        phase=ConvergencePhase.PATTERNS_UPDATE,
+        round=3,
+        max_rounds=10,
+    )
+    assert check_max_rounds(s) is True
+
+
 # --- Net negative ---
 
 

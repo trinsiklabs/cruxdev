@@ -50,9 +50,37 @@ def check_timeout(state: ConvergenceState) -> bool:
     return time.time() > state.deadline
 
 
+PHASE_MAX_ROUNDS: dict[str, int] = {
+    "planning": 0,          # Uses state.max_rounds
+    "plan_auditing": 0,     # Uses state.max_rounds
+    "doc_alignment": 0,     # Uses state.max_rounds
+    "viability": 3,
+    "executing": -1,        # -1 = auto-scale from checklist items
+    "code_auditing": 0,     # Uses state.max_rounds
+    "doc_auditing": 0,      # Uses state.max_rounds
+    "e2e_testing": 0,       # Uses state.max_rounds
+    "patterns_update": 3,
+}
+
+
 def check_max_rounds(state: ConvergenceState) -> bool:
-    """Integer comparison. Code, not LLM."""
-    return state.round >= state.max_rounds
+    """Phase-aware max rounds check. Code, not LLM.
+
+    Execution phase uses auto-scaling: total_items * 2 as safety valve.
+    Other phases use state.max_rounds or phase-specific limits.
+    """
+    phase_limit = PHASE_MAX_ROUNDS.get(state.phase.value, 0)
+
+    if phase_limit == -1:
+        # Auto-scale for execution: safety valve at 2x checklist items
+        from .checklist_parser import parse_checklist
+        items = parse_checklist(state.plan_file)
+        total = len(items) if items else state.max_rounds
+        limit = max(total * 2, state.max_rounds)
+        return state.round >= limit
+
+    limit = phase_limit if phase_limit > 0 else state.max_rounds
+    return state.round >= limit
 
 
 def check_net_negative(state: ConvergenceState) -> bool:
