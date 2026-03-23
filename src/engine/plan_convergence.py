@@ -49,7 +49,10 @@ def run_plan_convergence(
     Audits the plan file, fixes issues, repeats until
     two consecutive clean passes or escalation.
     """
-    state.phase = ConvergencePhase.PLAN_AUDITING
+    # Don't override phase — let the runner control it
+    # Only set if not already in a valid auditing phase
+    if state.phase not in (ConvergencePhase.PLAN_AUDITING, ConvergencePhase.DOC_ALIGNMENT):
+        state.phase = ConvergencePhase.PLAN_AUDITING
     state.round = 0
     state.consecutive_clean = 0
 
