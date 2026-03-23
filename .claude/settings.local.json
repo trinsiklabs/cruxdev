@@ -90,7 +90,12 @@
       "Bash(npm create:*)",
       "Bash(npx astro:*)",
       "Bash(npm run:*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "Bash(/opt/homebrew/opt/python@3.14/libexec/bin/python -m pytest tests/ --tb=short -q --no-header)",
+      "Bash(pkill -f \"python.*pytest\")",
+      "Bash(pkill -f python.*pytest)",
+      "Bash(pkill -f pytest)",
+      "Bash(pkill -9 -f pytest)"
     ]
   }
 }

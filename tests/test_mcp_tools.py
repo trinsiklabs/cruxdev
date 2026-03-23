@@ -52,7 +52,7 @@ def test_create_plan_template():
 
 def test_validate_plan_structure_valid(tmp_path):
     plan = tmp_path / "plan.md"
-    plan.write_text("# Build Plan for Feature X\n\n## Phase 1: Implementation\n\n- [ ] Write the code\n- [ ] Run pytest to verify\n\n## Convergence\n\nTwo consecutive clean passes required.\n")
+    plan.write_text("# Build Plan for Feature X\n\n## Phase 1: Implementation\n\n- [ ] Write the code\n- [ ] Run pytest to verify\n\n## Document Alignment\n\n- docs/DESIGN.md — design spec\n\n## Convergence\n\nTwo consecutive clean passes required.\n")
     result = validate_plan_structure(str(plan))
     data = json.loads(result)
     assert data["valid"] is True

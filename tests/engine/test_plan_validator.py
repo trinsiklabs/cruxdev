@@ -17,6 +17,8 @@ def test_validate_good_plan(tmp_path):
 ## Phase 1: Setup
 - [ ] 1.1 Do the thing
 - [ ] 1.2 Run pytest tests
+## Document Alignment
+- docs/DESIGN.md — design spec
 ## Convergence
 Two consecutive clean passes.
 """)
@@ -86,10 +88,19 @@ def test_get_plan_template():
     assert "Phase 1" in t
     assert "convergence" in t.lower()
     assert "coverage" in t.lower()
+    assert "Document Alignment" in t
 
 
 def test_validate_checked_items(tmp_path):
     plan = tmp_path / "plan.md"
-    plan.write_text("# Plan\n## Phase 1\n- [x] done item\n- [ ] todo item\npytest\nconvergence\n")
+    plan.write_text("# Plan\n## Phase 1\n- [x] done item\n- [ ] todo item\npytest\nconvergence\n## Document Alignment\n- doc.md\n")
     result = validate_plan(str(plan))
     assert result.valid
+
+
+def test_validate_missing_alignment(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n## Phase 1\n- [ ] item\npytest\nconvergence\n")
+    result = validate_plan(str(plan))
+    assert not result.valid
+    assert any("Document Alignment" in e for e in result.errors)

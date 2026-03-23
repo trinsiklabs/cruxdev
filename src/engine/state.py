@@ -13,6 +13,7 @@ import time
 class ConvergencePhase(Enum):
     PLANNING = "planning"
     PLAN_AUDITING = "plan_auditing"
+    DOC_ALIGNMENT = "doc_alignment"
     VIABILITY = "viability"
     EXECUTING = "executing"
     CODE_AUDITING = "code_auditing"

@@ -58,6 +58,13 @@ def validate_plan(plan_path: str) -> PlanValidationResult:
     if not re.search(r"converge|convergence|clean pass|coverage", content, re.IGNORECASE):
         result.warnings.append("Plan does not reference convergence criteria")
 
+    # Must have Document Alignment section
+    if not re.search(r"##\s+Document Alignment", content, re.IGNORECASE):
+        result.errors.append(
+            "Plan must have a '## Document Alignment' section listing product docs "
+            "and memory files the plan must conform to"
+        )
+
     # Check for empty plan
     if len(content.strip()) < 50:
         result.errors.append("Plan is too short (< 50 characters)")
@@ -100,6 +107,16 @@ def get_plan_template(goal: str) -> str:
 - [ ] 2.1 [First task]
 - [ ] 2.2 [Second task]
 - [ ] 2.3 Tests pass, coverage ≥ 100%
+
+---
+
+## Document Alignment
+
+### Product Docs (this plan must conform to):
+- [path/to/relevant_doc.md] — [what decisions it contains]
+
+### Memory Files (captured decisions this plan must respect):
+- [path/to/memory_file.md] — [what decision it captures]
 
 ---
 

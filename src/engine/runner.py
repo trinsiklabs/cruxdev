@@ -59,6 +59,11 @@ class ConvergenceRunner:
         elif phase == ConvergencePhase.PLAN_AUDITING:
             run_plan_convergence(self.state, self.llm, self.state_path)
 
+        elif phase == ConvergencePhase.DOC_ALIGNMENT:
+            # Doc alignment uses the same audit pattern as plan convergence
+            # but audits the plan against external docs
+            run_plan_convergence(self.state, self.llm, self.state_path)
+
         elif phase == ConvergencePhase.VIABILITY:
             # Viability check — advance if plan converged
             pass

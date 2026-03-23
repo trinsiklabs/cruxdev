@@ -5,6 +5,8 @@ and processes the results. This module maps engine state to tasks.
 """
 
 import json
+import os
+import re
 import time
 from dataclasses import dataclass
 from typing import Optional
@@ -137,7 +139,7 @@ def get_next_task(
 
     if state.phase == ConvergencePhase.PLAN_AUDITING:
         if check_convergence(state):
-            state.phase = ConvergencePhase.VIABILITY
+            state.phase = ConvergencePhase.DOC_ALIGNMENT
             state.round = 0
             state.consecutive_clean = 0
             save_state(state, state_path)
@@ -148,6 +150,28 @@ def get_next_task(
             files=[state.plan_file],
             dimensions=PLAN_DIMENSIONS,
             recommended_tier=phase_tier or "fast",
+        )
+
+    if state.phase == ConvergencePhase.DOC_ALIGNMENT:
+        if check_convergence(state):
+            state.phase = ConvergencePhase.VIABILITY
+            state.round = 0
+            state.consecutive_clean = 0
+            save_state(state, state_path)
+            return get_next_task(state, state_path, source_files, doc_files, test_command)
+        # Extract alignment docs from the plan file
+        alignment_docs = _extract_alignment_docs(state.plan_file)
+        return Task(
+            task_type="doc_align",
+            description=(
+                f"Document alignment audit (round {state.round}). "
+                f"Read each alignment doc and verify the plan conforms to it. "
+                f"Check: decisions, constraints, requirements, pricing rules, feature specs."
+            ),
+            files=[state.plan_file] + alignment_docs,
+            dimensions=["doc_alignment"],
+            recommended_tier="standard",
+            metadata={"alignment_docs": alignment_docs},
         )
 
     if state.phase == ConvergencePhase.VIABILITY:
@@ -225,6 +249,46 @@ def get_next_task(
         description=f"Unknown phase: {state.phase.value}",
         files=[], dimensions=[],
     )
+
+
+def _extract_alignment_docs(plan_file: str) -> list[str]:
+    """Extract alignment doc paths from a build plan's Document Alignment section.
+
+    Looks for a table or list of doc paths under ## Document Alignment.
+    Returns list of file paths found.
+    """
+    try:
+        with open(plan_file) as f:
+            content = f.read()
+    except (FileNotFoundError, OSError):
+        return []
+
+    # Find the Document Alignment section
+    match = re.search(
+        r"##\s+Document Alignment\s*\n(.*?)(?=\n##\s|\Z)",
+        content,
+        re.DOTALL,
+    )
+    if not match:
+        return []
+
+    section = match.group(1)
+
+    # Extract file paths from the section
+    # Matches: paths in table cells, after | or -, or in backticks
+    paths = []
+    for line in section.split("\n"):
+        # Table format: | ... | path/to/file.md |
+        for cell_match in re.finditer(r'[\|`]\s*([a-zA-Z0-9_/.:-]+\.md)\s*[\|`]', line):
+            path = cell_match.group(1).strip()
+            if path and not path.startswith("---"):
+                paths.append(path)
+        # List format: - path/to/file.md — description
+        list_match = re.match(r'\s*[-*]\s+([a-zA-Z0-9_/.:-]+\.md)', line)
+        if list_match:
+            paths.append(list_match.group(1))
+
+    return list(dict.fromkeys(paths))  # Dedupe preserving order
 
 
 def submit_result(

@@ -6,7 +6,7 @@ import pytest
 
 from src.engine.persistence import save_state
 from src.engine.state import ConvergencePhase, ConvergenceState
-from src.engine.task_router import get_next_task, submit_result
+from src.engine.task_router import get_next_task, submit_result, _extract_alignment_docs
 
 
 def test_planning_phase_returns_write_task(tmp_path):
@@ -29,7 +29,7 @@ def test_plan_auditing_returns_audit_task(tmp_path):
     assert "plan" in task.description.lower()
 
 
-def test_plan_auditing_converges_to_viability(tmp_path):
+def test_plan_auditing_converges_to_doc_alignment(tmp_path):
     state = ConvergenceState(
         plan_file="plan.md",
         phase=ConvergencePhase.PLAN_AUDITING,
@@ -39,12 +39,8 @@ def test_plan_auditing_converges_to_viability(tmp_path):
     save_state(state, path)
 
     task = get_next_task(state, path)
-    # Should advance past viability → executing → code_auditing
-    assert state.phase in (
-        ConvergencePhase.CODE_AUDITING,
-        ConvergencePhase.VIABILITY,
-        ConvergencePhase.EXECUTING,
-    )
+    # Plan auditing now converges to doc_alignment (new gate)
+    assert state.phase == ConvergencePhase.DOC_ALIGNMENT
 
 
 def test_code_auditing_returns_audit_task(tmp_path):
@@ -303,6 +299,96 @@ def test_task_to_dict_with_tier():
     t = Task(task_type="audit", description="d", files=[], dimensions=[], recommended_tier="fast")
     d = t.to_dict()
     assert d["recommended_tier"] == "fast"
+
+
+# --- Doc alignment ---
+
+
+def test_doc_alignment_phase(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n## Document Alignment\n- docs/design.md — spec\n")
+    state = ConvergenceState(plan_file=str(plan), phase=ConvergencePhase.DOC_ALIGNMENT)
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+
+    task = get_next_task(state, path)
+    assert task.task_type == "doc_align"
+    assert "alignment" in task.description.lower()
+    assert task.recommended_tier == "standard"
+
+
+def test_doc_alignment_converges_to_viability(tmp_path):
+    state = ConvergenceState(
+        plan_file="plan.md",
+        phase=ConvergencePhase.DOC_ALIGNMENT,
+        consecutive_clean=2,
+    )
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+
+    task = get_next_task(state, path)
+    # Should advance past doc_alignment → viability → executing → code_auditing
+    assert state.phase in (
+        ConvergencePhase.VIABILITY,
+        ConvergencePhase.EXECUTING,
+        ConvergencePhase.CODE_AUDITING,
+    )
+
+
+# --- Alignment doc extraction ---
+
+
+def test_extract_alignment_docs_list(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("""# Plan
+## Document Alignment
+- docs/DESIGN.md — design spec
+- docs/PRICING.md — pricing rules
+- memory/badges.md — badge requirements
+## Next Section
+""")
+    docs = _extract_alignment_docs(str(plan))
+    assert "docs/DESIGN.md" in docs
+    assert "docs/PRICING.md" in docs
+    assert "memory/badges.md" in docs
+
+
+def test_extract_alignment_docs_table(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("""# Plan
+## Document Alignment
+
+| Doc | Purpose | Path |
+|-----|---------|------|
+| Design | spec | `docs/DESIGN.md` |
+| Pricing | tiers | `docs/PRICING.md` |
+""")
+    docs = _extract_alignment_docs(str(plan))
+    assert "docs/DESIGN.md" in docs
+    assert "docs/PRICING.md" in docs
+
+
+def test_extract_alignment_docs_missing_section(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n## Phase 1\n- [ ] do stuff\n")
+    docs = _extract_alignment_docs(str(plan))
+    assert docs == []
+
+
+def test_extract_alignment_docs_missing_file():
+    docs = _extract_alignment_docs("/nonexistent/plan.md")
+    assert docs == []
+
+
+def test_extract_alignment_docs_dedupes(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("""# Plan
+## Document Alignment
+- docs/DESIGN.md — first reference
+- docs/DESIGN.md — duplicate reference
+""")
+    docs = _extract_alignment_docs(str(plan))
+    assert docs.count("docs/DESIGN.md") == 1
 
 
 def test_task_to_dict_minimal():

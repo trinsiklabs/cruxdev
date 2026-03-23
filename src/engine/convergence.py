@@ -19,6 +19,7 @@ from .state import (
 PHASE_ORDER = [
     ConvergencePhase.PLANNING,
     ConvergencePhase.PLAN_AUDITING,
+    ConvergencePhase.DOC_ALIGNMENT,
     ConvergencePhase.VIABILITY,
     ConvergencePhase.EXECUTING,
     ConvergencePhase.CODE_AUDITING,

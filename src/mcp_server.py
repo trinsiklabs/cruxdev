@@ -152,6 +152,7 @@ def validate_plan_structure(plan_file: str) -> str:
     Validates (errors = must fix):
     - Has a title (# heading)
     - Has checklist items (- [ ] task)
+    - Has a Document Alignment section (lists product docs the plan must conform to)
     - Not too short (> 50 chars)
 
     Warns (should fix):
@@ -185,7 +186,8 @@ def start_convergence(
 
     This begins the convergence loop. The engine will guide you through:
     1. Plan auditing (is the plan complete and feasible?)
-    2. Code auditing (8 dimensions: correctness, security, tests, etc.)
+    2. Document alignment (does the plan conform to product docs and decisions?)
+    3. Code auditing (8 dimensions: correctness, security, tests, etc.)
     3. Doc auditing (5 dimensions: accuracy, completeness, etc.)
     4. E2E testing (run the test suite)
     5. Convergence (two consecutive clean passes)

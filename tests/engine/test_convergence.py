@@ -54,7 +54,7 @@ def test_advance_phase_at_converged():
 
 
 def test_phase_order_length():
-    assert len(PHASE_ORDER) == 9
+    assert len(PHASE_ORDER) == 10
     assert PHASE_ORDER[0] == ConvergencePhase.PLANNING
     assert PHASE_ORDER[-1] == ConvergencePhase.CONVERGED
 
