@@ -166,13 +166,13 @@ def test_convergence_cancel(tmp_path):
 def test_full_convergence_loop(tmp_path):
     """Simulate a full convergence loop: start → submit clean passes → done."""
     plan = tmp_path / "plan.md"
-    plan.write_text("# Plan\n- [ ] item\npytest\nconvergence\n")
+    plan.write_text("# Plan\n- [x] 1.1 Already done\npytest\nconvergence\n")
 
     start = json.loads(start_convergence(str(plan)))
     cid = start["convergence_id"]
 
-    # Drive through planning phase
-    for _ in range(10):
+    # Drive through all phases — each needs 2 clean passes
+    for _ in range(30):
         task = json.loads(convergence_next_task(cid))
         if task["task"]["task_type"] in ("done", "escalated"):
             break

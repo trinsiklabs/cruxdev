@@ -19,6 +19,37 @@ def test_planning_phase_returns_write_task(tmp_path):
     assert "plan" in task.description.lower()
 
 
+def test_planning_converges_to_plan_auditing(tmp_path):
+    """After 2 clean passes in PLANNING, advance to PLAN_AUDITING."""
+    state = ConvergenceState(
+        plan_file="plan.md",
+        phase=ConvergencePhase.PLANNING,
+        consecutive_clean=2,
+    )
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+
+    task = get_next_task(state, path)
+    # Should have advanced past PLANNING
+    assert state.phase != ConvergencePhase.PLANNING
+    assert task.task_type != "write"
+
+
+def test_planning_does_not_advance_before_convergence(tmp_path):
+    """With only 1 clean pass, PLANNING stays in PLANNING."""
+    state = ConvergenceState(
+        plan_file="plan.md",
+        phase=ConvergencePhase.PLANNING,
+        consecutive_clean=1,
+    )
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+
+    task = get_next_task(state, path)
+    assert state.phase == ConvergencePhase.PLANNING
+    assert task.task_type == "write"
+
+
 def test_plan_auditing_returns_audit_task(tmp_path):
     state = ConvergenceState(plan_file="plan.md", phase=ConvergencePhase.PLAN_AUDITING)
     path = str(tmp_path / "state.json")

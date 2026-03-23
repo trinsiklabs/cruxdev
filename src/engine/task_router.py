@@ -129,6 +129,12 @@ def get_next_task(
     phase_tier = PHASE_MODEL_TIERS.get(state.phase.value)
 
     if state.phase == ConvergencePhase.PLANNING:
+        if check_convergence(state):
+            state.phase = ConvergencePhase.PLAN_AUDITING
+            state.round = 0
+            state.consecutive_clean = 0
+            save_state(state, state_path)
+            return get_next_task(state, state_path, source_files, doc_files, test_command)
         return Task(
             task_type="write",
             description="Create or refine the build plan. Follow the methodology from get_methodology().",
