@@ -54,6 +54,7 @@ After the engine reports "done", you MUST complete these additional steps:
      - What's the domain and DNS provider?
    - Write `docs/DEPLOYMENT.md` from the answers, then deploy
 4. **Patterns update**: Capture learnings in DEVELOPMENT_PATTERNS_CRUXDEV.md if novel.
+5. **Inbox check**: Call `check_inbox()` to see if other sessions reported issues or improvements for this project. Handle any that apply. Acknowledge all.
 
 ### Step 4: Report
 

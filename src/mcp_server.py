@@ -359,6 +359,206 @@ def convergence_cancel(convergence_id: str) -> str:
     })
 
 
+# --- Session bus tools ---
+
+
+def _get_broker():  # pragma: no cover — monkeypatched in tests
+    from .bus.broker import Broker
+    return Broker()
+
+
+@mcp.tool()
+def session_register(project_name: str) -> str:
+    """Register this session with the CruxDev session bus.
+
+    Call this at the start of a session so other sessions can discover you
+    and send you messages. Returns your session ID.
+
+    Args:
+        project_name: Name of the project you're working on (e.g., "crux", "cruxcli")
+    """
+    broker = _get_broker()
+    session_id = broker.register_session(project_name, os.getcwd())
+    return json.dumps({
+        "session_id": session_id,
+        "project": project_name,
+        "status": "registered",
+    })
+
+
+@mcp.tool()
+def session_list() -> str:
+    """List all active CruxDev sessions across all projects.
+
+    Shows what sessions are running, which projects they're in,
+    and when they last checked in.
+    """
+    broker = _get_broker()
+    sessions = broker.list_sessions()
+    return json.dumps([
+        {
+            "id": s.id,
+            "project": s.project,
+            "directory": s.directory,
+            "last_heartbeat_ago": round(time.time() - s.last_heartbeat, 1),
+        }
+        for s in sessions
+    ], indent=2)
+
+
+@mcp.tool()
+def report_issue(
+    target_project: str,
+    title: str,
+    body: str,
+    severity: str = "medium",
+) -> str:
+    """Report an issue you've discovered to another project's session.
+
+    Use this when you find a bug, limitation, or problem in another
+    project's code or tools while working on your project.
+
+    Args:
+        target_project: Which project has the issue (e.g., "cruxdev", "crux")
+        title: Brief description of the issue
+        body: Detailed description including what you were doing when you found it
+        severity: "high", "medium", or "low"
+    """
+    broker = _get_broker()
+    # Determine source project from cwd
+    source = os.path.basename(os.getcwd())
+    msg_id = broker.report_issue(source, target_project, title, body, severity)
+    return json.dumps({
+        "message_id": msg_id,
+        "status": "sent",
+        "from": source,
+        "to": target_project,
+    })
+
+
+@mcp.tool()
+def report_improvement(
+    target_project: str,
+    title: str,
+    body: str,
+) -> str:
+    """Suggest an improvement to another project.
+
+    Use this when you think of a feature, optimization, or enhancement
+    that would help another project in the ecosystem.
+
+    Args:
+        target_project: Which project to improve (e.g., "cruxdev", "crux")
+        title: Brief description of the improvement
+        body: Detailed description of what to change and why
+    """
+    broker = _get_broker()
+    source = os.path.basename(os.getcwd())
+    msg_id = broker.report_improvement(source, target_project, title, body)
+    return json.dumps({
+        "message_id": msg_id,
+        "status": "sent",
+        "from": source,
+        "to": target_project,
+    })
+
+
+@mcp.tool()
+def share_pattern(
+    pattern_name: str,
+    description: str,
+) -> str:
+    """Share a pattern you've learned with all other sessions.
+
+    Use this when you discover a useful pattern, convention, or technique
+    that other projects in the ecosystem should know about.
+
+    Args:
+        pattern_name: Short name for the pattern (e.g., "atomic-config-writes")
+        description: What the pattern is and why it matters
+    """
+    broker = _get_broker()
+    source = os.path.basename(os.getcwd())
+    msg_id = broker.share_pattern(source, pattern_name, description)
+    return json.dumps({
+        "message_id": msg_id,
+        "status": "broadcast",
+        "from": source,
+        "pattern": pattern_name,
+    })
+
+
+@mcp.tool()
+def notify_breaking_change(
+    affected_projects: str,
+    description: str,
+) -> str:
+    """Notify other projects of a breaking change you've made.
+
+    Use this when you rename, remove, or change the behavior of something
+    that other projects depend on.
+
+    Args:
+        affected_projects: Comma-separated project names (e.g., "crux,cruxcli")
+        description: What changed and what other projects need to do
+    """
+    broker = _get_broker()
+    source = os.path.basename(os.getcwd())
+    projects = [p.strip() for p in affected_projects.split(",") if p.strip()]
+    msg_ids = broker.notify_breaking_change(source, projects, description)
+    return json.dumps({
+        "message_ids": msg_ids,
+        "status": "sent",
+        "from": source,
+        "to": projects,
+    })
+
+
+@mcp.tool()
+def check_inbox(project_name: str = "") -> str:
+    """Check for messages from other sessions.
+
+    Returns issues, improvements, patterns, and breaking changes
+    reported by other projects. Call this periodically and after convergence.
+
+    Args:
+        project_name: Your project name (auto-detected from cwd if empty)
+    """
+    broker = _get_broker()
+    project = project_name or os.path.basename(os.getcwd())
+    messages = broker.check_inbox(project)
+    return json.dumps([
+        {
+            "id": m.id,
+            "type": m.type,
+            "from": m.source_project,
+            "title": m.title,
+            "body": m.body,
+            "severity": m.severity,
+            "age_seconds": round(time.time() - m.created_at, 1),
+        }
+        for m in messages
+    ], indent=2)
+
+
+@mcp.tool()
+def acknowledge_message(message_id: str) -> str:
+    """Mark a message as handled.
+
+    Call this after you've acted on an issue, improvement, pattern,
+    or breaking change notification.
+
+    Args:
+        message_id: The ID of the message to acknowledge
+    """
+    broker = _get_broker()
+    found = broker.acknowledge(message_id)
+    return json.dumps({
+        "message_id": message_id,
+        "acknowledged": found,
+    })
+
+
 # --- Legacy direct-execution support ---
 
 
