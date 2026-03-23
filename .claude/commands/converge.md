@@ -36,13 +36,33 @@ Repeat until done:
    - Found issues: `[{"id": "f1", "file": "path", "dimension": "correctness", "severity": "high", "description": "what's wrong", "suggested_fix": "how to fix", "fixed": true}]`
 5. Go to step 1
 
-### Step 3: Report
+### Step 3: Post-Execution Convergence (Mandatory)
 
-When you get "done" or "escalated", call `convergence_status(convergence_id)` and report:
+After the engine reports "done", you MUST complete these additional steps:
+
+1. **Documentation convergence**: Audit all docs in `docs/` against the current code. Two clean passes.
+2. **Website convergence** (if project has a website): Audit site against WEBSITE_PLANNING.md. Update metrics. Two clean passes.
+3. **Deployment** (if project has a website/webapp):
+   - If `docs/DEPLOYMENT.md` exists: follow it to deploy
+   - If `docs/DEPLOYMENT.md` does NOT exist: ask the user these questions to create one:
+     - Where is this deployed? (Vercel, Cloudflare Pages, Netlify, etc.)
+     - What's the deploy command or CI/CD pipeline?
+     - What environment variables or secrets are needed?
+     - Is there a staging environment?
+     - What's the domain and DNS provider?
+   - Write `docs/DEPLOYMENT.md` from the answers, then deploy
+4. **Patterns update**: Capture learnings in DEVELOPMENT_PATTERNS_CRUXDEV.md if novel.
+
+### Step 4: Report
+
+When ALL convergence steps are complete, report:
 - Total rounds completed
 - Total findings found and fixed
 - Time elapsed
 - Final phase
+- Documentation convergence status
+- Website convergence status (if applicable)
+- Deployment status (if applicable)
 
 ## Rules
 

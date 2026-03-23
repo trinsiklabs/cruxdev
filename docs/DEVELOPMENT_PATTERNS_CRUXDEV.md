@@ -54,6 +54,8 @@ Agent: [drives the ENTIRE cycle to completion autonomously]
   → patterns update
   → documentation convergence (audit all docs against new code, two clean passes)
   → website convergence (audit project website against WEBSITE_PLANNING.md standards)
+  → deployment convergence (deploy using docs/DEPLOYMENT.md, create if missing)
+  → patterns update
   → DONE: report convergence status
 ```
 
@@ -382,7 +384,7 @@ Every plan execution MUST complete ALL of these convergence steps before reporti
 
 ### 3.0 Post-Execution Convergence Requirements
 
-After code convergence, three additional convergence loops are mandatory:
+After code convergence, four additional convergence loops are mandatory:
 
 **A. Documentation Convergence:**
 - Audit ALL documentation files against the current codebase
@@ -390,19 +392,31 @@ After code convergence, three additional convergence loops are mandatory:
 - Two consecutive clean passes required
 - Files to audit: CLAUDE.md, all docs in `docs/`, all build plans in `build_plans/`, README if present
 
-**B. Website Convergence (if project has a website):**
+**B. Website Convergence (if project has a website or web app):**
 - Audit the project website against `docs/WEBSITE_PLANNING.md` standards
 - Check: SEO (meta tags, structured data, llms.txt), performance (Core Web Vitals), accessibility (WCAG 2.1 AA), content accuracy (does the site match what the code actually does?)
 - Update any metrics on the site (test counts, feature counts, etc.)
 - Two consecutive clean passes required
 - Reference: `docs/WEBSITE_UPGRADE_DIRECTIVE.md` for the full checklist
 
-**C. Patterns Update:**
+**C. Deployment Convergence (if project has a website or web app):**
+- After website/webapp convergence, deploy using `docs/DEPLOYMENT.md`
+- If `docs/DEPLOYMENT.md` does not exist, **prompt the user** to create one by asking:
+  1. Where is this deployed? (Vercel, Cloudflare Pages, Netlify, AWS, self-hosted, etc.)
+  2. What's the deploy command or CI/CD pipeline? (git push, GitHub Actions, manual, etc.)
+  3. What environment variables or secrets are needed?
+  4. Is there a staging environment?
+  5. What's the domain and DNS provider?
+- Write `docs/DEPLOYMENT.md` from the answers, then deploy
+- If `docs/DEPLOYMENT.md` exists, follow it exactly — run the deploy commands, verify the deployment is live and correct
+- After deployment, verify: site is accessible, SSL works, no broken links, content matches the converged version
+
+**D. Patterns Update:**
 - Capture any new learnings from this plan execution
 - Apply the Learnings Admission Gate (Section 2F)
 - Update this file (DEVELOPMENT_PATTERNS_CRUXDEV.md) if novel patterns were discovered
 
-**The lifecycle is not complete until all three have converged.** Code convergence alone is insufficient.
+**The lifecycle is not complete until all four have converged.** Code convergence alone is insufficient.
 
 ### 3A. The Convergence Loop (Post-Execution)
 
