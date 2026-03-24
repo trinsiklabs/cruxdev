@@ -359,6 +359,30 @@ def convergence_cancel(convergence_id: str) -> str:
     })
 
 
+# --- Status tool ---
+
+
+@mcp.tool()
+def cruxdev_status(project_dir: str = ".") -> str:
+    """Check CruxDev installation health — is everything wired and working?
+
+    Runs health checks: MCP server, tools, state directory, config, Python version,
+    dependencies, methodology docs, slash commands, active convergences.
+
+    Returns a structured report with pass/fail for each check.
+    """
+    from .status import get_status
+    report = get_status(project_dir)
+    result = {
+        "healthy": report.healthy,
+        "checks": [{"name": c.name, "passed": c.passed, "message": c.message} for c in report.checks],
+        "warnings": [{"name": w.name, "message": w.message} for w in report.warnings],
+        "active_convergences": report.active_convergences,
+        "versions": report.versions,
+    }
+    return json.dumps(result, indent=2)
+
+
 # --- Session bus tools ---
 
 
