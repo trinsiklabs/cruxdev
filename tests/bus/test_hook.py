@@ -53,7 +53,14 @@ def test_check_and_notify_rate_limited(tmp_path):
     assert result == []
 
 
-def test_check_and_notify_empty_inbox(tmp_path):
+def test_check_and_notify_empty_inbox(tmp_path, monkeypatch):
+    # Use a clean broker to avoid picking up real bus messages
+    from src.bus.broker import Broker
+    db_path = str(tmp_path / "clean_bus.db")
+    import src.bus.broker as broker_module
+    original = broker_module.Broker
+    monkeypatch.setattr(broker_module, "Broker", lambda db_path=db_path: original(db_path=db_path))
+
     check_file = str(tmp_path / "last_check")
     result = check_and_notify("nonexistent_project", check_file)
     assert result == []
