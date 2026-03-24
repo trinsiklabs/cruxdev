@@ -35,7 +35,7 @@ mcp = FastMCP(
     instructions="""CruxDev is an autonomous convergence engine. It drives code through
 audit-fix-re-audit loops until two consecutive independent clean passes are achieved.
 
-QUICK START: When the user says "converge [plan]":
+CONVERGENCE: When the user says "converge [plan]":
 1. Call start_convergence(plan_file) — engine creates state, returns first task
 2. Loop: call convergence_next_task(id) to get what to do next
 3. Execute the task (read files, audit code, fix issues, run tests)
@@ -43,8 +43,27 @@ QUICK START: When the user says "converge [plan]":
 5. Repeat 2-4 until task_type is "done" or "escalated"
 DO NOT decide when to stop — the engine decides.
 
-For planning: call get_methodology() first, then create_plan_template(goal).
-For adoption: call get_adoption_process() for step-by-step instructions.""",
+RESEARCH: ALL research activities MUST follow the 5-pass iterative deepening system:
+1. Broad search — establish the landscape
+2. Academic/authoritative — find evidence with specifics
+3. Practitioner/user — find real-world experience
+4. Contrarian/adversarial — find counter-evidence (NOT OPTIONAL)
+5. Primary sources — official docs, original data
+Research converges when novelty drops below 10% across 5 consecutive searches.
+Counter-research is MANDATORY for all claims. Every citation must be verified.
+Call get_methodology() for the full methodology document.
+
+POST-EXECUTION: After EVERY convergence, you MUST:
+1. Audit all docs against code (two clean passes)
+2. Update website metrics if applicable
+3. Deploy if applicable
+4. Check inbox for messages from other sessions
+5. Capture learnings if novel
+
+ADOPTION: Call get_adoption_process() for step-by-step instructions.
+PLANNING: Call create_plan_template(goal) to scaffold a build plan.
+SESSION BUS: Call session_register(project_name) at session start.
+Call check_inbox() periodically and after convergence.""",
 )
 
 os.makedirs(STATE_DIR, exist_ok=True)
