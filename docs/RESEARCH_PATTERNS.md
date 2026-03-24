@@ -386,7 +386,105 @@ This maps directly to CruxDev's model tier system (micro → fast → standard �
 
 ---
 
-## 14. Integration with CruxDev Systems
+## 14. Hallucination Mitigation
+
+### The Scale of the Problem
+
+LLM citation hallucination rates are severe and measured:
+
+| Platform | Citation Hallucination Rate |
+|----------|---------------------------|
+| Perplexity | 37% |
+| ChatGPT | 67% |
+| Grok-3 | 94% |
+
+All current frontier models exceed 10% hallucination on enterprise-length document summarization. 50+ papers with hallucinated citations found in ICLR 2026 submissions. 100+ AI-hallucinated citations found in NeurIPS 2025 accepted papers — passing 3+ peer reviewers.
+
+### Mitigation Techniques (Measured Effectiveness)
+
+| Technique | Hallucination Reduction |
+|-----------|------------------------|
+| RAG (retrieval-augmented generation) | 71% reduction vs standalone LLM |
+| Schema-driven extraction (Elicit pattern) | 94-99% accuracy |
+| Evidence-anchored scoring | Eliminates unverifiable justifications |
+| Checker model pattern | Separate model verifies relevance before synthesis |
+
+### Mandatory Rules
+
+1. **Never trust LLM-generated citations without verification.** Run every citation through the source verification pipeline (Section 6).
+2. **Synthesize from retrieved content only.** Never from model prior knowledge. If you can't cite a source, don't include the claim.
+3. **Schema-driven extraction.** Define what fields to extract BEFORE the LLM reads the source. This constrains hallucination.
+4. **Checker model pattern.** For high-stakes research, use a second model to verify relevance before the primary model synthesizes.
+
+---
+
+## 15. Defense-in-Depth Guardrails
+
+Research guardrails operate as a pipeline where each stage reduces risk:
+
+```
+INPUT VALIDATION → MODEL EXECUTION → OUTPUT VALIDATION → POST-PROCESSING
+     Normalize,       Controlled        Verify facts,      Log, archive,
+     bound,           execution         filter,             provenance
+     policy-check     context           check citations     chain
+```
+
+### Research-Specific Guardrails
+
+| Guardrail | What It Catches |
+|-----------|----------------|
+| Source diversity enforcement | Echo chamber — reject if < 3 unique domains per session |
+| Citation existence check | Hallucinated references — verify against CrossRef, Semantic Scholar |
+| Claim-source alignment | Misattributed findings — compare claim against actual source text |
+| Recency gate | Outdated evidence — flag citations > 5 years in fast-moving fields |
+| Contradiction detection | Self-contradictory findings — cross-check each claim |
+| Confidence calibration | Overconfident wrong answers — require uncertainty markers |
+
+### Parallelized Guardrails
+
+Independent checks run simultaneously (toxicity, schema, citation): 200ms serial → 70ms parallel. Only dependent checks (citation verification needs content first) run sequentially.
+
+---
+
+## 16. Evaluation Pillars
+
+Every research system should be evaluated across five dimensions:
+
+| Pillar | What It Measures | Key Metrics |
+|--------|-----------------|-------------|
+| Intelligence | Task completion, reasoning quality | Accuracy, citation correctness |
+| Performance | Speed and cost | Latency, cost per quality point |
+| Reliability | Robustness under stress | Failure recovery, context retention |
+| Responsibility | Safety and governance | Permission compliance, transparency |
+| User Experience | Output quality for humans | Clarity, trust, satisfaction |
+
+### Primary Efficiency Metric: Cost Per Quality Point
+
+If quality plateaus but cost keeps rising, research has hit diminishing returns. Monitor this continuously. Alert when cost per quality point exceeds 2x the rolling average.
+
+---
+
+## 17. Industry Benchmarks
+
+### Target Accuracy Levels
+
+| System | Task | Accuracy |
+|--------|------|----------|
+| otto-SR | Screening sensitivity | 96.7% |
+| otto-SR | Data extraction | 93.1% |
+| Elicit | Data extraction | 94-99% |
+| Consensus AI | Claim verification | High (checker model pattern) |
+
+### Anthropic Multi-Agent Research (Production Findings)
+
+- Multi-agent (Opus lead + Sonnet workers) outperformed single-agent by 90.2%
+- Token usage explains 80% of performance variance
+- Multi-agent consumes 15x more tokens than standard chat
+- Parallel tool calling reduced research time by up to 90%
+
+---
+
+## 18. Integration with CruxDev Systems
 
 ### Competitive Analysis (`COMPETITORS_PATTERN.md`)
 
