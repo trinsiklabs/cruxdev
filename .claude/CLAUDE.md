@@ -76,6 +76,7 @@ cruxdev/
 | `docs/SESSION_UPGRADE.md` | Guide for leveling up active sessions |
 | `docs/WEBSITE_PLANNING.md` | Universal website planning methodology |
 | `docs/COMPETITORS_PATTERN.md` | Competitive intelligence methodology |
+| `docs/RESEARCH_PATTERNS.md` | Universal research methodology — 5-pass, convergence-detected, quality-scored |
 | `build_plans/CRUX_ECOSYSTEM_PLAN.md` | Master plan — what to build, in what order |
 
 ## Conventions
