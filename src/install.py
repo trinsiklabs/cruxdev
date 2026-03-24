@@ -85,10 +85,23 @@ def install(project_dir: str = ".") -> dict:
         with open(settings_path, "w") as f:
             json.dump(settings, f, indent=2)
 
+    # Copy slash commands to target project
+    commands_src = os.path.join(CRUXDEV_ROOT, ".claude", "commands")
+    commands_dst = os.path.join(project_dir, ".claude", "commands")
+    if os.path.isdir(commands_src):
+        os.makedirs(commands_dst, exist_ok=True)
+        import shutil
+        for cmd_file in os.listdir(commands_src):
+            if cmd_file.endswith(".md"):
+                src_path = os.path.join(commands_src, cmd_file)
+                dst_path = os.path.join(commands_dst, cmd_file)
+                shutil.copy2(src_path, dst_path)
+
     items = [
         f"Created .cruxdev/ in {project_dir}",
         f"Added cruxdev to .mcp.json",
         f"Added session bus hook to .claude/settings.local.json",
+        f"Copied slash commands to .claude/commands/",
         f"CruxDev root: {CRUXDEV_ROOT}",
         f"Python: {get_python_path()}",
     ]
