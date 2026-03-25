@@ -965,15 +965,26 @@ def generate_gap_analysis(
     from .competitors.research import CompetitorProfile, Feature
 
     features = [f.strip() for f in our_features.split(",") if f.strip()]
-    raw_comps = json.loads(competitors_json)
+    try:
+        raw_comps = json.loads(competitors_json) if isinstance(competitors_json, str) else competitors_json
+    except json.JSONDecodeError as e:
+        return json.dumps({"error": f"Invalid competitors_json: {e}"})
 
     profiles = []
     for c in raw_comps:
+        if not isinstance(c, dict):
+            continue
+        comp_features = []
+        for f in c.get("features", []):
+            if isinstance(f, dict):
+                comp_features.append(Feature(f.get("name", ""), "", f.get("has", True)))
+            elif isinstance(f, str):
+                comp_features.append(Feature(f, "", True))
         p = CompetitorProfile(
-            name=c.get("name", ""),
+            name=c.get("name", "unknown"),
             url=c.get("url", ""),
             category=c.get("category", "noted"),
-            features=[Feature(f["name"], "", f.get("has", True)) for f in c.get("features", [])],
+            features=comp_features,
         )
         profiles.append(p)
 

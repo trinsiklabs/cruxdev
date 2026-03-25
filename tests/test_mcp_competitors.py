@@ -66,6 +66,23 @@ class TestVerifyCompetitorLinks:
 
 
 class TestGenerateGapAnalysis:
+    def test_invalid_json(self):
+        result = json.loads(generate_gap_analysis("Us", "testing", "not valid json"))
+        assert "error" in result
+
+    def test_string_features(self):
+        competitors = json.dumps([
+            {"name": "Comp", "url": "u", "category": "official",
+             "features": ["auto-test", "deploy"]},
+        ])
+        result = json.loads(generate_gap_analysis("Us", "testing", competitors))
+        assert result["total_gaps"] > 0
+
+    def test_non_dict_entries_skipped(self):
+        competitors = json.dumps(["not a dict", {"name": "Real", "url": "u", "features": []}])
+        result = json.loads(generate_gap_analysis("Us", "testing", competitors))
+        assert "our_name" in result
+
     def test_runs_analysis(self):
         competitors = json.dumps([
             {
