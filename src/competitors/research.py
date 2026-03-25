@@ -8,6 +8,12 @@ from dataclasses import dataclass, field
 from typing import Literal
 
 
+MoatType = Literal[
+    "network_effects", "switching_costs", "brand", "data_flywheel",
+    "regulatory", "execution_speed", "cost_advantage",
+]
+
+
 @dataclass
 class Feature:
     """A single feature of a competitor."""
@@ -15,6 +21,41 @@ class Feature:
     description: str
     has_feature: bool = True
     notes: str = ""
+
+
+@dataclass
+class MoatScore:
+    """Moat assessment for a single moat type. Score 0-3."""
+    moat_type: MoatType
+    score: int = 0  # 0=none, 1=weak, 2=moderate, 3=strong
+    evidence: str = ""
+
+
+@dataclass
+class ThreatAssessment:
+    """Threat assessment for a competitor. Each dimension 1-5."""
+    market_overlap: int = 1
+    growth_velocity: int = 1
+    resource_asymmetry: int = 1
+    technical_proximity: int = 1
+    time_to_relevance_months: int = 24
+
+    @property
+    def threat_score(self) -> float:
+        """Average of the four scored dimensions."""
+        return (self.market_overlap + self.growth_velocity +
+                self.resource_asymmetry + self.technical_proximity) / 4
+
+    @property
+    def threat_level(self) -> str:
+        s = self.threat_score
+        if s >= 4:
+            return "existential"
+        if s >= 3:
+            return "significant"
+        if s >= 2:
+            return "moderate"
+        return "low"
 
 
 @dataclass
@@ -26,12 +67,17 @@ class CompetitorProfile:
     description: str = ""
     category: Literal["official", "watch", "noted"] = "noted"
     pricing: str = ""
+    revenue_model: str = ""
     tech_stack: list[str] = field(default_factory=list)
     features: list[Feature] = field(default_factory=list)
     strengths: list[str] = field(default_factory=list)
     weaknesses: list[str] = field(default_factory=list)
     differentiation: str = ""
     last_researched: str = ""
+    moats: list[MoatScore] = field(default_factory=list)
+    threat: ThreatAssessment = field(default_factory=ThreatAssessment)
+    funding: str = ""
+    growth_signals: list[str] = field(default_factory=list)
 
     def feature_names(self) -> list[str]:
         """Get list of feature names this competitor has."""
@@ -66,6 +112,28 @@ class CompetitorProfile:
         if self.differentiation:
             lines.append("")
             lines.append(f"**Differentiation:** {self.differentiation}")
+        if self.revenue_model:
+            lines.append(f"**Revenue Model:** {self.revenue_model}")
+        if self.funding:
+            lines.append(f"**Funding:** {self.funding}")
+        if self.moats:
+            lines.append("")
+            lines.append("**Moat Analysis:**")
+            for m in self.moats:
+                label = "none weak moderate strong".split()[m.score]
+                lines.append(f"- {m.moat_type}: {label}")
+                if m.evidence:
+                    lines.append(f"  - {m.evidence}")
+        if self.threat.threat_score > 1:
+            lines.append("")
+            lines.append(f"**Threat Level:** {self.threat.threat_level} ({self.threat.threat_score:.1f}/5)")
+            if self.threat.time_to_relevance_months < 24:
+                lines.append(f"**Time to Relevance:** {self.threat.time_to_relevance_months} months")
+        if self.growth_signals:
+            lines.append("")
+            lines.append("**Growth Signals:**")
+            for g in self.growth_signals:
+                lines.append(f"- {g}")
         return "\n".join(lines)
 
 
@@ -104,6 +172,12 @@ def parse_profile_response(
             continue
         if lower.startswith("differentiation:"):
             profile.differentiation = stripped.split(":", 1)[1].strip()
+            continue
+        if lower.startswith("revenue model:"):
+            profile.revenue_model = stripped.split(":", 1)[1].strip()
+            continue
+        if lower.startswith("funding:"):
+            profile.funding = stripped.split(":", 1)[1].strip()
             continue
 
         # Section headers

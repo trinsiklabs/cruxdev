@@ -122,6 +122,69 @@ Every piece of information must be verified:
 
 **If a claim cannot be verified, it must be marked as unverified.**
 
+### 2.2b Strategic Analysis (Per Competitor)
+
+Beyond product features, assess each competitor on these strategic dimensions:
+
+**Moat Analysis — What makes them defensible?**
+
+Score each moat type 0-3 (0=none, 1=weak, 2=moderate, 3=strong):
+
+| Moat Type | What to look for |
+|-----------|-----------------|
+| Network Effects | Value increases as more users join (marketplaces, platforms, communities) |
+| Switching Costs | How painful/expensive is it to leave? (data lock-in, workflow integration, learning curve) |
+| Brand | Do users search for the brand name instead of the category? Mindshare dominance. |
+| Data Flywheel | Product improves as more data flows through it. Dynamic, not static data. |
+| Regulatory/Compliance | Certifications, licenses, security approvals that take years to obtain. |
+| Execution Speed | Ship velocity, iteration cycles, time-to-market advantage. |
+| Cost Advantage | Can they deliver at lower cost due to scale, architecture, or efficiency? |
+
+**Threat Assessment**
+
+| Dimension | Score 1-5 | Question |
+|-----------|-----------|----------|
+| Market Overlap | | How much of your TAM do they serve? |
+| Growth Velocity | | How fast are they growing? (stars/month, downloads/month, funding) |
+| Resource Asymmetry | | Do they have more funding/people/distribution than you? |
+| Technical Proximity | | How close is their architecture to yours? Could they replicate your features? |
+| Time to Relevance | | How soon could they become a serious threat? (months) |
+
+**Threat Level** = average score. >=4 = existential, 3-4 = significant, 2-3 = moderate, <2 = low.
+
+**Market Sizing (TAM/SAM/SOM)**
+
+For each competitor (and yourself), estimate:
+- **TAM:** Total addressable market — everyone who could use this category of tool
+- **SAM:** Serviceable available market — segment you can realistically reach
+- **SOM:** Serviceable obtainable market — what you can capture in 12-24 months
+
+Use both top-down (market reports) and bottom-up (customer count × price) approaches.
+
+**Business Model Analysis**
+
+| Element | What to document |
+|---------|-----------------|
+| Revenue Model | How do they make money? (SaaS, usage, freemium, open-core, services) |
+| Pricing Tiers | Free/pro/enterprise, per-seat/per-usage/flat |
+| Unit Economics | CAC, LTV if estimatable from public data |
+| Sustainability | Is their model self-sustaining or VC-subsidized? |
+
+**Value Curve (Blue Ocean Strategy Canvas)**
+
+For your category, identify 5-8 key factors of competition. Score each competitor and yourself 1-5 on each factor. Plot as a line chart. Look for:
+- Where your curve diverges (differentiation)
+- Factors to eliminate, reduce, raise, or create
+- Uncontested market space
+
+**Jobs-to-be-Done**
+
+For each competitor, map which customer jobs they address:
+- Core job (what the user is hired to do)
+- Related jobs (adjacent needs they solve)
+- Emotional/social jobs (how they make users feel)
+- Satisfaction level per job (underserved, adequately served, overserved)
+
 ### 2.3 Convergence Criterion
 
 Two consecutive research passes on each competitor find zero new significant information not already documented.
