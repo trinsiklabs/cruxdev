@@ -867,11 +867,74 @@ def counter_research(
 
 
 @mcp.tool()
+def setup_competitive_analysis(
+    our_name: str,
+    our_description: str,
+    our_category: str,
+    our_features: str,
+    competitors_json: str,
+    overview: str = "",
+    project_dir: str = ".",
+    write_files: bool = True,
+) -> str:
+    """Run complete competitive analysis in one call — no multi-step orchestration needed.
+
+    This is the PRIMARY tool for competitive analysis. It does everything:
+    1. Parses competitor data (handles any input format)
+    2. Builds feature comparison matrix
+    3. Classifies gaps (must-close, should-close, nice-to-have)
+    4. Generates comparison pages for official/watch competitors
+    5. Produces complete COMPETITORS.md
+    6. Generates discovery queries for future research
+    7. Optionally writes all files to disk
+
+    Args:
+        our_name: Our product name (e.g., "CruxDev")
+        our_description: What we do (e.g., "Autonomous convergence framework")
+        our_category: Market category (e.g., "AI coding tools")
+        our_features: Comma-separated list of our features
+        competitors_json: JSON array of competitors, each with: name, url, category,
+                         description, features (list), strengths (list), weaknesses (list),
+                         pricing, revenue_model. Features can be strings or dicts.
+        overview: Overview paragraph for COMPETITORS.md (optional)
+        project_dir: Project directory for writing files (default: cwd)
+        write_files: Whether to write COMPETITORS.md and comparison pages (default: true)
+    """
+    from .competitors.runner import parse_competitor_inputs, setup, write_results
+    from .mcp_normalize import to_string_list
+
+    features = to_string_list(our_features)
+    competitors = parse_competitor_inputs(competitors_json)
+
+    result = setup(
+        our_name=our_name,
+        our_description=our_description,
+        our_category=our_category,
+        our_features=features,
+        competitors=competitors,
+        overview=overview,
+    )
+
+    files_written = []
+    if write_files:
+        proj = project_dir if project_dir != "." else os.getcwd()
+        files_written = write_results(result, proj)
+
+    return json.dumps({
+        **result.summary,
+        "files_written": files_written,
+        "gap_analysis": result.gap_analysis,
+        "discovery_queries": result.discovery_queries,
+        "competitors_doc_preview": result.competitors_doc[:2000],
+    }, indent=2)
+
+
+@mcp.tool()
 def discover_competitors(
     project_description: str,
     category: str,
 ) -> str:
-    """Generate search queries and parse discovery results for finding competitors.
+    """Generate search queries for finding competitors (use setup_competitive_analysis instead for full pipeline).
 
     Returns structured discovery queries based on the project description and category.
     Use these queries with web search, then feed results back through this tool.
