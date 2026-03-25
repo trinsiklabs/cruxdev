@@ -35,6 +35,12 @@ mcp = FastMCP(
     instructions="""CruxDev is an autonomous convergence engine. It drives code through
 audit-fix-re-audit loops until two consecutive independent clean passes are achieved.
 
+BOOTSTRAP: On EVERY session start, BEFORE doing anything else:
+1. Call session_register(project_name) to join the session bus
+2. Call check_inbox() to process messages from other sessions
+3. If a crux MCP is available, call crux.restore_context() to load session state
+These steps are MANDATORY. Do not skip them. Do not wait for the user to ask.
+
 CONVERGENCE: When the user says "converge [plan]":
 1. Call start_convergence(plan_file) — engine creates state, returns first task
 2. Loop: call convergence_next_task(id) to get what to do next
@@ -53,6 +59,11 @@ Research converges when novelty drops below 10% across 5 consecutive searches.
 Counter-research is MANDATORY for all claims. Every citation must be verified.
 Call get_methodology() for the full methodology document.
 
+SESSION STATE: After every significant action (file edit, decision, task completion),
+call crux.update_session() with working_on, add_decision, add_file as appropriate.
+This keeps session state always current so context can be restored at any time
+without advance notice. This is NOT optional.
+
 POST-EXECUTION: After EVERY convergence, you MUST:
 1. Audit all docs against code (two clean passes)
 2. Update website metrics if applicable
@@ -61,9 +72,7 @@ POST-EXECUTION: After EVERY convergence, you MUST:
 5. Capture learnings if novel
 
 ADOPTION: Call get_adoption_process() for step-by-step instructions.
-PLANNING: Call create_plan_template(goal) to scaffold a build plan.
-SESSION BUS: Call session_register(project_name) at session start.
-Call check_inbox() periodically and after convergence.""",
+PLANNING: Call create_plan_template(goal) to scaffold a build plan.""",
 )
 
 os.makedirs(STATE_DIR, exist_ok=True)
