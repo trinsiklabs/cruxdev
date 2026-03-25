@@ -930,6 +930,97 @@ def setup_competitive_analysis(
 
 
 @mcp.tool()
+def research_competitor_start(
+    competitor_name: str,
+    competitor_url: str = "",
+    category: str = "",
+) -> str:
+    """Start guided 5-pass research on a competitor. Enforces the research methodology.
+
+    This is a state machine. Call this to start, then call research_competitor_next_step
+    to get search instructions, then research_competitor_submit to submit findings.
+    The engine enforces all 5 passes (broad, academic, practitioner, CONTRARIAN, primary)
+    and will NOT accept results that skip the contrarian pass.
+
+    Args:
+        competitor_name: Name of the competitor to research
+        competitor_url: URL of the competitor (helps generate search queries)
+        category: Market category for context
+    """
+    from .competitors.guided_research import get_or_create_session, get_next_step
+
+    state, is_new = get_or_create_session(competitor_name, competitor_url, category)
+    step = get_next_step(state)
+    return json.dumps({
+        "session_created": is_new,
+        "competitor": competitor_name,
+        "step": step,
+    }, indent=2)
+
+
+@mcp.tool()
+def research_competitor_next_step(competitor_name: str) -> str:
+    """Get the next research instruction for a competitor.
+
+    Returns: which pass you're on, what to search, what data is needed.
+    Follow the instructions exactly — the engine enforces the methodology.
+
+    Args:
+        competitor_name: Name of the competitor being researched
+    """
+    from .competitors.guided_research import get_or_create_session, get_next_step
+
+    state, _ = get_or_create_session(competitor_name)
+    step = get_next_step(state)
+    return json.dumps({"step": step}, indent=2)
+
+
+@mcp.tool()
+def research_competitor_submit(
+    competitor_name: str,
+    findings: str,
+    sources: str = "",
+    profile_updates: str = "",
+) -> str:
+    """Submit findings for the current research pass.
+
+    The engine validates your submission:
+    - Contrarian pass MUST have at least one finding (cannot be skipped)
+    - After all passes, compile final profile data via profile_updates
+
+    Args:
+        competitor_name: Name of the competitor
+        findings: Pipe-separated findings from this pass
+        sources: Comma-separated source URLs consulted
+        profile_updates: JSON object of profile fields to update (e.g., {"pricing": "$10/mo"})
+    """
+    from .competitors.guided_research import get_or_create_session, submit_pass_result
+    from .mcp_normalize import to_pipe_list, to_string_list
+
+    state, _ = get_or_create_session(competitor_name)
+
+    finding_list = to_pipe_list(findings)
+    source_list = to_string_list(sources)
+
+    updates = None
+    if profile_updates:
+        try:
+            updates = json.loads(profile_updates) if isinstance(profile_updates, str) else profile_updates
+        except json.JSONDecodeError:
+            updates = None
+
+    result = submit_pass_result(state, finding_list, source_list, profile_updates=updates)
+    return json.dumps(result, indent=2)
+
+
+@mcp.tool()
+def research_competitor_list() -> str:
+    """List all active guided research sessions."""
+    from .competitors.guided_research import list_sessions
+    return json.dumps(list_sessions(), indent=2)
+
+
+@mcp.tool()
 def discover_competitors(
     project_description: str,
     category: str,
