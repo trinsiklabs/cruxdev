@@ -50,17 +50,38 @@ def mark_checked(last_check_file: str = LAST_CHECK_FILE) -> None:
 def check_and_notify(
     project: str,
     last_check_file: str = LAST_CHECK_FILE,
+    broker_factory=None,
 ) -> list[dict]:
-    """Check inbox if rate limit allows. Returns messages found."""
+    """Check inbox if rate limit allows. Returns messages found.
+
+    Uses notification files first (fast path), falls back to SQLite query.
+    Clears the notification file after reading messages.
+
+    Args:
+        project: Project name to check inbox for
+        last_check_file: Path to rate-limit tracking file
+        broker_factory: Optional callable returning a Broker (for testing)
+    """
     if not should_check(last_check_file):
         return []
 
     mark_checked(last_check_file)
 
     try:
-        from .broker import Broker
-        broker = Broker()
+        if broker_factory:
+            broker = broker_factory()
+        else:
+            from .broker import Broker
+            broker = Broker()
+
+        # Fast path: check notification file first
+        notification = broker.read_notification(project)
+        if notification is None:
+            return []
+
+        # Notification exists — read actual messages from SQLite
         messages = broker.check_inbox(project)
+        broker.clear_notification(project)
     except Exception:  # pragma: no cover — broker init may fail
         return []
 

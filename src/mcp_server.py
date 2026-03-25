@@ -602,6 +602,458 @@ def acknowledge_message(message_id: str) -> str:
     })
 
 
+# --- Adoption tools ---
+
+
+@mcp.tool()
+def classify_project(project_dir: str = ".") -> str:
+    """Classify a project — determine type(s), maturity, and required templates.
+
+    Scans the project directory for known patterns (code, configs, docs)
+    and returns the best-fit classification with confidence score.
+
+    Args:
+        project_dir: Path to the project to classify (default: current directory)
+    """
+    from .adoption.classify import classify_project as _classify
+    result = _classify(project_dir)
+    return json.dumps({
+        "primary_type": result.primary_type,
+        "secondary_types": result.secondary_types,
+        "maturity": result.maturity,
+        "confidence": result.confidence,
+        "signals": result.signals,
+    }, indent=2)
+
+
+@mcp.tool()
+def inventory_project(project_dir: str = ".") -> str:
+    """Inventory all project materials — documents, code, assets.
+
+    Scans the project and produces a structured inventory with
+    format detection and size tracking.
+
+    Args:
+        project_dir: Path to the project to inventory
+    """
+    from .adoption.inventory import inventory_project as _inventory
+    result = _inventory(project_dir)
+    return json.dumps({
+        "total_items": len(result.items),
+        "total_size": result.total_size,
+        "by_format": {fmt: len(items) for fmt, items in result.by_format.items()},
+        "markdown": result.to_markdown(),
+    }, indent=2)
+
+
+@mcp.tool()
+def get_templates(
+    project_type: str,
+    maturity: str = "minimal",
+) -> str:
+    """Get required document templates for a project type and maturity.
+
+    Returns templates organized by category with requirement levels.
+
+    Args:
+        project_type: From classify_project (e.g., "software-existing", "website")
+        maturity: From classify_project (e.g., "minimal", "growing", "production")
+    """
+    from .adoption.templates import get_templates_for_type
+    ts = get_templates_for_type(project_type, maturity)
+    return json.dumps({
+        "total": len(ts.templates),
+        "required": len(ts.required),
+        "templates": [
+            {"category": t.category, "name": t.name, "filename": t.filename, "requirement": t.requirement}
+            for t in ts.templates
+        ],
+        "by_category": {cat: len(items) for cat, items in ts.by_category.items()},
+    }, indent=2)
+
+
+@mcp.tool()
+def analyze_gaps(project_dir: str = ".") -> str:
+    """Analyze gaps between project state and template requirements.
+
+    Runs classification, inventory, and template matching to find
+    missing or stub documents. Returns GAPS.md content.
+
+    Args:
+        project_dir: Path to the project to analyze
+    """
+    from .adoption.classify import classify_project as _classify
+    from .adoption.gaps import analyze_gaps as _analyze
+    from .adoption.inventory import inventory_project as _inventory
+    from .adoption.templates import get_templates_for_type
+
+    classification = _classify(project_dir)
+    inventory = _inventory(project_dir)
+    templates = get_templates_for_type(classification.primary_type, classification.maturity)
+    result = _analyze(project_dir, inventory, templates)
+
+    return json.dumps({
+        "project_type": classification.primary_type,
+        "maturity": classification.maturity,
+        "total_gaps": len(result.open_gaps),
+        "critical": len(result.critical),
+        "gaps": [
+            {"name": g.template_name, "file": g.template_file,
+             "severity": g.severity, "reason": g.reason}
+            for g in result.open_gaps
+        ],
+        "markdown": result.to_markdown(),
+    }, indent=2)
+
+
+@mcp.tool()
+def gap_status(project_dir: str = ".") -> str:
+    """Show current gap counts by priority for a project.
+
+    Quick summary of how many gaps exist at each severity level.
+
+    Args:
+        project_dir: Path to the project
+    """
+    from .adoption.classify import classify_project as _classify
+    from .adoption.gaps import analyze_gaps as _analyze
+    from .adoption.inventory import inventory_project as _inventory
+    from .adoption.templates import get_templates_for_type
+
+    classification = _classify(project_dir)
+    inventory = _inventory(project_dir)
+    templates = get_templates_for_type(classification.primary_type, classification.maturity)
+    result = _analyze(project_dir, inventory, templates)
+
+    by_sev = result.by_severity
+    return json.dumps({
+        "critical": len(by_sev.get("critical", [])),
+        "high": len(by_sev.get("high", [])),
+        "medium": len(by_sev.get("medium", [])),
+        "low": len(by_sev.get("low", [])),
+        "total_open": len(result.open_gaps),
+    }, indent=2)
+
+
+# --- Research tools ---
+
+
+@mcp.tool()
+def research_topic(
+    topic: str,
+    sub_questions: str = "",
+) -> str:
+    """Start a research session on a topic.
+
+    Creates a research session with the 5-pass methodology:
+    1. Broad search, 2. Academic, 3. Practitioner, 4. Contrarian, 5. Primary.
+
+    Returns the session ID and initial search queries.
+
+    Args:
+        topic: What to research
+        sub_questions: Comma-separated sub-questions to investigate
+    """
+    from .research.session import create_session
+    from .research.counter import generate_negation_queries
+
+    questions = [q.strip() for q in sub_questions.split(",") if q.strip()] if sub_questions else []
+    session = create_session(topic, questions)
+
+    return json.dumps({
+        "session_id": session.session_id,
+        "topic": session.topic,
+        "sub_questions": session.sub_questions,
+        "current_pass": session.current_pass,
+        "instructions": "Execute 5 passes: broad, academic, practitioner, contrarian, primary. Submit findings after each search.",
+    }, indent=2)
+
+
+@mcp.tool()
+def research_status(session_id: str) -> str:
+    """Check convergence status of a research session.
+
+    Args:
+        session_id: The session ID from research_topic()
+    """
+    from .research.session import ResearchSession
+    from .research.convergence import check_research_convergence
+
+    # Build a minimal session to check convergence
+    # In practice, the session state would be loaded from checkpoint
+    return json.dumps({
+        "session_id": session_id,
+        "instructions": "Load session from checkpoint or track state in conversation. Use counter_research() for adversarial verification.",
+    }, indent=2)
+
+
+@mcp.tool()
+def verify_research_sources(
+    finding_id: str,
+    source_urls: str,
+) -> str:
+    """Run source verification pipeline on research findings.
+
+    Checks URL reachability for all sources.
+
+    Args:
+        finding_id: ID of the finding being verified
+        source_urls: Comma-separated URLs to verify
+    """
+    from .research.verify import verify_sources
+
+    urls = [u.strip() for u in source_urls.split(",") if u.strip()]
+    result = verify_sources(finding_id, urls)
+    return json.dumps({
+        "finding_id": result.finding_id,
+        "overall_verified": result.overall_verified,
+        "reachable_count": result.reachable_count,
+        "total_sources": len(result.sources_checked),
+        "sources": [
+            {"url": s.url, "reachable": s.reachable, "error": s.error}
+            for s in result.sources_checked
+        ],
+    }, indent=2)
+
+
+@mcp.tool()
+def counter_research(
+    claim: str,
+    counter_evidence: str = "",
+    alternative_explanations: str = "",
+    supporting_count: int = 1,
+) -> str:
+    """Run adversarial verification on a claim.
+
+    Generates negation queries and assesses robustness based on
+    counter-evidence vs supporting evidence.
+
+    Args:
+        claim: The claim to verify adversarially
+        counter_evidence: Pipe-separated counter-evidence found
+        alternative_explanations: Pipe-separated alternative explanations
+        supporting_count: Number of supporting sources found
+    """
+    from .research.counter import run_counter_research
+
+    counter = [c.strip() for c in counter_evidence.split("|") if c.strip()] if counter_evidence else []
+    alts = [a.strip() for a in alternative_explanations.split("|") if a.strip()] if alternative_explanations else []
+
+    result = run_counter_research(claim, counter, alts, supporting_count)
+    return json.dumps({
+        "claim": result.original_claim,
+        "robustness": result.robustness,
+        "is_contested": result.is_contested,
+        "negation_queries": result.negation_queries,
+        "counter_evidence": result.counter_evidence,
+        "alternative_explanations": result.alternative_explanations,
+    }, indent=2)
+
+
+# --- Competitors tools ---
+
+
+@mcp.tool()
+def discover_competitors(
+    project_description: str,
+    category: str,
+) -> str:
+    """Generate search queries and parse discovery results for finding competitors.
+
+    Returns structured discovery queries based on the project description and category.
+    Use these queries with web search, then feed results back through this tool.
+
+    Args:
+        project_description: What your project does (e.g., "AI-driven convergence engine")
+        category: Market category (e.g., "AI coding tools", "DevOps automation")
+    """
+    from .competitors.discovery import generate_discovery_queries
+    queries = generate_discovery_queries(project_description, category)
+    return json.dumps({
+        "queries": queries,
+        "instructions": "Run each query via web search, then call research_competitor() for each result.",
+    }, indent=2)
+
+
+@mcp.tool()
+def research_competitor(
+    name: str,
+    url: str,
+    research_text: str,
+) -> str:
+    """Parse research text into a structured competitor profile.
+
+    Feed in your research findings (from web search, docs, etc.) and get back
+    a structured profile with features, strengths, weaknesses, pricing, etc.
+
+    Args:
+        name: Competitor name
+        url: Competitor website URL
+        research_text: Your research findings as text (tagline, features, pricing, etc.)
+    """
+    from .competitors.research import parse_profile_response
+    profile = parse_profile_response(name, url, research_text)
+    return json.dumps({
+        "name": profile.name,
+        "url": profile.url,
+        "tagline": profile.tagline,
+        "category": profile.category,
+        "pricing": profile.pricing,
+        "tech_stack": profile.tech_stack,
+        "features": [{"name": f.name, "has": f.has_feature} for f in profile.features],
+        "strengths": profile.strengths,
+        "weaknesses": profile.weaknesses,
+        "differentiation": profile.differentiation,
+        "markdown": profile.to_markdown(),
+    }, indent=2)
+
+
+@mcp.tool()
+def verify_competitor_links(
+    competitor_name: str,
+    profile_markdown: str,
+) -> str:
+    """Test all URLs in a competitor profile, returns pass/fail per link.
+
+    Checks every URL found in the profile markdown for reachability.
+
+    Args:
+        competitor_name: Name of the competitor
+        profile_markdown: Markdown text containing URLs to verify
+    """
+    from .competitors.verification import verify_profile_links
+    result = verify_profile_links(competitor_name, profile_markdown)
+    return json.dumps({
+        **result.to_dict(),
+        "links": [
+            {"url": r.url, "status": r.status, "code": r.status_code, "error": r.error}
+            for r in result.links_checked
+        ],
+    }, indent=2)
+
+
+@mcp.tool()
+def generate_gap_analysis(
+    our_name: str,
+    our_features: str,
+    competitors_json: str,
+) -> str:
+    """Run gap analysis comparing our features against competitors.
+
+    Builds a feature matrix and classifies gaps by priority:
+    - must-close: 2+ official competitors have it
+    - should-close: 1 official competitor has it
+    - nice-to-have: only non-official competitors have it
+
+    Args:
+        our_name: Our product name
+        our_features: Comma-separated list of our features
+        competitors_json: JSON array of competitor profiles (from research_competitor)
+    """
+    from .competitors.gap_analysis import run_gap_analysis
+    from .competitors.research import CompetitorProfile, Feature
+
+    features = [f.strip() for f in our_features.split(",") if f.strip()]
+    raw_comps = json.loads(competitors_json)
+
+    profiles = []
+    for c in raw_comps:
+        p = CompetitorProfile(
+            name=c.get("name", ""),
+            url=c.get("url", ""),
+            category=c.get("category", "noted"),
+            features=[Feature(f["name"], "", f.get("has", True)) for f in c.get("features", [])],
+        )
+        profiles.append(p)
+
+    result = run_gap_analysis(our_name, features, profiles)
+    return json.dumps({
+        "our_name": result.our_name,
+        "total_features": len(result.feature_matrix),
+        "total_gaps": len(result.gaps),
+        "must_close": len(result.must_close),
+        "should_close": len(result.should_close),
+        "gaps": [
+            {"feature": g.feature_name, "priority": g.priority,
+             "competitors": g.competitors_with_feature, "status": g.status}
+            for g in result.gaps
+        ],
+        "markdown": result.to_markdown(),
+    }, indent=2)
+
+
+@mcp.tool()
+def generate_comparison_page(
+    our_name: str,
+    our_features: str,
+    competitor_name: str,
+    competitor_url: str,
+    competitor_research: str,
+) -> str:
+    """Generate a /vs/<competitor> comparison page for the project website.
+
+    Produces markdown with frontmatter, feature comparison table,
+    strengths/weaknesses, and pricing comparison.
+
+    Args:
+        our_name: Our product name
+        our_features: Comma-separated list of our features
+        competitor_name: Competitor name
+        competitor_url: Competitor website URL
+        competitor_research: Research text about the competitor
+    """
+    from .competitors.comparison_page import generate_comparison_content
+    from .competitors.research import parse_profile_response
+
+    features = [f.strip() for f in our_features.split(",") if f.strip()]
+    profile = parse_profile_response(competitor_name, competitor_url, competitor_research)
+    page = generate_comparison_content(our_name, features, profile)
+    return json.dumps({
+        "slug": page.slug,
+        "title": page.title,
+        "features_compared": page.features_compared,
+        "markdown": page.to_markdown(),
+    }, indent=2)
+
+
+@mcp.tool()
+def generate_gap_build_plan(
+    plan_number: int,
+    feature_name: str,
+    competitors_with_feature: str,
+    priority: str,
+    our_name: str,
+    context: str = "",
+) -> str:
+    """Create a build plan to close a specific competitive gap.
+
+    Generates a complete build plan following CruxDev template with
+    document alignment, checklists, convergence criteria, etc.
+
+    Args:
+        plan_number: Build plan number (e.g., 12)
+        feature_name: Name of the feature gap to close
+        competitors_with_feature: Comma-separated competitor names that have this feature
+        priority: Gap priority (must-close, should-close, nice-to-have)
+        our_name: Our product name
+        context: Optional notes about how competitors implement this feature
+    """
+    from .competitors.build_plan_generator import generate_gap_plan
+    from .competitors.gap_analysis import FeatureGap
+
+    comps = [c.strip() for c in competitors_with_feature.split(",") if c.strip()]
+    gap = FeatureGap(
+        feature_name=feature_name,
+        competitors_with_feature=comps,
+        priority=priority,
+    )
+    plan = generate_gap_plan(plan_number, gap, our_name, context)
+    return json.dumps({
+        "filename": plan.filename,
+        "content": plan.content,
+    }, indent=2)
+
+
 # --- Legacy direct-execution support ---
 
 

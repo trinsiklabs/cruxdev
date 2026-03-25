@@ -176,14 +176,72 @@ class Broker:
         body: str,
         severity: str = "medium",
     ) -> str:
-        """Send a message. Returns message ID."""
+        """Send a message. Returns message ID.
+
+        Also writes a notification file so hook scripts can detect
+        new messages without querying SQLite.
+        """
         msg_id = str(uuid.uuid4())[:8]
         with self._conn() as conn:
             conn.execute(
                 "INSERT INTO messages (id, type, source_project, target_project, title, body, severity, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (msg_id, type, source_project, target_project, title, body, severity, time.time()),
             )
+        # Write notification file for push-based detection
+        if target_project != "*":
+            self._write_notification(target_project, title)
+        else:
+            # Broadcast — notify all registered projects
+            for session in self.list_sessions():
+                if session.project != source_project:
+                    self._write_notification(session.project, title)
         return msg_id
+
+    def _write_notification(self, project: str, title: str) -> None:
+        """Write a notification file for a project."""
+        notify_dir = os.path.join(os.path.dirname(self.db_path), "notifications")
+        os.makedirs(notify_dir, exist_ok=True)
+        notify_path = os.path.join(notify_dir, f"{project}.notify")
+
+        # Read existing count if any
+        count = 0
+        try:
+            with open(notify_path) as f:
+                existing = json.loads(f.read())
+                count = existing.get("count", 0)
+        except (FileNotFoundError, json.JSONDecodeError, ValueError):
+            pass
+
+        data = json.dumps({
+            "count": count + 1,
+            "latest_title": title,
+            "updated_at": time.time(),
+        })
+        # Atomic write
+        tmp_path = notify_path + ".tmp"
+        with open(tmp_path, "w") as f:
+            f.write(data)
+        os.replace(tmp_path, notify_path)
+
+    def clear_notification(self, project: str) -> bool:
+        """Clear the notification file for a project. Returns True if file existed."""
+        notify_dir = os.path.join(os.path.dirname(self.db_path), "notifications")
+        notify_path = os.path.join(notify_dir, f"{project}.notify")
+        try:
+            os.remove(notify_path)
+            return True
+        except FileNotFoundError:
+            return False
+
+    def read_notification(self, project: str) -> dict | None:
+        """Read notification file for a project. Returns None if no notification."""
+        notify_dir = os.path.join(os.path.dirname(self.db_path), "notifications")
+        notify_path = os.path.join(notify_dir, f"{project}.notify")
+        try:
+            with open(notify_path) as f:
+                return json.loads(f.read())
+        except (FileNotFoundError, json.JSONDecodeError):
+            return None
 
     def check_inbox(
         self,
