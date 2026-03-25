@@ -35,6 +35,13 @@ def test_session_register():
     assert len(result["session_id"]) == 8
 
 
+def test_session_register_default_name():
+    result = json.loads(session_register())
+    assert result["status"] == "registered"
+    # Uses cwd basename as project name
+    assert len(result["project"]) > 0
+
+
 def test_session_list():
     session_register("crux")
     session_register("cruxcli")

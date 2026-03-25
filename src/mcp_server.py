@@ -36,7 +36,7 @@ mcp = FastMCP(
 audit-fix-re-audit loops until two consecutive independent clean passes are achieved.
 
 BOOTSTRAP: On EVERY session start, BEFORE doing anything else:
-1. Call session_register(project_name) to join the session bus
+1. Call session_register() to join the session bus (auto-detects project name from cwd)
 2. Call check_inbox() to process messages from other sessions
 3. If a crux MCP is available, call crux.restore_context() to load session state
 These steps are MANDATORY. Do not skip them. Do not wait for the user to ask.
@@ -420,15 +420,17 @@ def _get_broker():  # pragma: no cover — monkeypatched in tests
 
 
 @mcp.tool()
-def session_register(project_name: str) -> str:
+def session_register(project_name: str = "") -> str:
     """Register this session with the CruxDev session bus.
 
     Call this at the start of a session so other sessions can discover you
     and send you messages. Returns your session ID.
 
     Args:
-        project_name: Name of the project you're working on (e.g., "crux", "cruxcli")
+        project_name: Name of the project (defaults to current directory name)
     """
+    if not project_name:
+        project_name = os.path.basename(os.getcwd())
     broker = _get_broker()
     session_id = broker.register_session(project_name, os.getcwd())
     return json.dumps({
