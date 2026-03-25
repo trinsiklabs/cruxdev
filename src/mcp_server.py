@@ -812,8 +812,9 @@ def verify_research_sources(
         source_urls: Comma-separated URLs to verify
     """
     from .research.verify import verify_sources
+    from .mcp_normalize import to_string_list
 
-    urls = [u.strip() for u in source_urls.split(",") if u.strip()]
+    urls = to_string_list(source_urls)
     result = verify_sources(finding_id, urls)
     return json.dumps({
         "finding_id": result.finding_id,
@@ -846,11 +847,12 @@ def counter_research(
         supporting_count: Number of supporting sources found
     """
     from .research.counter import run_counter_research
+    from .mcp_normalize import to_int, to_pipe_list
 
-    counter = [c.strip() for c in counter_evidence.split("|") if c.strip()] if counter_evidence else []
-    alts = [a.strip() for a in alternative_explanations.split("|") if a.strip()] if alternative_explanations else []
+    counter = to_pipe_list(counter_evidence)
+    alts = to_pipe_list(alternative_explanations)
 
-    result = run_counter_research(claim, counter, alts, supporting_count)
+    result = run_counter_research(claim, counter, alts, to_int(supporting_count, 1))
     return json.dumps({
         "claim": result.original_claim,
         "robustness": result.robustness,
@@ -963,30 +965,19 @@ def generate_gap_analysis(
     """
     from .competitors.gap_analysis import run_gap_analysis
     from .competitors.research import CompetitorProfile, Feature
+    from .mcp_normalize import normalize_competitors, to_string_list
 
-    features = [f.strip() for f in our_features.split(",") if f.strip()]
-    try:
-        raw_comps = json.loads(competitors_json) if isinstance(competitors_json, str) else competitors_json
-    except json.JSONDecodeError as e:
-        return json.dumps({"error": f"Invalid competitors_json: {e}"})
+    features = to_string_list(our_features)
+    normalized = normalize_competitors(competitors_json)
 
     profiles = []
-    for c in raw_comps:
-        if not isinstance(c, dict):
-            continue
-        comp_features = []
-        for f in c.get("features", []):
-            if isinstance(f, dict):
-                comp_features.append(Feature(f.get("name", ""), "", f.get("has", True)))
-            elif isinstance(f, str):
-                comp_features.append(Feature(f, "", True))
-        p = CompetitorProfile(
-            name=c.get("name", "unknown"),
-            url=c.get("url", ""),
-            category=c.get("category", "noted"),
-            features=comp_features,
-        )
-        profiles.append(p)
+    for c in normalized:
+        profiles.append(CompetitorProfile(
+            name=c["name"],
+            url=c["url"],
+            category=c["category"],
+            features=[Feature(f["name"], "", f["has"]) for f in c["features"]],
+        ))
 
     result = run_gap_analysis(our_name, features, profiles)
     return json.dumps({
@@ -1026,8 +1017,9 @@ def generate_comparison_page(
     """
     from .competitors.comparison_page import generate_comparison_content
     from .competitors.research import parse_profile_response
+    from .mcp_normalize import to_string_list
 
-    features = [f.strip() for f in our_features.split(",") if f.strip()]
+    features = to_string_list(our_features)
     profile = parse_profile_response(competitor_name, competitor_url, competitor_research)
     page = generate_comparison_content(our_name, features, profile)
     return json.dumps({
@@ -1062,8 +1054,10 @@ def generate_gap_build_plan(
     """
     from .competitors.build_plan_generator import generate_gap_plan
     from .competitors.gap_analysis import FeatureGap
+    from .mcp_normalize import to_int, to_string_list
 
-    comps = [c.strip() for c in competitors_with_feature.split(",") if c.strip()]
+    plan_number = to_int(plan_number, 1)
+    comps = to_string_list(competitors_with_feature)
     gap = FeatureGap(
         feature_name=feature_name,
         competitors_with_feature=comps,

@@ -66,9 +66,10 @@ class TestVerifyCompetitorLinks:
 
 
 class TestGenerateGapAnalysis:
-    def test_invalid_json(self):
+    def test_invalid_json_returns_empty(self):
         result = json.loads(generate_gap_analysis("Us", "testing", "not valid json"))
-        assert "error" in result
+        # normalize_competitors handles bad JSON gracefully — returns empty
+        assert result["total_gaps"] == 0
 
     def test_string_features(self):
         competitors = json.dumps([
