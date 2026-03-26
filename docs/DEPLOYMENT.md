@@ -23,10 +23,21 @@ Output: `./dist/` directory with static files.
 
 ### Deploy
 
-Production deployment is not yet configured. Options under consideration:
-- Cloudflare Pages (recommended — free, fast, global CDN)
-- Vercel
-- Netlify
+**Host:** vh1.trinsik.io
+**User:** cruxdev.dev
+**Method:** rsync over SSH
+**Key:** `~/.ssh/cruxdev_deploy` (ed25519)
+
+```bash
+cd /Users/user/personal/cruxdev-dev
+./deploy.sh
+```
+
+Or manually:
+```bash
+npm run build
+rsync -avz --delete -e "ssh -i ~/.ssh/cruxdev_deploy -o IdentitiesOnly=yes" dist/ cruxdev.dev@vh1.trinsik.io:~/
+```
 
 ### Pre-Deployment Checklist
 
