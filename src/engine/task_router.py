@@ -82,6 +82,41 @@ class Task:
         return d
 
 
+def _auto_discover_docs(plan_file: str) -> list[str]:
+    """Auto-discover doc files from project docs/ directory.
+
+    If a docs/ directory exists relative to the plan file's project,
+    returns all .md files in it. Falls back to [plan_file].
+    """
+    import glob
+
+    # Try to find docs/ relative to the plan file
+    plan_dir = os.path.dirname(os.path.abspath(plan_file))
+
+    # Walk up to find project root (look for .git, pyproject.toml, package.json)
+    project_root = plan_dir
+    for _ in range(5):  # max 5 levels up
+        if any(os.path.exists(os.path.join(project_root, marker))
+               for marker in (".git", "pyproject.toml", "package.json")):
+            break
+        parent = os.path.dirname(project_root)
+        if parent == project_root:
+            break
+        project_root = parent
+
+    docs_dir = os.path.join(project_root, "docs")
+    if os.path.isdir(docs_dir):
+        docs = glob.glob(os.path.join(docs_dir, "*.md"))
+        # Also check README at root
+        readme = os.path.join(project_root, "README.md")
+        if os.path.exists(readme):
+            docs.append(readme)
+        if docs:
+            return sorted(docs)
+
+    return [plan_file]
+
+
 def get_next_task(
     state: ConvergenceState,
     state_path: str,
@@ -261,7 +296,7 @@ def get_next_task(
             state.consecutive_clean = 0
             save_state(state, state_path)
             return get_next_task(state, state_path, source_files, doc_files, test_command)
-        files = doc_files or [state.plan_file]
+        files = doc_files or _auto_discover_docs(state.plan_file)
         return Task(
             task_type="audit",
             description=f"Audit documentation (round {state.round}). Check accuracy, completeness, consistency.",

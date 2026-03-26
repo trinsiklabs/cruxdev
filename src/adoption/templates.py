@@ -65,6 +65,7 @@ TEMPLATES: list[Template] = [
 
     # Website templates
     Template("website", "Deployment", "Deployment procedures", "docs/DEPLOYMENT.md", "R"),
+    Template("website", "Website Config", "Site URL, hosting, domain", "docs/WEBSITE.md", "R"),
     Template("website", "SEO Strategy", "Search engine optimization", "docs/SEO_STRATEGY.md", "P"),
 
     # Research templates

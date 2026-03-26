@@ -70,7 +70,9 @@ def validate_plan(plan_path: str) -> PlanValidationResult:
     if not re.search(r"Post-Execution Convergence|Documentation convergence|Website convergence", content, re.IGNORECASE):
         result.warnings.append(
             "Plan has no post-execution convergence checklist. Every plan should include: "
-            "documentation convergence, website convergence, deployment, patterns update, inbox check."
+            "documentation convergence, website convergence, deployment, patterns update, inbox check. "
+            "NOTE: If the project has a docs/ folder, documentation convergence is auto-enforced by the engine "
+            "even if not listed here — but listing it makes the requirement explicit."
         )
 
     # Check for empty plan
