@@ -522,7 +522,8 @@ Landing pages are prime targets for AI citation because they answer specific que
 
 **Weekly:**
 - Performance review: which landing pages drive traffic to nav pages, which convert
-- Zero-traffic landing pages: diagnose why (not indexed? bad keyword? thin content?) and fix — don't delete. Improve content, add internal links, resubmit to search console. Only merge into another page if the keyword itself has zero search volume after re-research confirms it.
+- Zero-traffic landing pages: diagnose why (not indexed? bad keyword? thin content?) and fix — don't delete. Improve content, add internal links, resubmit to search console.
+- **RULE: Once a page is indexed, NEVER delete it.** Deleting an indexed page creates a 404, damages domain authority, and requires maintaining redirect maps. Instead, update the content. A page that exists and ranks poorly is better than a 404 or a redirect chain. Improve it, don't remove it.
 
 **After competitive analysis updates:**
 - When COMPETITORS.md is updated, check if new competitor names or features create new keyword opportunities
