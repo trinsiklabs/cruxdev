@@ -56,6 +56,11 @@ This document parallels `DEVELOPMENT_PATTERNS.md` (for code) and `E2E_TEST_PATTE
 - Identify gaps: what are competitors doing poorly or not at all?
 - Note: also check how competitors appear in AI responses (search for your category in ChatGPT, Claude, Perplexity)
 
+**If the project uses CruxDev's competitive analysis system** (`docs/COMPETITORS.md` exists):
+- Use the competitive data as the primary input for this phase — don't duplicate research
+- The feature matrix, gap analysis, moat analysis, and threat scores from COMPETITORS.md feed directly into comparison page content
+- Call `setup_competitive_analysis` or use existing COMPETITORS.md data to auto-generate `/vs/<competitor>` comparison pages (see §4.6 Comparison Pages)
+
 ### 1.4 Requirements
 
 - **Functional**: What the site must do (forms, search, auth, e-commerce, etc.)
@@ -188,12 +193,35 @@ List every page the site needs at launch. For each page:
 - No unnecessary parameters or IDs
 - Plan 301 redirects from any existing/legacy URLs
 
-### 4.5 Validation
+### 4.5 Comparison Pages (if competitive analysis active)
+
+If the project has a `docs/COMPETITORS.md` (from CruxDev's competitive analysis system), generate comparison pages:
+
+**Navigation:**
+- Add a "Compare" or "vs" top-level or secondary nav item
+- Each official/watch competitor gets its own `/vs/<competitor-slug>` page
+- Index page at `/compare` or `/vs` listing all comparisons
+
+**Per-competitor page structure:**
+- SEO-optimized title: "[Our Product] vs [Competitor] — Features, Pricing & Comparison"
+- Meta description targeting "[our product] vs [competitor]" search queries
+- Feature comparison table (from COMPETITORS.md feature matrix)
+- Strengths/weaknesses side-by-side
+- Pricing comparison (if applicable)
+- "When to choose [us]" vs "When to choose [them]" sections
+- FAQPage structured data (schema.org) for AI/search visibility
+- CTA at bottom
+
+**Data source:** All comparison content is generated from COMPETITORS.md data via CruxDev's `generate_comparison_page()` tool. When COMPETITORS.md is updated (daily competitive monitoring), comparison pages must be regenerated and redeployed.
+
+**URL pattern:** `/vs/competitor-name` (lowercase, hyphens, no special chars)
+
+### 4.6 Validation
 
 - **Tree testing**: Users find content in proposed hierarchy (no visual design, just the tree)
 - Iterate until success rate > 80%
 
-**Deliverables**: Sitemap, navigation model, URL map, redirect plan, tree test results.
+**Deliverables**: Sitemap, navigation model, URL map, redirect plan, comparison pages, tree test results.
 
 ---
 
@@ -211,6 +239,7 @@ List every page the site needs at launch. For each page:
   - **Decision**: What do they search when ready to buy/adopt? ("X pricing", "X tutorial", "X getting started")
 - For each keyword: search volume, difficulty, current ranking, content to create
 - Focus on long-tail (100-1,000 monthly searches) over competitive head terms
+- **Comparison keywords are high-value consideration-stage content**: "[product] vs [competitor]" queries have strong purchase intent. If comparison pages exist (§4.5), each one targets its own keyword cluster.
 
 ### 5.2 Content Cluster Architecture
 
@@ -567,6 +596,15 @@ WCAG 2.1 AA is the minimum legal standard (US ADA, EU EAA). 5,000+ accessibility
 - **Monthly** (ongoing): Trends, content performance, SEO rankings, AI visibility
 - **Quarterly**: A/B test results, competitive analysis refresh, strategy review
 - **Annually**: Full audit — accessibility, performance, content freshness, IA review
+
+### 12.3 Comparison Page Maintenance (if competitive analysis active)
+
+If the project uses CruxDev's competitive analysis system:
+- When `docs/COMPETITORS.md` is updated (daily competitive monitoring), comparison pages must be regenerated
+- The WEBSITE_CONVERGENCE phase in the convergence engine auto-triggers this
+- Regeneration uses `generate_comparison_page()` from the updated competitor data
+- Deploy after regeneration — stale comparison pages damage SEO and credibility
+- New competitors added to COMPETITORS.md should get comparison pages added to the nav
 
 ### 12.3 Content Maintenance
 
