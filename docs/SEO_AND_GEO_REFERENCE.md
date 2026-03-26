@@ -522,7 +522,7 @@ Landing pages are prime targets for AI citation because they answer specific que
 
 **Weekly:**
 - Performance review: which landing pages drive traffic to nav pages, which convert
-- Prune or merge landing pages with zero traffic after 30 days (not 3 months — bot time)
+- Zero-traffic landing pages: diagnose why (not indexed? bad keyword? thin content?) and fix — don't delete. Improve content, add internal links, resubmit to search console. Only merge into another page if the keyword itself has zero search volume after re-research confirms it.
 
 **After competitive analysis updates:**
 - When COMPETITORS.md is updated, check if new competitor names or features create new keyword opportunities
