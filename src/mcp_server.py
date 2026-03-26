@@ -28,6 +28,9 @@ from .engine.task_router import Task, get_next_task, submit_result
 CRUXDEV_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE_DIR = os.path.join(CRUXDEV_ROOT, ".cruxdev", "convergence_state")
 
+# In-memory map: convergence_id → state_path (for project-local resolution)
+_convergence_paths: dict[str, str] = {}
+
 # --- Server ---
 
 mcp = FastMCP(
@@ -81,7 +84,18 @@ os.makedirs(STATE_DIR, exist_ok=True)
 
 
 def _state_path(convergence_id: str) -> str:
-    return os.path.join(STATE_DIR, f"{convergence_id}.json")
+    # Check project-local path first, fall back to legacy location
+    if convergence_id in _convergence_paths:
+        return _convergence_paths[convergence_id]
+    legacy = os.path.join(STATE_DIR, f"{convergence_id}.json")
+    if os.path.exists(legacy):
+        return legacy
+    return legacy  # Default for new runs (overridden in start_convergence)
+
+
+def _project_state_path(project_dir: str, convergence_id: str) -> str:
+    """State path under the target project's .cruxdev/."""
+    return os.path.join(project_dir, ".cruxdev", "convergence_state", f"{convergence_id}.json")
 
 
 # --- Bootstrap tools ---
@@ -211,6 +225,7 @@ def start_convergence(
     source_files: str = "",
     doc_files: str = "",
     test_command: str = "",
+    project_dir: str = "",
 ) -> str:
     """Start converging a build plan. Returns the first task for you to execute.
 
@@ -239,15 +254,42 @@ def start_convergence(
         test_command: Shell command to run tests (e.g. "python3 -m pytest tests/ -v")
     """
     from .engine.plan_status import update_plan_status
+    from .engine.convergence_index import find_active_run, register_run
+    from .engine import wal
+
+    proj = project_dir if project_dir else os.getcwd()
+
+    # Check for existing active run (deterministic resume)
+    existing = find_active_run(proj, plan_file)
+    if existing:
+        _convergence_paths[existing.convergence_id] = existing.state_path
+        state = load_state(existing.state_path)
+        task = get_next_task(state, existing.state_path)
+        return json.dumps({
+            "convergence_id": existing.convergence_id,
+            "status": "resumed",
+            "phase": state.phase.value,
+            "round": state.round,
+            "task": task.to_dict(),
+        }, indent=2)
 
     convergence_id = str(uuid.uuid4())[:8]
+    path = _project_state_path(proj, convergence_id)
     state = ConvergenceState(
         plan_file=plan_file,
         deadline=time.time() + (timeout_minutes * 60),
         max_rounds=max_rounds,
+        project_dir=proj,
     )
-    path = _state_path(convergence_id)
+
+    # WAL: log start BEFORE state mutation
+    wal.append(path, "start", {"plan_file": plan_file, "convergence_id": convergence_id})
+
     save_state(state, path)
+
+    # Register in index + memory map
+    register_run(proj, plan_file, convergence_id, path)
+    _convergence_paths[convergence_id] = path
 
     # Mark plan as started
     update_plan_status(plan_file, "IN PROGRESS")
@@ -383,16 +425,30 @@ def convergence_submit_result(
             }, indent=2)
         validated.append(item)
 
+    from .engine import wal
+    from .engine.plan_status import update_plan_status
+    from .engine.convergence_index import update_run_status
+
+    # WAL: log submit BEFORE state mutation
+    wal.append(path, "submit", {
+        "phase": state.phase.value,
+        "round": state.round,
+        "findings_count": len(validated),
+    })
+
     submit_result(state, path, {"findings": validated})
 
     # Merge submit + next: return the next task inline to eliminate stopping points
-    from .engine.plan_status import update_plan_status
     next_task = get_next_task(state, path)
 
     if next_task.task_type == "done":
         update_plan_status(state.plan_file, "CONVERGED")
+        if state.project_dir:
+            update_run_status(state.project_dir, convergence_id, "converged")
     elif next_task.task_type == "escalated":
         update_plan_status(state.plan_file, "ESCALATED")
+        if state.project_dir:
+            update_run_status(state.project_dir, convergence_id, "escalated")
 
     return json.dumps({
         "convergence_id": convergence_id,

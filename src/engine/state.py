@@ -77,3 +77,4 @@ class ConvergenceState:
     escalation_reason: Optional[str] = None
     created_at: float = field(default_factory=time.time)
     updated_at: float = field(default_factory=time.time)
+    project_dir: str = ""  # Project directory — state stored here

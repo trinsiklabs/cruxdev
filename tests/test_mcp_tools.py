@@ -114,6 +114,19 @@ def test_submit_escalated_updates_plan_status(tmp_path):
     assert "ESCALATED" in plan.read_text()
 
 
+def test_start_convergence_resumes_active_run(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n**Status:** NOT STARTED\n- [ ] task\n")
+    start1 = json.loads(start_convergence(str(plan), project_dir=str(tmp_path)))
+    cid1 = start1["convergence_id"]
+    assert start1["status"] == "started"
+
+    # Calling start again with same plan should RESUME, not create new
+    start2 = json.loads(start_convergence(str(plan), project_dir=str(tmp_path)))
+    assert start2["status"] == "resumed"
+    assert start2["convergence_id"] == cid1
+
+
 def test_start_convergence_with_files(tmp_path):
     plan = tmp_path / "plan.md"
     plan.write_text("# Plan\n")

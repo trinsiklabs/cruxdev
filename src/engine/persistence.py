@@ -83,6 +83,7 @@ def deserialize(data: dict[str, Any]) -> ConvergenceState:
         escalation_reason=data.get("escalation_reason"),
         created_at=data.get("created_at", 0.0),
         updated_at=data.get("updated_at", 0.0),
+        project_dir=data.get("project_dir", ""),
     )
 
 
