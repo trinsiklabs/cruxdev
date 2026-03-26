@@ -426,7 +426,94 @@ Google values freshness for queries where recency matters (news, evolving topics
 
 ---
 
-### 1.6 Backlink Strategy
+### 1.6 Keyword-to-Landing-Page System
+
+**Purpose:** Every keyword/question identified in research gets a page. Not just "what people search to find us" — also "what people search when they don't know they need us."
+
+#### 1.6.1 Keyword Research Tiers
+
+Research must cover ALL of these tiers, not just the obvious ones:
+
+| Tier | Audience State | Example (for a convergence engine) | Priority |
+|------|---------------|--------------------------------------|----------|
+| **Tier 1: Solution-aware** | Knows the category, comparing options | "AI code review tool comparison" | High |
+| **Tier 2: Problem-aware** | Knows the pain, seeking solutions | "how to stop re-prompting AI coding agent" | High |
+| **Tier 3: Symptom-aware** | Feels the pain, doesn't know the cause | "AI code keeps introducing bugs after multiple edits" | Medium |
+| **Tier 4: Problem-unaware** | Has the problem but doesn't recognize it | "how to know when AI-generated code is done" | Medium |
+| **Tier 5: Adjacent interest** | Interested in adjacent topics that lead here | "TDD best practices 2026", "AI coding agent safety" | Lower |
+
+**Critical:** Tier 3 and 4 are where the biggest opportunity lies. Competitors only target Tiers 1-2. A page that answers "why does my AI keep making the same mistakes?" captures an audience that didn't know convergence engines exist.
+
+#### 1.6.2 Keyword Registry
+
+All researched keywords/questions must be tracked in a structured registry:
+
+```markdown
+## Keyword Registry
+
+| Keyword/Question | Tier | Monthly Volume | Difficulty | Intent | Landing Page | Nav Page Target | Status |
+|-----------------|------|---------------|-----------|--------|-------------|----------------|--------|
+| "AI code review tool" | 1 | 2,400 | High | Commercial | /lp/ai-code-review | /engine | Created |
+| "how to stop re-prompting AI" | 2 | 320 | Low | Informational | /lp/stop-re-prompting | /methodology | Created |
+| "AI code introduces bugs" | 3 | 890 | Medium | Informational | /lp/ai-code-quality | /engine | Planned |
+| "when is AI code done" | 4 | 110 | Low | Informational | /lp/convergence-explained | /methodology | Planned |
+```
+
+This registry lives in `docs/SEO_KEYWORDS.md` (or equivalent) and is the source of truth for all landing page planning.
+
+#### 1.6.3 Landing Page Architecture
+
+Each keyword cluster gets a landing page at `/lp/<slug>` (or `/resources/<slug>`, `/learn/<slug>`):
+
+**Landing page structure:**
+1. **H1** matching the search query (exact or close semantic match)
+2. **Answer the question** in the first 2-3 paragraphs (for featured snippets and AI extraction)
+3. **Expand with depth** — 800-2,000 words of genuinely useful content
+4. **Internal links** to the relevant nav page(s) — this is how landing pages funnel to the main site
+5. **CTA** — get started, read more, try it
+6. **Structured data** — Article, FAQPage, or HowTo schema as appropriate
+
+**Key principle:** Landing pages exist to RANK and FUNNEL. They answer the searcher's question, then guide them to the main site pages where the product story is told. They are NOT product pages — they are content pages that happen to lead to the product.
+
+#### 1.6.4 Indexing Without Nav Presence
+
+Landing pages must be indexed by search engines and AI but should NOT clutter the main site navigation:
+
+**How to achieve this:**
+
+1. **XML Sitemap inclusion** — Add all `/lp/*` pages to `sitemap.xml`. This is the primary discovery mechanism for search engines.
+2. **No nav link required** — Pages do NOT need to be in the header/footer navigation. Google indexes pages via sitemap, internal links, and crawling — nav presence is not required.
+3. **Internal linking** — Link TO landing pages from relevant blog posts, docs, and other content. Link FROM landing pages to nav pages. This creates a web of internal links without polluting navigation.
+4. **robots.txt** — Ensure `/lp/` is NOT blocked. Explicitly allow crawling.
+5. **Canonical URLs** — Each landing page has its own canonical (it IS the canonical — don't point it at a nav page).
+6. **llms.txt** — List key landing pages in `llms.txt` for AI discoverability.
+7. **Blog cross-linking** — Blog posts naturally link to related landing pages, providing additional crawl paths.
+
+**What NOT to do:**
+- Do NOT add landing pages to the main nav (clutters UX, dilutes main nav authority)
+- Do NOT use `noindex` on landing pages (defeats the purpose)
+- Do NOT create thin landing pages (< 300 words) — they won't rank and may be flagged as doorway pages
+- Do NOT duplicate content across landing pages — each must have unique, substantive content
+
+#### 1.6.5 AI/GEO Visibility for Landing Pages
+
+Landing pages are prime targets for AI citation because they answer specific questions directly:
+
+- **First-paragraph answer pattern** — AI models extract from the first 2-3 sentences. Put a clear, definitive answer there.
+- **Question-as-heading** — Use the actual search query as an H2 or H3. AI models match headings to queries.
+- **Structured data** — FAQPage schema gives AI models structured Q&A pairs to cite.
+- **Unique claims with evidence** — AI models prefer content that makes specific, sourced claims over generic advice.
+
+#### 1.6.6 Landing Page Maintenance
+
+- **Quarterly refresh:** Update landing pages with current data, links, and relevance.
+- **Keyword registry re-research:** Every quarter, re-run keyword research to find new Tier 3-4 opportunities.
+- **Performance tracking:** Track which landing pages rank, which drive traffic to nav pages, which convert.
+- **Prune or merge:** If a landing page gets zero traffic after 6 months, merge its content into a related page or expand it.
+
+---
+
+### 1.7 Backlink Strategy
 
 #### How Links Affect Ranking
 
