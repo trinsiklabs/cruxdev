@@ -411,8 +411,9 @@ def get_next_task(
                 f"2. Verify all claims on the site are accurate against docs/\n"
                 f"3. Check comparison pages are current against docs/COMPETITORS.md\n"
                 f"4. Update any screenshots or demos if the UI changed\n"
-                f"5. Deploy the updated site per docs/DEPLOYMENT.md\n"
-                f"Methodology: docs/WEBSITE_PLANNING.md Phase 12 (Post-Launch Operations)\n"
+                f"5. Verify all landing pages (/lp/*) have accurate content, working links to nav pages\n"
+                f"6. Deploy the updated site per docs/DEPLOYMENT.md\n"
+                f"Methodology: docs/WEBSITE_PLANNING.md Phase 12 + docs/SEO_AND_GEO_REFERENCE.md §1.6\n"
                 + (
                     f"6. This is a WEBAPP — also converge against docs/E2E_TEST_PATTERNS.md and docs/UAT_TEST_PATTERNS.md\n"
                     f"   Run E2E tests to verify user flows work after changes\n"

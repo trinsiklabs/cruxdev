@@ -506,10 +506,27 @@ Landing pages are prime targets for AI citation because they answer specific que
 
 #### 1.6.6 Landing Page Maintenance
 
-- **Quarterly refresh:** Update landing pages with current data, links, and relevance.
-- **Keyword registry re-research:** Every quarter, re-run keyword research to find new Tier 3-4 opportunities.
-- **Performance tracking:** Track which landing pages rank, which drive traffic to nav pages, which convert.
-- **Prune or merge:** If a landing page gets zero traffic after 6 months, merge its content into a related page or expand it.
+**After every website update:**
+- Verify all landing pages still have accurate content (metrics, features, claims)
+- Check internal links from landing pages to nav pages still resolve
+- Update any landing page that references changed functionality
+- The WEBSITE_CONVERGENCE phase auto-triggers this — landing pages are part of website convergence, not a separate step
+
+**Daily (SEO research refresh — bot time, not human time):**
+- Re-run keyword research for Tier 1-3 terms — search landscape changes in hours now
+- Check ranking positions for existing landing pages
+- Identify new Tier 3-4 keyword opportunities from search console data, competitor changes, or industry shifts
+- Add new keywords to the registry with status "Planned"
+- Flag any landing pages that dropped in rankings for content refresh
+- Create landing pages for validated "Planned" keywords — don't batch, ship immediately
+
+**Weekly:**
+- Performance review: which landing pages drive traffic to nav pages, which convert
+- Prune or merge landing pages with zero traffic after 30 days (not 3 months — bot time)
+
+**After competitive analysis updates:**
+- When COMPETITORS.md is updated, check if new competitor names or features create new keyword opportunities
+- New comparison pages (`/vs/`) may create new landing page opportunities for related searches
 
 ---
 
