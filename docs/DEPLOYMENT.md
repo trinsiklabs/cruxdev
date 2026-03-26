@@ -36,7 +36,7 @@ cd /Users/user/personal/cruxdev-dev
 Or manually:
 ```bash
 npm run build
-rsync -avz --delete -e "ssh -i ~/.ssh/cruxdev_deploy -o IdentitiesOnly=yes" dist/ cruxdev.dev@vh1.trinsik.io:~/
+rsync -avz --delete -e "ssh -i ~/.ssh/cruxdev_deploy -o IdentitiesOnly=yes" dist/ cruxdev.dev@vh1.trinsik.io:~/public_html/
 ```
 
 ### Pre-Deployment Checklist
