@@ -43,11 +43,13 @@ These steps are MANDATORY. Do not skip them. Do not wait for the user to ask.
 
 CONVERGENCE: When the user says "converge [plan]":
 1. Call start_convergence(plan_file) — engine creates state, returns first task
-2. Loop: call convergence_next_task(id) to get what to do next
-3. Execute the task (read files, audit code, fix issues, run tests)
-4. Call convergence_submit_result(id, findings_json) to report back
-5. Repeat 2-4 until task_type is "done" or "escalated"
-DO NOT decide when to stop — the engine decides.
+2. Execute the task (read files, audit code, fix issues, run tests)
+3. Call convergence_submit_result(id, findings_json) — returns the NEXT task inline
+4. Execute that next task immediately. DO NOT ask the user "should I continue?"
+5. Repeat 2-4 until next_task.task_type is "done" or "escalated"
+DO NOT decide when to stop — the engine decides. DO NOT pause between phases.
+DO NOT ask for permission to continue. The submit response includes the next task
+so there is no gap where you should stop.
 
 RESEARCH: ALL research activities MUST follow the 5-pass iterative deepening system:
 1. Broad search — establish the landscape
@@ -236,6 +238,8 @@ def start_convergence(
         doc_files: Comma-separated doc files to audit (e.g. "README.md,CHANGELOG.md")
         test_command: Shell command to run tests (e.g. "python3 -m pytest tests/ -v")
     """
+    from .engine.plan_status import update_plan_status
+
     convergence_id = str(uuid.uuid4())[:8]
     state = ConvergenceState(
         plan_file=plan_file,
@@ -244,6 +248,9 @@ def start_convergence(
     )
     path = _state_path(convergence_id)
     save_state(state, path)
+
+    # Mark plan as started
+    update_plan_status(plan_file, "IN PROGRESS")
 
     src = [f.strip() for f in source_files.split(",") if f.strip()] if source_files else None
     docs = [f.strip() for f in doc_files.split(",") if f.strip()] if doc_files else None
@@ -287,6 +294,8 @@ def convergence_next_task(
         doc_files: Override doc files (comma-separated)
         test_command: Override test command
     """
+    from .engine.plan_status import update_plan_status
+
     path = _state_path(convergence_id)
     state = load_state(path)
 
@@ -295,6 +304,12 @@ def convergence_next_task(
     test_cmd = test_command.split() if test_command else None
 
     task = get_next_task(state, path, src, docs, test_cmd)
+
+    # Update plan status on terminal states
+    if task.task_type == "done":
+        update_plan_status(state.plan_file, "CONVERGED")
+    elif task.task_type == "escalated":
+        update_plan_status(state.plan_file, "ESCALATED")
 
     return json.dumps({
         "convergence_id": convergence_id,
@@ -333,12 +348,51 @@ def convergence_submit_result(
     path = _state_path(convergence_id)
     state = load_state(path)
 
-    try:
-        findings = json.loads(findings_json)
-    except json.JSONDecodeError:
-        findings = []
+    # Strict validation — fail closed on bad input
+    if not findings_json or findings_json.strip() == "":
+        findings_json = "[]"
 
-    submit_result(state, path, {"findings": findings})
+    try:
+        raw = json.loads(findings_json) if isinstance(findings_json, str) else findings_json
+    except json.JSONDecodeError as e:
+        return json.dumps({
+            "convergence_id": convergence_id,
+            "status": "rejected",
+            "error": f"Invalid JSON in findings: {e}. State was NOT mutated. Fix the JSON and resubmit.",
+        }, indent=2)
+
+    if not isinstance(raw, list):
+        return json.dumps({
+            "convergence_id": convergence_id,
+            "status": "rejected",
+            "error": "findings_json must be a JSON array. State was NOT mutated.",
+        }, indent=2)
+
+    # Validate each finding has required fields
+    REQUIRED_FINDING_FIELDS = {"id", "file", "dimension", "severity", "description"}
+    validated = []
+    for i, item in enumerate(raw):
+        if not isinstance(item, dict):
+            continue
+        missing = REQUIRED_FINDING_FIELDS - set(item.keys())
+        if missing:
+            return json.dumps({
+                "convergence_id": convergence_id,
+                "status": "rejected",
+                "error": f"Finding [{i}] missing required fields: {sorted(missing)}. State was NOT mutated.",
+            }, indent=2)
+        validated.append(item)
+
+    submit_result(state, path, {"findings": validated})
+
+    # Merge submit + next: return the next task inline to eliminate stopping points
+    from .engine.plan_status import update_plan_status
+    next_task = get_next_task(state, path)
+
+    if next_task.task_type == "done":
+        update_plan_status(state.plan_file, "CONVERGED")
+    elif next_task.task_type == "escalated":
+        update_plan_status(state.plan_file, "ESCALATED")
 
     return json.dumps({
         "convergence_id": convergence_id,
@@ -346,6 +400,9 @@ def convergence_submit_result(
         "round": state.round,
         "consecutive_clean": state.consecutive_clean,
         "status": "result_accepted",
+        "findings_count": len(validated),
+        "continue": not is_terminal(state.phase),
+        "next_task": next_task.to_dict(),
     }, indent=2)
 
 

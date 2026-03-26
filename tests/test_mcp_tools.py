@@ -71,11 +71,47 @@ def test_validate_plan_structure_invalid(tmp_path):
 
 def test_start_convergence(tmp_path):
     plan = tmp_path / "plan.md"
-    plan.write_text("# Plan\n- [ ] do stuff\n")
+    plan.write_text("# Plan\n**Status:** NOT STARTED\n- [ ] do stuff\n")
     result = json.loads(start_convergence(str(plan)))
     assert "convergence_id" in result
     assert result["status"] == "started"
+    # Plan status should be updated to IN PROGRESS
+    assert "IN PROGRESS" in plan.read_text()
     assert "task" in result
+
+
+def test_convergence_escalated_updates_plan_status(tmp_path):
+    from src.engine.persistence import load_state, save_state
+    from src.mcp_server import state_path as get_state_path
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n**Status:** IN PROGRESS\n- [ ] task\n")
+    start = json.loads(start_convergence(str(plan), max_rounds=1))
+    cid = start["convergence_id"]
+
+    sp = get_state_path(cid)
+    state = load_state(sp)
+    state.round = 10
+    save_state(state, sp)
+
+    result = json.loads(convergence_next_task(cid))
+    assert "ESCALATED" in plan.read_text()
+
+
+def test_submit_escalated_updates_plan_status(tmp_path):
+    from src.engine.persistence import load_state, save_state
+    from src.mcp_server import state_path as get_state_path
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n**Status:** IN PROGRESS\n- [ ] task\n")
+    start = json.loads(start_convergence(str(plan), max_rounds=1))
+    cid = start["convergence_id"]
+
+    sp = get_state_path(cid)
+    state = load_state(sp)
+    state.round = 10
+    save_state(state, sp)
+
+    result = json.loads(convergence_submit_result(cid, "[]"))
+    assert "ESCALATED" in plan.read_text()
 
 
 def test_start_convergence_with_files(tmp_path):
@@ -133,9 +169,70 @@ def test_convergence_submit_invalid_json(tmp_path):
     start = json.loads(start_convergence(str(plan)))
     cid = start["convergence_id"]
 
-    # Invalid JSON should be handled gracefully
+    # Invalid JSON must be REJECTED — fail closed, not silent clean pass
     result = json.loads(convergence_submit_result(cid, "not json"))
+    assert result["status"] == "rejected"
+    assert "Invalid JSON" in result["error"]
+
+
+def test_convergence_submit_missing_fields(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n")
+    start = json.loads(start_convergence(str(plan)))
+    cid = start["convergence_id"]
+
+    # Missing required fields must be rejected
+    result = json.loads(convergence_submit_result(cid, '[{"id": "f1"}]'))
+    assert result["status"] == "rejected"
+    assert "missing required fields" in result["error"]
+
+
+def test_convergence_submit_not_array(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n")
+    start = json.loads(start_convergence(str(plan)))
+    cid = start["convergence_id"]
+
+    result = json.loads(convergence_submit_result(cid, '{"not": "array"}'))
+    assert result["status"] == "rejected"
+
+
+def test_convergence_submit_returns_next_task(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n- [ ] task\n")
+    start = json.loads(start_convergence(str(plan)))
+    cid = start["convergence_id"]
+
+    result = json.loads(convergence_submit_result(cid, "[]"))
     assert result["status"] == "result_accepted"
+    assert "next_task" in result
+    assert "continue" in result
+
+
+def test_convergence_submit_empty_string(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n- [ ] task\n")
+    start = json.loads(start_convergence(str(plan)))
+    cid = start["convergence_id"]
+
+    result = json.loads(convergence_submit_result(cid, ""))
+    assert result["status"] == "result_accepted"
+    assert result["findings_count"] == 0
+
+
+def test_convergence_submit_non_dict_skipped(tmp_path):
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n- [ ] task\n")
+    start = json.loads(start_convergence(str(plan)))
+    cid = start["convergence_id"]
+
+    findings = json.dumps(["not a dict", {
+        "id": "f1", "file": "a.py", "dimension": "correctness",
+        "severity": "high", "description": "bug", "suggested_fix": "fix",
+    }])
+    result = json.loads(convergence_submit_result(cid, findings))
+    assert result["status"] == "result_accepted"
+    assert result["findings_count"] == 1
 
 
 def test_convergence_status(tmp_path):
