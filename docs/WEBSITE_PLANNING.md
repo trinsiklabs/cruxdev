@@ -30,6 +30,44 @@ This document parallels `DEVELOPMENT_PATTERNS.md` (for code) and `E2E_TEST_PATTE
 
 ---
 
+## Phase 0: Pre-Build Setup
+
+**Purpose:** Collect essential project identity and select the website engine BEFORE starting any build work.
+
+### 0.1 Product Identity (Required)
+
+- **Go-to-market name:** The public-facing product name. This may differ from the project folder name. Examples: project folder `cruxdev` → site name "CruxDev", project `trueassess` → site name "TrueAssess.me"
+- **Project name:** The folder/repo name (used internally for paths, configs)
+- **Tagline:** One-line description for meta tags and hero section
+- **Domain:** Target domain if known (can be decided later)
+
+### 0.2 Logo (Optional but Flagged)
+
+- **Logo file:** SVG preferred, PNG acceptable. Provide the path to the logo file.
+- The engine will proceed without a logo but will flag it as a gap in GAPS.md.
+- If no logo is provided, use text-based branding with the go-to-market name.
+- **Favicon:** Auto-generated from logo SVG if provided.
+
+### 0.3 Engine Selection (Required)
+
+**Consult `docs/WEBSITE_ENGINES.md` for the full ecosystem matrix with pros, cons, migration paths, and the decision tree.**
+
+Present the user with engine options based on their project type. Do NOT default to any engine without asking. The user must consciously choose, understanding the trade-offs.
+
+Quick recommendations:
+- Content/marketing site → Astro or 11ty
+- Blog with memberships → Ghost
+- Docs site → Astro (Starlight) or 11ty
+- Interactive webapp → SvelteKit, Next.js, or Phoenix LiveView
+- Visual editing needed → TinaCMS + Astro, or Ghost
+- Elixir project → Phoenix or Still
+- Rust project → Zola
+- Maximum portability → 11ty
+
+**Deliverables:** Product identity, logo (or gap), engine selection with rationale.
+
+---
+
 ## Phase 1: Discovery & Research
 
 **Purpose:** Understand who the site is for, what it must accomplish, and what already exists. No design, no code — only research.
