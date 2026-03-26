@@ -113,16 +113,19 @@ def test_doc_auditing_returns_audit_task(tmp_path):
     assert "doc" in task.description.lower()
 
 
-def test_doc_auditing_converges_to_e2e(tmp_path):
+def test_doc_auditing_converges_to_website(tmp_path):
     state = ConvergenceState(
-        plan_file="plan.md",
+        plan_file=str(tmp_path / "plan.md"),
         phase=ConvergencePhase.DOC_AUDITING,
         consecutive_clean=2,
     )
+    (tmp_path / ".git").mkdir()
+    (tmp_path / "plan.md").write_text("# Plan\n- [ ] task")
     path = str(tmp_path / "state.json")
     save_state(state, path)
 
     task = get_next_task(state, path)
+    # No website → skips WEBSITE_CONVERGENCE → advances to E2E_TESTING
     assert state.phase == ConvergencePhase.E2E_TESTING
 
 
