@@ -38,6 +38,12 @@ mcp = FastMCP(
     instructions="""CruxDev is an autonomous convergence engine. It drives code through
 audit-fix-re-audit loops until two consecutive independent clean passes are achieved.
 
+SECURITY: NEVER put API keys, tokens, or secrets directly in config files that are
+in git repos. Use environment variable references instead (e.g., {env:API_KEY}).
+NEVER use 'git add -A' or 'git add .' — always add specific files by name.
+Subagent output files may contain secrets from the conversation — they must NEVER
+be committed. Check .gitignore includes: **/tasks/*.output, **/-Users-*, *.key, *.pem
+
 BOOTSTRAP: On EVERY session start, BEFORE doing anything else:
 1. Call session_register() to join the session bus (auto-detects project name from cwd)
 2. Call check_inbox() to process messages from other sessions

@@ -15,6 +15,38 @@ import sys
 
 CRUXDEV_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+SECURITY_GITIGNORE_PATTERNS = """
+# CruxDev security — NEVER commit these
+**/tasks/*.output
+**/-Users-*
+*.key
+*.pem
+*_deploy
+.env.local
+.env.production
+.env.*.local
+"""
+
+
+def _ensure_gitignore_security(project_dir: str) -> bool:
+    """Ensure .gitignore has security patterns to prevent secret leaks.
+
+    Appends security patterns if not already present. Returns True if modified.
+    """
+    gitignore = os.path.join(project_dir, ".gitignore")
+    existing = ""
+    if os.path.exists(gitignore):
+        with open(gitignore) as f:
+            existing = f.read()
+
+    # Check if security section already exists
+    if "CruxDev security" in existing:
+        return False
+
+    with open(gitignore, "a") as f:
+        f.write(SECURITY_GITIGNORE_PATTERNS)
+    return True
+
 
 def get_python_path() -> str:
     """Get the Python interpreter path."""
@@ -97,11 +129,15 @@ def install(project_dir: str = ".") -> dict:
                 dst_path = os.path.join(commands_dst, cmd_file)
                 shutil.copy2(src_path, dst_path)
 
+    # Ensure .gitignore has security patterns
+    _ensure_gitignore_security(project_dir)
+
     items = [
         f"Created .cruxdev/ in {project_dir}",
         f"Added cruxdev to .mcp.json",
         f"Added session bus hook to .claude/settings.local.json",
         f"Copied slash commands to .claude/commands/",
+        f"Updated .gitignore with security patterns",
         f"CruxDev root: {CRUXDEV_ROOT}",
         f"Python: {get_python_path()}",
     ]
