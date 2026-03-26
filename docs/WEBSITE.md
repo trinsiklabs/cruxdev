@@ -33,18 +33,24 @@ These must be kept current with the actual codebase:
 
 | Metric | Current on Site | Actual | Status |
 |--------|----------------|--------|--------|
-| Tests passing | 543 | 1,075 | STALE |
+| Tests passing | 1,075 | 1,075 | Current |
 | Test coverage | 100% | 100% | Current |
-| MCP tools | 18 | 39 | STALE |
+| MCP tools | 39 | 39 | Current |
 | Clean passes | 2 | 2 | Current |
 
 ## Comparison Pages
 
-The `/vs/` directory exists but is empty. Should be populated from `docs/COMPETITORS.md` using `generate_comparison_page()`. Official competitors to create pages for:
-- Superpowers
-- Backbeat
-- DeepSource
-- yoyo-evolve
+Generated from `docs/COMPETITORS.md` per `WEBSITE_PLANNING.md` §4.5:
+
+| Route | Competitor | Status |
+|-------|-----------|--------|
+| `/vs/` | Index page | Created |
+| `/vs/superpowers` | Superpowers (110K stars, direct) | Created |
+| `/vs/backbeat` | Backbeat (3 stars, direct) | Created |
+| `/vs/deepsource` | DeepSource (adjacent, code review) | Created |
+| `/vs/yoyo-evolve` | yoyo-evolve (669 stars, direct) | Created |
+
+Each page includes: feature comparison table, strengths/weaknesses, FAQ, FAQPage schema.org structured data, CTA.
 
 ## Build & Deploy
 
