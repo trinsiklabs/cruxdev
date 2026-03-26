@@ -17,15 +17,32 @@ last_updated: "2026-03-26"
 
 ## Pages
 
-| Route | Purpose |
-|-------|---------|
-| `/` | Homepage — hero, trust metrics, methodology overview, safety gates, model tiers |
-| `/docs/` | Documentation (quickstart, guides) |
-| `/methodology/` | Full development methodology |
-| `/engine/` | Engine architecture and specs |
-| `/guides/` | Usage guides |
-| `/blog/` | Blog (empty) |
-| `/vs/` | Competitor comparison pages (empty — needs generation from COMPETITORS.md) |
+| Route | Purpose | Status |
+|-------|---------|--------|
+| `/` | Homepage — hero, metrics, methodology, safety gates, model tiers, compare, ecosystem, docs | Live |
+| `/methodology` | Convergence methodology — lifecycle, safety gates, audit dimensions, LLM minimization | Live |
+| `/engine` | Engine architecture — 39 MCP tools, 12 phases, model routing, input normalization | Live |
+| `/docs` | Documentation index — links to all doc sections | Live |
+| `/docs/quickstart` | 5-minute getting started guide | Live |
+| `/docs/adoption` | 9-phase adoption playbook | Live |
+| `/docs/research` | 5-pass research methodology | Live |
+| `/docs/competitors` | Competitive analysis methodology | Live |
+| `/docs/website-planning` | 12-phase website planning | Live |
+| `/docs/engines` | 15 website engines compared | Live |
+| `/docs/seo` | SEO/GEO reference | Live |
+| `/docs/e2e-testing` | E2E test patterns | Live |
+| `/docs/uat-testing` | UAT test patterns | Live |
+| `/blog` | Blog (coming soon) | Live |
+| `/vs` | Competitor comparison index | Live |
+| `/vs/superpowers` | CruxDev vs Superpowers | Live |
+| `/vs/backbeat` | CruxDev vs Backbeat | Live |
+| `/vs/deepsource` | CruxDev vs DeepSource | Live |
+| `/vs/yoyo-evolve` | CruxDev vs yoyo-evolve | Live |
+| `/lp/stop-re-prompting` | Landing: Stop re-prompting your AI agent | Live |
+| `/lp/when-is-code-done` | Landing: When is AI code done? | Live |
+| `/lp/ai-coding-mistakes` | Landing: AI agent keeps making mistakes | Live |
+| `/lp/one-pass-not-enough` | Landing: One review pass isn't enough | Live |
+| `/lp/ai-doom-loop` | Landing: Breaking the doom loop | Live |
 
 ## Metrics (on homepage)
 
