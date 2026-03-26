@@ -134,6 +134,85 @@ def test_completion_summary_empty():
     assert s["percentage"] == 100.0
 
 
+def test_mark_complete_in_file(tmp_path):
+    from src.engine.checklist_parser import mark_complete_in_file
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n- [ ] 1.1 First task\n- [ ] 1.2 Second task\n")
+
+    assert mark_complete_in_file(str(plan), "1.1") is True
+    content = plan.read_text()
+    assert "- [x] 1.1 First task" in content
+    assert "- [ ] 1.2 Second task" in content  # untouched
+
+
+def test_mark_complete_in_file_already_checked(tmp_path):
+    from src.engine.checklist_parser import mark_complete_in_file
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n- [x] 1.1 Already done\n")
+
+    assert mark_complete_in_file(str(plan), "1.1") is False  # already checked
+
+
+def test_mark_complete_in_file_not_found(tmp_path):
+    from src.engine.checklist_parser import mark_complete_in_file
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n- [ ] 1.1 Task\n")
+
+    assert mark_complete_in_file(str(plan), "9.9") is False  # doesn't exist
+
+
+def test_mark_complete_in_file_missing_file():
+    from src.engine.checklist_parser import mark_complete_in_file
+    assert mark_complete_in_file("/nonexistent/plan.md", "1.1") is False
+
+
+def test_mark_complete_in_file_unreadable(tmp_path):
+    from src.engine.checklist_parser import mark_complete_in_file
+    plan = tmp_path / "plan.md"
+    plan.write_text("- [ ] 1.1 Task")
+    plan.chmod(0o000)
+    assert mark_complete_in_file(str(plan), "1.1") is False
+    plan.chmod(0o644)
+
+
+def test_mark_complete_in_file_write_error(tmp_path, monkeypatch):
+    from src.engine.checklist_parser import mark_complete_in_file
+    plan = tmp_path / "plan.md"
+    plan.write_text("- [ ] 1.1 Task here")
+
+    original_open = open
+    calls = [0]
+    def fail_on_write(*args, **kwargs):
+        calls[0] += 1
+        mode = args[1] if len(args) > 1 else kwargs.get("mode", "r")
+        if calls[0] > 1 and "w" in mode:
+            raise OSError("disk full")
+        return original_open(*args, **kwargs)
+
+    monkeypatch.setattr("builtins.open", fail_on_write)
+    assert mark_complete_in_file(str(plan), "1.1") is False
+
+
+def test_submit_result_marks_checklist_in_file(tmp_path):
+    """Integration: submit_result with checklist_item durably marks in plan file."""
+    from src.engine.persistence import save_state
+    from src.engine.state import ConvergencePhase, ConvergenceState
+    from src.engine.task_router import submit_result
+
+    plan = tmp_path / "plan.md"
+    plan.write_text("# Plan\n## Phase 1\n- [ ] 1.1 Build it\n- [ ] 1.2 Test it\n")
+
+    state = ConvergenceState(plan_file=str(plan), phase=ConvergencePhase.EXECUTING)
+    path = str(tmp_path / "state.json")
+    save_state(state, path)
+
+    submit_result(state, path, {"checklist_item": "1.1", "findings": []})
+
+    content = plan.read_text()
+    assert "- [x] 1.1 Build it" in content
+    assert "- [ ] 1.2 Test it" in content
+
+
 def test_execution_phase_returns_execute_task(tmp_path):
     """Integration test: task router returns execute tasks for green-field."""
     from src.engine.persistence import save_state

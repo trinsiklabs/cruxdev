@@ -101,3 +101,33 @@ def completion_summary(items: list[ChecklistItem]) -> dict:
         "remaining": total - done,
         "percentage": round(done / total * 100, 1) if total > 0 else 100.0,
     }
+
+
+def mark_complete_in_file(plan_file: str, item_id: str) -> bool:
+    """Durably mark a checklist item as complete in the plan file.
+
+    Finds the line matching `- [ ] <item_id>` and replaces with `- [x] <item_id>`.
+    Returns True if found and updated, False otherwise.
+    """
+    if not os.path.exists(plan_file):
+        return False
+
+    try:
+        with open(plan_file) as f:
+            content = f.read()
+    except OSError:
+        return False
+
+    # Match the specific item: - [ ] N.M ...
+    pattern = rf'(^\s*-\s*)\[\s*\](\s*{re.escape(item_id)}\s)'
+    updated = re.sub(pattern, r'\1[x]\2', content, count=1, flags=re.MULTILINE)
+
+    if updated == content:
+        return False  # Item not found or already checked
+
+    try:
+        with open(plan_file, "w") as f:
+            f.write(updated)
+        return True
+    except OSError:
+        return False

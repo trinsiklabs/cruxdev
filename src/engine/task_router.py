@@ -509,15 +509,11 @@ def submit_result(
     """
     task_type = result.get("task_type", "audit")
 
-    # Handle execution phase checklist completion
+    # Handle execution phase checklist completion — durably mark in plan file
     checklist_item = result.get("checklist_item")
     if checklist_item and state.phase == ConvergencePhase.EXECUTING:
-        from .checklist_parser import parse_checklist, mark_complete
-        items = parse_checklist(state.plan_file)
-        mark_complete(items, checklist_item)
-        # Note: mark_complete modifies the in-memory list but doesn't persist.
-        # The plan file itself tracks completion via [x] markers.
-        # The engine re-parses on each get_next_task call.
+        from .checklist_parser import mark_complete_in_file
+        mark_complete_in_file(state.plan_file, checklist_item)
 
     findings_data = result.get("findings", [])
 
