@@ -18,6 +18,7 @@ class ConvergencePhase(Enum):
     EXECUTING = "executing"
     CODE_AUDITING = "code_auditing"
     DOC_AUDITING = "doc_auditing"
+    WEBSITE_CONVERGENCE = "website_convergence"
     E2E_TESTING = "e2e_testing"
     PATTERNS_UPDATE = "patterns_update"
     CONVERGED = "converged"

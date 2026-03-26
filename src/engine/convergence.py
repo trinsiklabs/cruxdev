@@ -24,6 +24,7 @@ PHASE_ORDER = [
     ConvergencePhase.EXECUTING,
     ConvergencePhase.CODE_AUDITING,
     ConvergencePhase.DOC_AUDITING,
+    ConvergencePhase.WEBSITE_CONVERGENCE,
     ConvergencePhase.E2E_TESTING,
     ConvergencePhase.PATTERNS_UPDATE,
     ConvergencePhase.CONVERGED,
@@ -58,6 +59,7 @@ PHASE_MAX_ROUNDS: dict[str, int] = {
     "executing": -1,        # -1 = auto-scale from checklist items
     "code_auditing": 0,     # Uses state.max_rounds
     "doc_auditing": 0,      # Uses state.max_rounds
+    "website_convergence": 0,  # Uses state.max_rounds
     "e2e_testing": 0,       # Uses state.max_rounds
     "patterns_update": 3,
 }

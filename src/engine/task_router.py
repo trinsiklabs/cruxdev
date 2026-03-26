@@ -82,6 +82,87 @@ class Task:
         return d
 
 
+def _detect_website(plan_file: str) -> dict:
+    """Detect if the project has a website that needs convergence.
+
+    Checks for: docs/DEPLOYMENT.md, docs/WEBSITE.md, or docs/WEBSITE_PLANNING.md.
+    Returns dict with has_website, files to audit, and any site URL found.
+    """
+    plan_dir = os.path.dirname(os.path.abspath(plan_file))
+
+    # Find project root (same logic as _auto_discover_docs)
+    project_root = plan_dir
+    for _ in range(5):
+        if any(os.path.exists(os.path.join(project_root, marker))
+               for marker in (".git", "pyproject.toml", "package.json")):
+            break
+        parent = os.path.dirname(project_root)
+        if parent == project_root:
+            break
+        project_root = parent
+
+    website_markers = [
+        os.path.join(project_root, "docs", "DEPLOYMENT.md"),
+        os.path.join(project_root, "docs", "WEBSITE.md"),
+    ]
+
+    found_files = [f for f in website_markers if os.path.exists(f)]
+
+    if not found_files:
+        return {"has_website": False, "files": [], "site_url": ""}
+
+    # Try to extract site URL from DEPLOYMENT.md or WEBSITE.md
+    site_url = ""
+    for f in found_files:
+        try:
+            with open(f) as fh:
+                content = fh.read()
+                # Look for URL patterns
+                import re
+                urls = re.findall(r'(https?://[^\s\)\]>"\']+\.(?:io|dev|com|org|net)[^\s\)\]>"\']*)', content)
+                if urls:
+                    site_url = urls[0]
+                    break
+        except OSError:
+            pass
+
+    return {
+        "has_website": True,
+        "files": found_files,
+        "site_url": site_url,
+        "project_root": project_root,
+    }
+
+
+def _detect_webapp(plan_file: str) -> bool:
+    """Detect if the project is a webapp (not just a static site).
+
+    Checks for: app/ directory, API routes, Dockerfile, E2E test patterns,
+    or other webapp indicators.
+    """
+    plan_dir = os.path.dirname(os.path.abspath(plan_file))
+
+    project_root = plan_dir
+    for _ in range(5):
+        if any(os.path.exists(os.path.join(project_root, marker))
+               for marker in (".git", "pyproject.toml", "package.json")):
+            break
+        parent = os.path.dirname(project_root)
+        if parent == project_root:
+            break
+        project_root = parent
+
+    webapp_markers = [
+        os.path.join(project_root, "app"),
+        os.path.join(project_root, "api"),
+        os.path.join(project_root, "Dockerfile"),
+        os.path.join(project_root, "docker-compose.yml"),
+        os.path.join(project_root, "docs", "E2E_TEST_PATTERNS.md"),
+        os.path.join(project_root, "docs", "UAT_TEST_PATTERNS.md"),
+    ]
+    return any(os.path.exists(m) for m in webapp_markers)
+
+
 def _auto_discover_docs(plan_file: str) -> list[str]:
     """Auto-discover doc files from project docs/ directory.
 
@@ -291,7 +372,7 @@ def get_next_task(
 
     if state.phase == ConvergencePhase.DOC_AUDITING:
         if check_convergence(state):
-            state.phase = ConvergencePhase.E2E_TESTING
+            state.phase = ConvergencePhase.WEBSITE_CONVERGENCE
             state.round = 0
             state.consecutive_clean = 0
             save_state(state, state_path)
@@ -303,6 +384,47 @@ def get_next_task(
             files=files,
             dimensions=DOC_DIMENSIONS,
             recommended_tier=phase_tier or "fast",
+        )
+
+    if state.phase == ConvergencePhase.WEBSITE_CONVERGENCE:
+        website_info = _detect_website(state.plan_file)
+        if not website_info["has_website"]:
+            # No website — skip to E2E testing
+            state.phase = ConvergencePhase.E2E_TESTING
+            state.round = 0
+            state.consecutive_clean = 0
+            save_state(state, state_path)
+            return get_next_task(state, state_path, source_files, doc_files, test_command)
+        if check_convergence(state):
+            state.phase = ConvergencePhase.E2E_TESTING
+            state.round = 0
+            state.consecutive_clean = 0
+            save_state(state, state_path)
+            return get_next_task(state, state_path, source_files, doc_files, test_command)
+        is_webapp = _detect_webapp(state.plan_file)
+        return Task(
+            task_type="audit",
+            description=(
+                f"Website convergence (round {state.round}). The project has a website. "
+                f"Audit it against the now-converged code and docs:\n"
+                f"1. Update website metrics (test counts, tool counts, feature counts) to match current code\n"
+                f"2. Verify all claims on the site are accurate against docs/\n"
+                f"3. Check comparison pages are current against docs/COMPETITORS.md\n"
+                f"4. Update any screenshots or demos if the UI changed\n"
+                f"5. Deploy the updated site per docs/DEPLOYMENT.md\n"
+                f"Methodology: docs/WEBSITE_PLANNING.md Phase 12 (Post-Launch Operations)\n"
+                + (
+                    f"6. This is a WEBAPP — also converge against docs/E2E_TEST_PATTERNS.md and docs/UAT_TEST_PATTERNS.md\n"
+                    f"   Run E2E tests to verify user flows work after changes\n"
+                    f"   Verify UAT acceptance criteria are still met\n"
+                    if is_webapp else ""
+                )
+                + f"Website info: {website_info}"
+            ),
+            files=website_info.get("files", []),
+            dimensions=["accuracy", "completeness", "metrics", "deployment"]
+                + (["e2e_testing", "uat_testing"] if is_webapp else []),
+            recommended_tier=phase_tier or "standard",
         )
 
     if state.phase == ConvergencePhase.E2E_TESTING:

@@ -116,6 +116,6 @@ def test_convergence_state_custom():
 
 def test_all_phases_exist():
     phases = list(ConvergencePhase)
-    assert len(phases) == 11
+    assert len(phases) == 12
     assert ConvergencePhase.PLANNING in phases
     assert ConvergencePhase.ESCALATED in phases
