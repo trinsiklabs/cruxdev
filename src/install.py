@@ -22,10 +22,43 @@ SECURITY_GITIGNORE_PATTERNS = """
 *.key
 *.pem
 *_deploy
+.env
 .env.local
 .env.production
 .env.*.local
+.crux/
+.cruxdev/convergence_state/
+*.jsonl
 """
+
+
+def _install_secret_scanner(project_dir: str) -> bool:
+    """Install pre-commit hook that scans for secrets.
+
+    Copies scripts/pre-commit-secrets to .git/hooks/pre-commit if a .git
+    directory exists. Returns True if installed, False otherwise.
+    """
+    git_dir = os.path.join(project_dir, ".git")
+    if not os.path.isdir(git_dir):
+        return False
+
+    hooks_dir = os.path.join(git_dir, "hooks")
+    os.makedirs(hooks_dir, exist_ok=True)
+
+    hook_src = os.path.join(CRUXDEV_ROOT, "scripts", "pre-commit-secrets")
+    hook_dst = os.path.join(hooks_dir, "pre-commit")
+
+    if not os.path.exists(hook_src):
+        return False
+
+    # Don't overwrite existing pre-commit hook
+    if os.path.exists(hook_dst):
+        return False
+
+    import shutil
+    shutil.copy2(hook_src, hook_dst)
+    os.chmod(hook_dst, 0o755)
+    return True
 
 
 def _ensure_gitignore_security(project_dir: str) -> bool:
@@ -132,12 +165,16 @@ def install(project_dir: str = ".") -> dict:
     # Ensure .gitignore has security patterns
     _ensure_gitignore_security(project_dir)
 
+    # Install pre-commit secret scanner
+    _install_secret_scanner(project_dir)
+
     items = [
         f"Created .cruxdev/ in {project_dir}",
         f"Added cruxdev to .mcp.json",
         f"Added session bus hook to .claude/settings.local.json",
         f"Copied slash commands to .claude/commands/",
         f"Updated .gitignore with security patterns",
+        f"Installed pre-commit secret scanner",
         f"CruxDev root: {CRUXDEV_ROOT}",
         f"Python: {get_python_path()}",
     ]

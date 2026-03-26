@@ -6,3 +6,15 @@ __pycache__/
 dist/
 build/
 .env
+
+# CruxDev security — NEVER commit these
+.crux/
+.cruxdev/convergence_state/
+**/tasks/*.output
+**/-Users-*
+*.key
+*.pem
+*_deploy
+.env.local
+.env.production
+.env.*.local
