@@ -588,6 +588,12 @@ Apply all 5 doc audit dimensions to every website page:
 - Verify every prerequisite against actual requirements
 - Two consecutive clean passes across ALL pages before declaring converged
 
+**Dark mode / theme verification:**
+- Zero hardcoded dark-only color classes in any page file (no `text-white`, `bg-dark-*`, etc.)
+- Every color reference uses semantic CSS variables that switch between modes
+- Verify by grep: `grep -r "text-white\|bg-dev-\|text-dev-\|border-dev-" src/pages/` must return zero results
+- Visually verify every page in both light and dark mode
+
 **Anti-patterns (from BUILD_PLAN_027 failure):**
 - **Structural-only audit** — checking page existence and layout without reading content. This let "Python 3.12+" survive as a prerequisite on a Rust project.
 - **Metric-only search** — grep for numbers to update without reading surrounding prose. This let wrong dimension names ("tests, architecture, style" instead of actual engine names) persist across 12 pages.
