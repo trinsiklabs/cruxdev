@@ -1,6 +1,6 @@
 # BUILD_PLAN_029: Multi-Platform Binary Distribution via GitHub Actions
 
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Priority:** Critical (blocks adoption on non-ARM-Mac platforms)
 **Depends on:** BUILD_PLAN_016 (git automation)
 
