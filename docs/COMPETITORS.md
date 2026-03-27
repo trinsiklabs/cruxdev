@@ -1,14 +1,25 @@
 # Competitors
 
-**Last Updated:** 2026-03-27 (post-session: 26 build plans converged, 52 tools, 436 tests, 218 templates, domain architecture)
-**Project:** CruxDev — Autonomous Convergence Framework
-**Research Method:** 5-pass iterative deepening per RESEARCH_PATTERNS.md (broad → academic → practitioner → contrarian → primary sources)
+**Last Updated:** 2026-03-27 (45 build plans, 52 tools, 451 tests, 228 templates, harness positioning)
+**Project:** CruxDev — Autonomous Convergence Harness
+**Research Method:** 5-pass iterative deepening per RESEARCH_PATTERNS.md
+**Category:** AI Harness Engineering — Autonomous Convergence subcategory
 
 ## Competitive Position
 
-CruxDev is the only framework that drives AI coding agents through multi-dimensional audit-fix-re-audit loops until two consecutive independent clean passes are achieved. Every competitor is either an execution substrate (runs code but doesn't know when it's done) or an analysis tool (scans code but doesn't drive fixes). CruxDev sits between them.
+**The industry equation (Q1 2026): Agent = Model + Harness.** The model is commodity. The harness is moat. (Hashimoto, Fowler, Anthropic, OpenAI — all converging on this in Feb-Mar 2026.)
 
-**Category validation:** Karpathy calls the autonomous edit-evaluate-keep loop "the final boss battle" ([Fortune, 2026-03-17](https://fortune.com/2026/03/17/andrej-karpathy-loop-autonomous-ai-agents-future/)). CodeRabbit predicts multi-agent audit-fix workflows as the defining 2026 trend. MorphLLM benchmark: "Scaffolding matters as much as the model" — same Claude Opus scored differently across architectures.
+CruxDev is the only **autonomous convergence harness** — a harness that drives agents to mathematically defined completion (two consecutive independent clean passes across 39+ audit dimensions) without human intervention. Every other harness is a runtime wrapper: it runs agents safely but doesn't know when they're done.
+
+| What Others Build | What CruxDev Is |
+|------------------|----------------|
+| Runtime harness (run safely, observe, rollback) | **Convergence harness** (drive to verified completion) |
+| Human says "looks good" | Engine proves "two independent clean passes" |
+| LLM drives the loop | **Engine drives the loop**, LLM is a tool it calls |
+| Code-only | **Any project type** (18 types, 228 templates) |
+| Static harness | **Self-improving** (self-adoption after every build plan) |
+
+**Category validation:** Hashimoto coined "harness engineering" (Feb 2026). Fowler published. Forrester launching market evaluation. 3 academic papers on arXiv. Manus proved harness > model (5 rewrites, identical models, each better). The term is weeks old — the subcategory "autonomous convergence harness" is undefined and ownable.
 
 **Key risk acknowledged:** IEEE-ISTAS 2025 paper found 37.6% increase in critical security vulnerabilities after 5 iterations of LLM refinement ([arxiv.org/abs/2506.11022](https://arxiv.org/abs/2506.11022)). CruxDev's multi-dimensional audit (including explicit security dimension) and two-consecutive-clean-pass criterion address this, but regression detection between passes is a design enhancement to consider.
 
