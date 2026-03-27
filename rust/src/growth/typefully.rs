@@ -6,6 +6,7 @@
 use serde::{Deserialize, Serialize};
 
 const TYPEFULLY_API_URL: &str = "https://api.typefully.com/v1/drafts/";
+const TYPEFULLY_API_URL_V2: &str = "https://api.typefully.com/v2/drafts";
 
 /// Result of a Typefully post.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,13 +85,29 @@ pub async fn post_draft(
         "threadify": threadify,
     });
 
-    match client
-        .post(TYPEFULLY_API_URL)
-        .header("X-API-KEY", api_key)
-        .header("Content-Type", "application/json")
+    // Try v2 with Bearer auth first (matches crux's working implementation),
+    // fall back to v1 with X-API-KEY header
+    let resp = client
+        .post(TYPEFULLY_API_URL_V2)
+        .bearer_auth(api_key)
         .json(&body)
         .send()
-        .await
+        .await;
+
+    // If v2 fails (404), try v1
+    let resp = match &resp {
+        Ok(r) if r.status() == 404 => {
+            client
+                .post(TYPEFULLY_API_URL)
+                .header("X-API-KEY", api_key)
+                .json(&body)
+                .send()
+                .await
+        }
+        _ => resp,
+    };
+
+    match resp
     {
         Ok(resp) => {
             let status = resp.status();
