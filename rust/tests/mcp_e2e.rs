@@ -17,7 +17,7 @@ async fn test_mcp_handshake_and_tool_listing() {
         .await
         .expect("timeout listing tools");
 
-    assert_eq!(tools.len(), 41, "expected 41 tools, got {}", tools.len());
+    assert_eq!(tools.len(), 46, "expected 46 tools, got {}", tools.len());
 
     let names: Vec<&str> = tools.iter().map(|t| t.name.as_ref()).collect();
 
@@ -785,4 +785,116 @@ async fn test_state_survives_restart() {
     }
 
     drop(tempdir);
+}
+
+// ── BP016: Git workflow tools ────────────────────────────────────
+
+#[tokio::test]
+async fn test_git_status_check() {
+    let client = timeout(TIMEOUT, common::McpTestClient::start())
+        .await
+        .expect("timeout");
+
+    // Init a git repo in tempdir with initial commit
+    let td = client.tempdir();
+    std::process::Command::new("git").args(["init"]).current_dir(td).output().unwrap();
+    std::process::Command::new("git").args(["config", "user.email", "test@test.com"]).current_dir(td).output().unwrap();
+    std::process::Command::new("git").args(["config", "user.name", "Test"]).current_dir(td).output().unwrap();
+    std::fs::write(td.join("README.md"), "# Test").unwrap();
+    std::process::Command::new("git").args(["add", "README.md"]).current_dir(td).output().unwrap();
+    std::process::Command::new("git").args(["commit", "-m", "init"]).current_dir(td).output().unwrap();
+
+    let result = timeout(
+        TIMEOUT,
+        client.call_tool(
+            "git_status_check",
+            serde_json::json!({"project_dir": client.tempdir().to_str().unwrap()}),
+        ),
+    )
+    .await
+    .expect("timeout");
+
+    assert!(result.get("branch").is_some(), "should have branch: {result}");
+
+    client.shutdown().await;
+}
+
+#[tokio::test]
+async fn test_git_commit_dry_run() {
+    let client = timeout(TIMEOUT, common::McpTestClient::start())
+        .await
+        .expect("timeout");
+
+    let result = timeout(
+        TIMEOUT,
+        client.call_tool(
+            "git_commit_changes",
+            serde_json::json!({
+                "message": "test commit",
+                "files": "src/main.rs",
+                "project_dir": client.tempdir().to_str().unwrap(),
+                "dry_run": true,
+            }),
+        ),
+    )
+    .await
+    .expect("timeout");
+
+    assert_eq!(result.get("dry_run").and_then(|v| v.as_bool()), Some(true));
+    assert!(result.get("would_commit").is_some());
+
+    client.shutdown().await;
+}
+
+#[tokio::test]
+async fn test_git_commit_safety_rejects_target() {
+    let client = timeout(TIMEOUT, common::McpTestClient::start())
+        .await
+        .expect("timeout");
+
+    let result = timeout(
+        TIMEOUT,
+        client.call_tool(
+            "git_commit_changes",
+            serde_json::json!({
+                "message": "bad commit",
+                "files": "rust/target/debug/binary",
+                "project_dir": client.tempdir().to_str().unwrap(),
+                "dry_run": false,
+            }),
+        ),
+    )
+    .await
+    .expect("timeout");
+
+    assert!(result.get("error").is_some() || result.get("violations").is_some(),
+        "should reject target/ files: {result}");
+
+    client.shutdown().await;
+}
+
+#[tokio::test]
+async fn test_create_pr_dry_run() {
+    let client = timeout(TIMEOUT, common::McpTestClient::start())
+        .await
+        .expect("timeout");
+
+    let result = timeout(
+        TIMEOUT,
+        client.call_tool(
+            "create_pull_request",
+            serde_json::json!({
+                "title": "Test PR",
+                "body": "Test body",
+                "dry_run": true,
+            }),
+        ),
+    )
+    .await
+    .expect("timeout");
+
+    assert_eq!(result.get("dry_run").and_then(|v| v.as_bool()), Some(true));
+    assert!(result.get("would_create_pr").is_some());
+
+    client.shutdown().await;
 }

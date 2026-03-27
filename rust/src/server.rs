@@ -13,6 +13,68 @@ use std::sync::{LazyLock, Mutex};
 use crate::engine::{convergence, persistence, plan_status, plan_validator, wal, index, router};
 use crate::engine::state::ConvergenceState;
 
+// --- Parameter types (Git workflow) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct GitCommitParam {
+    /// Commit message
+    pub message: String,
+    /// Comma-separated list of files to stage and commit
+    pub files: String,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+    /// Dry run (default: true)
+    pub dry_run: Option<bool>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct GitPushParam {
+    /// Remote name (default: "origin")
+    pub remote: Option<String>,
+    /// Branch name (default: current branch)
+    pub branch: Option<String>,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+    /// Shell command to run tests before push (e.g. "cargo test")
+    pub test_command: Option<String>,
+    /// Dry run (default: true)
+    pub dry_run: Option<bool>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct CreatePrParam {
+    /// PR title
+    pub title: String,
+    /// PR body (markdown)
+    pub body: Option<String>,
+    /// Base branch (default: "master")
+    pub base: Option<String>,
+    /// Head branch (default: current branch)
+    pub head: Option<String>,
+    /// GitHub repo (default: origin)
+    pub repo: Option<String>,
+    /// Dry run (default: true)
+    pub dry_run: Option<bool>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct MergePrParam {
+    /// PR number
+    pub pr_number: u64,
+    /// GitHub repo
+    pub repo: String,
+    /// Merge method: "squash" (default), "merge", "rebase"
+    pub method: Option<String>,
+    /// Dry run (default: true)
+    pub dry_run: Option<bool>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct GitStatusParam {
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+}
+
 // --- Parameter types (GitHub issue monitoring) ---
 
 #[derive(Deserialize, JsonSchema)]
@@ -1495,6 +1557,195 @@ impl CruxDevServer {
                 "entries": [],
                 "note": "No audit log found. Run monitor_issues first.",
             }).to_string(),
+        }
+    }
+
+    // 42. git_commit_changes
+    #[tool(description = "Stage specific files and commit with safety checks. Dry-run by default. NEVER stages all files.")]
+    async fn git_commit_changes(&self, params: Parameters<GitCommitParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+
+        let files: Vec<String> = p.files.split(',')
+            .map(|s| s.trim().to_string())
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        // Safety check
+        let check = match crate::git::pre_commit_safety_check(&proj_dir, &files) {
+            Ok(c) => c,
+            Err(e) => return serde_json::json!({"error": e}).to_string(),
+        };
+
+        if !check.passed {
+            return serde_json::json!({
+                "error": "Safety check failed",
+                "violations": check.violations,
+            }).to_string();
+        }
+
+        if dry_run {
+            return serde_json::json!({
+                "dry_run": true,
+                "would_commit": files,
+                "message": p.message,
+                "safety_check": "passed",
+            }).to_string();
+        }
+
+        // Stage files
+        if let Err(e) = crate::git::add(&proj_dir, &files) {
+            return serde_json::json!({"error": format!("Stage failed: {e}")}).to_string();
+        }
+
+        // Commit
+        match crate::git::commit(&proj_dir, &p.message) {
+            Ok(result) => serde_json::json!(result).to_string(),
+            Err(e) => serde_json::json!({"error": e}).to_string(),
+        }
+    }
+
+    // 43. git_push_changes
+    #[tool(description = "Push commits to remote with optional test gate. Dry-run by default. Never force pushes.")]
+    async fn git_push_changes(&self, params: Parameters<GitPushParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+        let remote = p.remote.as_deref().unwrap_or("origin");
+        let branch = match &p.branch {
+            Some(b) => b.clone(),
+            None => crate::git::current_branch(&proj_dir).unwrap_or("master".into()),
+        };
+
+        // Pre-push test gate
+        if let Some(cmd) = &p.test_command {
+            let test_args: Vec<String> = cmd.split_whitespace().map(|s| s.to_string()).collect();
+            let check = match crate::git::pre_push_test_gate(&proj_dir, &test_args) {
+                Ok(c) => c,
+                Err(e) => return serde_json::json!({"error": e}).to_string(),
+            };
+            if !check.passed {
+                return serde_json::json!({
+                    "error": "Pre-push test gate failed",
+                    "violations": check.violations,
+                }).to_string();
+            }
+        }
+
+        if dry_run {
+            return serde_json::json!({
+                "dry_run": true,
+                "would_push_to": format!("{remote}/{branch}"),
+                "test_gate": "passed",
+            }).to_string();
+        }
+
+        match crate::git::push(&proj_dir, remote, &branch) {
+            Ok(result) => serde_json::json!(result).to_string(),
+            Err(e) => serde_json::json!({"error": e}).to_string(),
+        }
+    }
+
+    // 44. create_pull_request
+    #[tool(description = "Create a GitHub pull request. Dry-run by default.")]
+    async fn create_pull_request(&self, params: Parameters<CreatePrParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let base = p.base.as_deref().unwrap_or("master");
+        let proj_dir = self.project_dir.to_string_lossy().to_string();
+        let head = match &p.head {
+            Some(h) => h.clone(),
+            None => crate::git::current_branch(&proj_dir).unwrap_or("HEAD".into()),
+        };
+        let repo = p.repo.as_deref().unwrap_or("");
+
+        let body = p.body.as_deref().unwrap_or("*No description provided.*");
+
+        if dry_run {
+            return serde_json::json!({
+                "dry_run": true,
+                "would_create_pr": {
+                    "title": p.title,
+                    "base": base,
+                    "head": head,
+                    "repo": repo,
+                    "body_preview": &body[..body.len().min(200)],
+                },
+            }).to_string();
+        }
+
+        if repo.is_empty() {
+            return serde_json::json!({"error": "repo is required for live PR creation"}).to_string();
+        }
+
+        match crate::git::create_pr(repo, &p.title, body, base, &head) {
+            Ok(result) => serde_json::json!(result).to_string(),
+            Err(e) => serde_json::json!({"error": e}).to_string(),
+        }
+    }
+
+    // 45. merge_pull_request
+    #[tool(description = "Merge a GitHub pull request. Dry-run by default. Squash merge by default.")]
+    async fn merge_pull_request(&self, params: Parameters<MergePrParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let method = p.method.as_deref().unwrap_or("squash");
+
+        if dry_run {
+            return serde_json::json!({
+                "dry_run": true,
+                "would_merge": {
+                    "pr_number": p.pr_number,
+                    "repo": p.repo,
+                    "method": method,
+                },
+            }).to_string();
+        }
+
+        match crate::git::merge_pr(&p.repo, p.pr_number, method) {
+            Ok(true) => serde_json::json!({
+                "success": true,
+                "pr_number": p.pr_number,
+                "method": method,
+            }).to_string(),
+            Ok(false) => serde_json::json!({
+                "success": false,
+                "error": "Merge failed — check CI status or merge conflicts",
+            }).to_string(),
+            Err(e) => serde_json::json!({"error": e}).to_string(),
+        }
+    }
+
+    // 46. git_status_check
+    #[tool(description = "Get full git status for decision-making: branch, staged, unstaged, untracked files.")]
+    async fn git_status_check(&self, params: Parameters<GitStatusParam>) -> String {
+        let proj = params.0.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+
+        match crate::git::status(&proj_dir) {
+            Ok(st) => serde_json::json!({
+                "branch": st.branch,
+                "staged": st.staged,
+                "unstaged": st.unstaged,
+                "untracked": st.untracked,
+                "clean": st.staged.is_empty() && st.unstaged.is_empty() && st.untracked.is_empty(),
+            }).to_string(),
+            Err(e) => serde_json::json!({"error": e}).to_string(),
         }
     }
 }

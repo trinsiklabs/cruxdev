@@ -5,6 +5,7 @@ pub mod competitors;
 pub mod dispatch;
 pub mod engine;
 pub mod evolution;
+pub mod git;
 pub mod graph;
 pub mod improvement;
 pub mod install;
