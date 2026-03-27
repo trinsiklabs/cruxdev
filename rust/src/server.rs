@@ -756,15 +756,16 @@ impl CruxDevServer {
         let dir = params.0.project_dir.unwrap_or_else(|| ".".to_string());
         let report = crate::status::get_status(&dir);
 
-        // Template count
-        let templates_dir = self.project_dir.join("templates");
+        // Template count (from project dir passed as parameter, not server cwd)
+        let proj_path = std::path::Path::new(&dir);
+        let templates_dir = proj_path.join("templates");
         let template_types = crate::adoption::templates::discover_templates(
             templates_dir.to_str().unwrap_or("templates"),
         );
         let template_count: usize = template_types.values().map(|v| v.len()).sum();
 
-        // Skill count
-        let skills_dir = self.project_dir.join(".claude/skills");
+        // Skill count (from project dir)
+        let skills_dir = proj_path.join(".claude/skills");
         let skill_count = std::fs::read_dir(&skills_dir)
             .map(|entries| entries.filter_map(|e| e.ok()).filter(|e| e.path().is_dir()).count())
             .unwrap_or(0);

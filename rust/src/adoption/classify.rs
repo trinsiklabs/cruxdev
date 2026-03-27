@@ -259,7 +259,7 @@ fn scan_entries(project_dir: &str) -> Vec<String> {
 
         for entry in read_dir.flatten() {
             let name = entry.file_name().to_string_lossy().to_string();
-            if name.starts_with('.') || name == "node_modules" || name == "__pycache__" {
+            if name.starts_with('.') || name == "node_modules" || name == "__pycache__" || name == "templates" || name == "target" {
                 continue;
             }
             let path = entry.path();

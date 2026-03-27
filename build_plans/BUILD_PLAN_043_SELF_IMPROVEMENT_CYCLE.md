@@ -133,7 +133,7 @@ Project runs /adopt → finds gap → is this MY gap or a CruxDev gap?
         → ALL projects benefit on next adoption run
 ```
 
-The cruxcli session demonstrated this: it filed the `setup_competitive_analysis` empty-file bug via session bus, CruxDev fixed the root cause, and the fix benefited every project.
+**Reporting channel: GitHub Issues — for EVERYONE including internal projects.** All projects using CruxDev (including crux, cruxcli, cruxvibe) dogfood the same reporting path as external users: github.com/trinsiklabs/cruxdev/issues/new. Session bus is for real-time coordination, not bug reporting.
 
 **How to distinguish project gap vs CruxDev gap:**
 - Template missing that should exist for this project type → CruxDev gap (template registry incomplete)
