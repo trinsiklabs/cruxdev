@@ -265,6 +265,49 @@ For convergence engine integration — audit MCP servers against:
 
 ---
 
+## 13. Battle-Tested Patterns (from Crux's 57-Tool Server)
+
+Lessons learned building a production MCP server across multiple clients:
+
+### Capabilities must be explicitly enabled
+`ServerCapabilities::builder().enable_tools().build()` — without this, the server connects but `tools/list` is never called. The tools are invisible. `..Default::default()` produces empty capabilities.
+
+### Parameterless tools: omit Parameters entirely
+`Parameters<()>` causes deserialization errors — clients send `{}`, but `()` expects `null`. Use `async fn my_tool(&self) -> String` with no parameter.
+
+### Tool names are prefixed by clients
+Claude Code: `mcp__crux__tool_name`. CruxCLI: `crux_tool_name`. Don't include the server name in your function names.
+
+### Return plain text for read-output tools
+If the model needs to READ the output (not parse it), return plain text. The framework wraps it in `{"content": [{"type": "text", "text": "..."}]}`. Returning JSON causes triple-nesting: JSON inside text inside content array.
+
+### Per-project isolation via cwd
+Cache `std::env::current_dir()` at startup in a `LazyLock`. The MCP client spawns the server with cwd set to the project directory. Don't hardcode paths.
+
+### Config format varies per client
+
+| Client | Config File | Root Key | Type |
+|--------|------------|----------|------|
+| Claude Code | `.mcp.json` | `mcpServers` | `"stdio"` |
+| CruxCLI | `.cruxcli/cruxcli.jsonc` | `mcp` | `"local"` |
+| OpenCode | `.opencode/opencode.json` | `mcp` | `"local"` |
+| Cursor | `.cursor/mcp.json` | `mcpServers` | (none) |
+| OpenClaw | `~/.openclaw/openclaw.json` | `mcp.servers` | (none) |
+| Windsurf | `~/.codeium/windsurf/mcp_config.json` | `mcpServers` | (none) |
+
+Never assume one format. Per-integration documentation for each client.
+
+### The 400 tool concurrency bug (Claude Code #9433)
+Slow-starting servers or crashes during tool calls can corrupt Claude Code's conversation state permanently. `/rewind` and `/clear` don't fix it. Mitigate: use Rust (sub-millisecond startup), never crash (catch all errors, return error responses).
+
+### Instructions are hints, not guarantees
+Non-Claude models (GPT, DeepSeek, MiMo) often ignore the `instructions` field. For critical behavior, enforce via hooks or infrastructure — not instructions. This is why **skills are essential**: they provide guidance the model actually follows.
+
+### Binary size
+rmcp + tokio + clap + serde = ~2.5MB. Add reqwest: ~3MB. Add tree-sitter: ~6.5MB. Skip tree-sitter unless you need multi-language AST parsing.
+
+---
+
 ## References
 
 - MCP Specification — modelcontextprotocol.io
