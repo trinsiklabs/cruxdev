@@ -20,6 +20,9 @@ pub const DASHBOARD_DIMENSIONS: &[&str] = &["hierarchy", "density", "visualizati
 pub const WEBSITE_ESSENTIAL_PAGES: &[&str] = &["homepage", "quick_install", "quick_start", "documentation", "comparison_pages", "llms_txt", "robots_sitemap"];
 pub const MCP_SERVER_DIMENSIONS: &[&str] = &["tool_design", "security", "testing", "error_handling", "performance", "documentation", "skill_sync"];
 pub const SKILL_DIMENSIONS: &[&str] = &["design", "description", "mcp_sync", "testing", "safety", "documentation", "distribution"];
+pub const CONTENT_DIMENSIONS: &[&str] = &["accuracy", "completeness", "clarity", "consistency", "engagement", "structure", "voice", "citations"];
+pub const BUSINESS_DIMENSIONS: &[&str] = &["viability", "market_fit", "financial_soundness", "legal_compliance", "competitive_position", "scalability"];
+pub const MEDIA_DIMENSIONS: &[&str] = &["content_quality", "production_quality", "audience_fit", "seo", "accessibility", "consistency"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {

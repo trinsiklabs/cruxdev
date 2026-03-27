@@ -23,6 +23,14 @@ pub enum ProjectType {
     ConsultingClient,
     Research,
     Campaign,
+    Book,
+    BookSeries,
+    Podcast,
+    Newsletter,
+    YouTube,
+    Course,
+    OpenSource,
+    Composite,
 }
 
 impl ProjectType {
@@ -38,6 +46,14 @@ impl ProjectType {
             Self::ConsultingClient => "consulting-client",
             Self::Research => "research",
             Self::Campaign => "campaign",
+            Self::Book => "book",
+            Self::BookSeries => "book-series",
+            Self::Podcast => "podcast",
+            Self::Newsletter => "newsletter",
+            Self::YouTube => "youtube",
+            Self::Course => "course",
+            Self::OpenSource => "open-source",
+            Self::Composite => "composite",
         }
     }
 }
@@ -152,6 +168,58 @@ fn type_signals() -> Vec<(ProjectType, Vec<&'static str>)> {
         (
             ProjectType::Campaign,
             vec!["campaigns/", "marketing/", "ads/", "content/"],
+        ),
+        (
+            ProjectType::Book,
+            vec![
+                "BOOK_OUTLINE.md", "docs/BOOK_OUTLINE.md",
+                "CHAPTER_TEMPLATE.md", "MANUSCRIPT_TRACKING.md",
+                "chapters/", "manuscript/",
+            ],
+        ),
+        (
+            ProjectType::BookSeries,
+            vec![
+                "SERIES_BIBLE.md", "docs/SERIES_BIBLE.md",
+                "books/", "series/",
+            ],
+        ),
+        (
+            ProjectType::Podcast,
+            vec![
+                "SHOW_FORMAT.md", "docs/SHOW_FORMAT.md",
+                "EPISODE_PLAN.md", "episodes/",
+                "PODCAST_PRODUCTION_GUIDE.md",
+            ],
+        ),
+        (
+            ProjectType::Newsletter,
+            vec![
+                "NEWSLETTER_STRATEGY.md", "docs/NEWSLETTER_STRATEGY.md",
+                "ISSUE_PLAN.md", "issues/", "newsletters/",
+            ],
+        ),
+        (
+            ProjectType::YouTube,
+            vec![
+                "CHANNEL_STRATEGY.md", "docs/CHANNEL_STRATEGY.md",
+                "VIDEO_SEO_STRATEGY.md", "videos/", "thumbnails/",
+            ],
+        ),
+        (
+            ProjectType::Course,
+            vec![
+                "COURSE_OUTLINE.md", "docs/COURSE_OUTLINE.md",
+                "lessons/", "modules/", "curriculum/",
+            ],
+        ),
+        (
+            ProjectType::OpenSource,
+            vec![
+                "CONTRIBUTING.md", "CONTRIBUTING.rst",
+                "GOVERNANCE.md", "CODE_OF_CONDUCT.md",
+                ".github/ISSUE_TEMPLATE/",
+            ],
         ),
     ]
 }
@@ -377,5 +445,73 @@ mod tests {
             "src/".to_string(),
         ];
         assert_eq!(assess_maturity(&entries), Maturity::Growing);
+    }
+
+    #[test]
+    fn test_classify_book() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::create_dir_all(dir.path().join("chapters")).unwrap();
+        fs::write(dir.path().join("BOOK_OUTLINE.md"), "# My Book").unwrap();
+        let result = classify_project(dir.path().to_str().unwrap());
+        assert_eq!(result.primary_type, ProjectType::Book);
+    }
+
+    #[test]
+    fn test_classify_book_series() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::write(dir.path().join("SERIES_BIBLE.md"), "# My Series").unwrap();
+        fs::create_dir_all(dir.path().join("books")).unwrap();
+        let result = classify_project(dir.path().to_str().unwrap());
+        assert_eq!(result.primary_type, ProjectType::BookSeries);
+    }
+
+    #[test]
+    fn test_classify_podcast() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::write(dir.path().join("SHOW_FORMAT.md"), "# My Show").unwrap();
+        fs::create_dir_all(dir.path().join("episodes")).unwrap();
+        let result = classify_project(dir.path().to_str().unwrap());
+        assert_eq!(result.primary_type, ProjectType::Podcast);
+    }
+
+    #[test]
+    fn test_classify_newsletter() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::write(dir.path().join("NEWSLETTER_STRATEGY.md"), "# Strategy").unwrap();
+        let result = classify_project(dir.path().to_str().unwrap());
+        assert_eq!(result.primary_type, ProjectType::Newsletter);
+    }
+
+    #[test]
+    fn test_classify_youtube() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::write(dir.path().join("CHANNEL_STRATEGY.md"), "# Channel").unwrap();
+        fs::create_dir_all(dir.path().join("videos")).unwrap();
+        let result = classify_project(dir.path().to_str().unwrap());
+        assert_eq!(result.primary_type, ProjectType::YouTube);
+    }
+
+    #[test]
+    fn test_classify_opensource() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::write(dir.path().join("CONTRIBUTING.md"), "# Contributing").unwrap();
+        fs::write(dir.path().join("CODE_OF_CONDUCT.md"), "# CoC").unwrap();
+        fs::create_dir_all(dir.path().join("src")).unwrap();
+        let result = classify_project(dir.path().to_str().unwrap());
+        // Should detect both open source and software
+        let types = result.all_types();
+        assert!(types.contains(&ProjectType::OpenSource) || types.contains(&ProjectType::SoftwareExisting));
+    }
+
+    #[test]
+    fn test_new_project_types_as_str() {
+        assert_eq!(ProjectType::Book.as_str(), "book");
+        assert_eq!(ProjectType::BookSeries.as_str(), "book-series");
+        assert_eq!(ProjectType::Podcast.as_str(), "podcast");
+        assert_eq!(ProjectType::Newsletter.as_str(), "newsletter");
+        assert_eq!(ProjectType::YouTube.as_str(), "youtube");
+        assert_eq!(ProjectType::Course.as_str(), "course");
+        assert_eq!(ProjectType::OpenSource.as_str(), "open-source");
+        assert_eq!(ProjectType::Composite.as_str(), "composite");
     }
 }
