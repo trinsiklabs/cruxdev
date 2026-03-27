@@ -1,6 +1,6 @@
 # Competitors
 
-**Last Updated:** 2026-03-27 (post-session: 22 build plans converged, 52 tools, 419 tests)
+**Last Updated:** 2026-03-27 (post-session: 26 build plans converged, 52 tools, 436 tests, 218 templates, domain architecture)
 **Project:** CruxDev — Autonomous Convergence Framework
 **Research Method:** 5-pass iterative deepening per RESEARCH_PATTERNS.md (broad → academic → practitioner → contrarian → primary sources)
 
@@ -47,6 +47,10 @@ CruxDev is the only framework that drives AI coding agents through multi-dimensi
 - No TypeScript/Node.js toolchain detection
 - No ecosystem-neutral design (tied to one vendor)
 - No OpenClaw integration
+- Software-only — cannot manage books, podcasts, newsletters, businesses
+- No domain/sub-project architecture for composite businesses
+- No project template library (218 templates across 16 types)
+- No skill-server synchronization enforcement
 
 **Our moat vs them:**
 - Convergence engine with two-consecutive-clean-pass criterion
@@ -64,9 +68,13 @@ CruxDev is the only framework that drives AI coding agents through multi-dimensi
 - TypeScript toolchain detection: Jest/Vitest, ESLint/Biome, coverage parsing, npm audit, tsconfig strict
 - Competitive feedback loop: auto-detects when build plans change competitive position
 - Autonomous growth engine: Typefully posting, GitHub Releases, README optimization, metrics tracking
-- 10 research-converged methodology docs baked into audit dimensions (form, metrics, dashboard, color/contrast, DRY, research, competitors, growth, logo, MCP server)
+- 12 research-converged methodology docs baked into audit dimensions (form, metrics, dashboard, color/contrast, DRY, research, competitors, growth, logo, MCP server, AI skills)
 - Ecosystem-neutral: works with any MCP client (not locked to one vendor)
-- 52 MCP tools, 419 tests, single 5.1MB Rust binary
+- Universal project management: classifies and manages 18 project types (software, books, podcasts, newsletters, YouTube, businesses, courses, open source, composites)
+- Domain architecture: parent projects with typed sub-projects, cross-project convergence, multi-domain membership
+- 218 project templates across 16 categories (software, business, book, podcast, newsletter, YouTube, etc.)
+- SKILL.md standard: 7 skills migrated, skill-server synchronization enforcement
+- 52 MCP tools, 436 tests, single 5.1MB Rust binary
 
 **Their moat vs us:**
 - 110K stars vs our early stage — massive mindshare
