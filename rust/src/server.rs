@@ -13,6 +13,36 @@ use std::sync::{LazyLock, Mutex};
 use crate::engine::{convergence, persistence, plan_status, plan_validator, wal, index, router};
 use crate::engine::state::ConvergenceState;
 
+// --- Parameter types (Growth engine) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct RunGrowthCycleParam {
+    /// GitHub repo (e.g. "owner/repo")
+    pub repo: String,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+    /// Dry run (default: true)
+    pub dry_run: Option<bool>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct GrowthStatusParam {
+    /// GitHub repo (e.g. "owner/repo")
+    pub repo: Option<String>,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct PostToTypefullyParam {
+    /// Content to post
+    pub content: String,
+    /// Create as thread (default: false)
+    pub threadify: Option<bool>,
+    /// Dry run (default: true)
+    pub dry_run: Option<bool>,
+}
+
 // --- Parameter types (Git workflow) ---
 
 #[derive(Deserialize, JsonSchema)]
@@ -1747,6 +1777,137 @@ impl CruxDevServer {
             }).to_string(),
             Err(e) => serde_json::json!({"error": e}).to_string(),
         }
+    }
+
+    // 47. run_growth_cycle
+    #[tool(description = "Run autonomous growth cycle: changelog → release notes → X post → README check → llms.txt → metrics. Dry-run by default.")]
+    async fn run_growth_cycle(&self, params: Parameters<RunGrowthCycleParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+
+        let mut actions: Vec<serde_json::Value> = Vec::new();
+
+        // 1. Generate release notes
+        let notes = crate::growth::releases::generate_release_notes(&proj_dir, "latest");
+        actions.push(serde_json::json!({"action": "release_notes", "content_preview": &notes[..notes.len().min(200)]}));
+
+        // 2. Check README health
+        let readme_health = crate::growth::readme::check_readme(&proj_dir, 0, 0);
+        actions.push(serde_json::json!({"action": "readme_check", "suggestions": readme_health.suggestions}));
+
+        // 3. Compose X post
+        let x_post = crate::growth::typefully::compose_release_thread(
+            "CruxDev", "latest", &notes, 368, 49,
+        );
+        actions.push(serde_json::json!({"action": "x_post", "content": &x_post[..x_post.len().min(280)]}));
+
+        // 4. Post to Typefully (if not dry run and API key available)
+        if !dry_run {
+            if let Some(api_key) = crate::growth::typefully::api_key_from_env() {
+                let result = crate::growth::typefully::post_draft(&api_key, &x_post, true).await;
+                actions.push(serde_json::json!({"action": "typefully_post", "success": result.success, "error": result.error}));
+            } else {
+                actions.push(serde_json::json!({"action": "typefully_post", "skipped": true, "reason": "TYPEFULLY_API_KEY not set"}));
+            }
+        }
+
+        // 5. Collect growth metrics
+        match crate::growth::metrics::collect_metrics(&p.repo) {
+            Ok(metrics) => {
+                let metrics_path = format!("{proj_dir}/.cruxdev/growth/metrics.jsonl");
+                let _ = std::fs::create_dir_all(format!("{proj_dir}/.cruxdev/growth"));
+                if !dry_run {
+                    let _ = crate::growth::metrics::append_metrics(&metrics_path, &metrics);
+                }
+                actions.push(serde_json::json!({"action": "metrics", "stars": metrics.stars, "forks": metrics.forks, "open_issues": metrics.open_issues}));
+            }
+            Err(e) => {
+                actions.push(serde_json::json!({"action": "metrics", "error": e}));
+            }
+        }
+
+        serde_json::json!({
+            "repo": p.repo,
+            "dry_run": dry_run,
+            "actions_count": actions.len(),
+            "actions": actions,
+        }).to_string()
+    }
+
+    // 48. growth_status
+    #[tool(description = "Get current growth metrics and history for a project.")]
+    async fn growth_status(&self, params: Parameters<GrowthStatusParam>) -> String {
+        let proj = params.0.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+
+        let metrics_path = format!("{proj_dir}/.cruxdev/growth/metrics.jsonl");
+        let history = crate::growth::metrics::read_metrics_history(&metrics_path);
+
+        let mut result = serde_json::json!({
+            "history_depth": history.len(),
+        });
+
+        if let Some(latest) = history.last() {
+            result["latest"] = serde_json::json!({
+                "stars": latest.stars,
+                "forks": latest.forks,
+                "open_issues": latest.open_issues,
+                "watchers": latest.watchers,
+            });
+        }
+
+        if let Some(repo) = &params.0.repo
+            && let Ok(live) = crate::growth::metrics::collect_metrics(repo)
+        {
+            result["live"] = serde_json::json!({
+                "stars": live.stars,
+                "forks": live.forks,
+                "open_issues": live.open_issues,
+            });
+        }
+
+        // README health
+        let readme = crate::growth::readme::check_readme(&proj_dir, 0, 0);
+        result["readme"] = serde_json::json!({
+            "exists": readme.exists,
+            "suggestions": readme.suggestions,
+        });
+
+        result.to_string()
+    }
+
+    // 49. post_to_typefully
+    #[tool(description = "Post content to X/Twitter via Typefully API. Dry-run by default.")]
+    async fn post_to_typefully(&self, params: Parameters<PostToTypefullyParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let threadify = p.threadify.unwrap_or(false);
+
+        if dry_run {
+            return serde_json::json!({
+                "dry_run": true,
+                "would_post": &p.content[..p.content.len().min(280)],
+                "threadify": threadify,
+            }).to_string();
+        }
+
+        let api_key = match crate::growth::typefully::api_key_from_env() {
+            Some(k) => k,
+            None => return serde_json::json!({"error": "TYPEFULLY_API_KEY not set"}).to_string(),
+        };
+
+        let result = crate::growth::typefully::post_draft(&api_key, &p.content, threadify).await;
+        serde_json::json!(result).to_string()
     }
 }
 

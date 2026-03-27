@@ -6,6 +6,7 @@ pub mod dispatch;
 pub mod engine;
 pub mod evolution;
 pub mod git;
+pub mod growth;
 pub mod graph;
 pub mod improvement;
 pub mod install;
