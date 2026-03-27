@@ -264,6 +264,50 @@ For each gap (feature they have, you don't):
 
 ---
 
+## Phase 4B: Integration Ecosystem Analysis
+
+**Purpose:** Track what platforms/tools each competitor integrates with and at what depth. Integration ecosystems are often the deciding factor for adoption.
+
+### 4B.1 Integration Inventory
+
+For each competitor, document:
+
+| Field | Description |
+|-------|-------------|
+| **name** | Platform/tool name (e.g., "VSCode", "Slack", "GitHub") |
+| **depth** | native (core feature), plugin (official), api (REST/webhook), community (third-party) |
+| **description** | What the integration does |
+
+### 4B.2 Integration Comparison Matrix
+
+Build a matrix: rows = integrations, columns = us + competitors.
+
+Example:
+| Integration | Us | Superpowers | OpenClaw |
+|-------------|-----|-------------|----------|
+| MCP | native | N/A | native |
+| GitHub Issues | native | N/A | community |
+| Slack | N/A | N/A | native |
+
+### 4B.3 Integration Gap Classification
+
+Same priority system as feature gaps:
+- **must-close:** 2+ official competitors have the integration
+- **should-close:** 1 official competitor has it
+- **nice-to-have:** only watch/noted competitors have it
+
+### 4B.4 Integration-Driven Build Plans
+
+Each integration gap generates a build plan — same as feature gaps. Integration pages on the website are the output: per-integration setup guide, verified claims only, roadmap clearly separated.
+
+### 4B.5 Per-Integration Documentation Rule
+
+Integration specifics must NOT be inline in core docs. Each integration gets:
+- Its own page on the website (/integrations/[name])
+- Its own config section in install guide
+- Its own troubleshooting section
+- Managed as a sub-entity with its own convergence state
+
 ## Phase 5: Gap Closure
 
 **Purpose:** Automatically generate and queue build plans to close competitive gaps.

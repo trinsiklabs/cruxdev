@@ -155,6 +155,37 @@ pub struct CompetitorProfile {
     pub threat: ThreatAssessment,
     pub funding: String,
     pub growth_signals: Vec<String>,
+    #[serde(default)]
+    pub integrations: Vec<Integration>,
+}
+
+/// A platform/tool integration for a competitor.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub struct Integration {
+    pub name: String,
+    pub depth: IntegrationDepth,
+    pub description: String,
+}
+
+/// How deep the integration is.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum IntegrationDepth {
+    Native,    // Built into the core product
+    Plugin,    // Official or first-party plugin
+    Api,       // REST/GraphQL API integration
+    Community, // Third-party / community-maintained
+}
+
+impl IntegrationDepth {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Native => "native",
+            Self::Plugin => "plugin",
+            Self::Api => "api",
+            Self::Community => "community",
+        }
+    }
 }
 
 impl CompetitorProfile {
@@ -177,6 +208,7 @@ impl CompetitorProfile {
             threat: ThreatAssessment::default(),
             funding: String::new(),
             growth_signals: Vec::new(),
+            integrations: Vec::new(),
         }
     }
 
@@ -263,6 +295,13 @@ impl CompetitorProfile {
             lines.push("**Growth Signals:**".to_string());
             for g in &self.growth_signals {
                 lines.push(format!("- {g}"));
+            }
+        }
+        if !self.integrations.is_empty() {
+            lines.push(String::new());
+            lines.push("**Integrations:**".to_string());
+            for i in &self.integrations {
+                lines.push(format!("- {} ({}): {}", i.name, i.depth.as_str(), i.description));
             }
         }
         lines.join("\n")
@@ -432,6 +471,38 @@ mod tests {
         assert_eq!(profile.pricing, "$20/mo");
         assert_eq!(profile.strengths, vec!["Fast", "Smart completions"]);
         assert_eq!(profile.weaknesses, vec!["Expensive"]);
+    }
+
+    #[test]
+    fn test_integrations_in_profile() {
+        let mut profile = CompetitorProfile::new("Test", "https://test.com");
+        profile.integrations.push(Integration {
+            name: "VSCode".into(),
+            depth: IntegrationDepth::Native,
+            description: "Built-in extension".into(),
+        });
+        profile.integrations.push(Integration {
+            name: "Slack".into(),
+            depth: IntegrationDepth::Api,
+            description: "Webhook notifications".into(),
+        });
+        let md = profile.to_markdown();
+        assert!(md.contains("**Integrations:**"));
+        assert!(md.contains("VSCode (native)"));
+        assert!(md.contains("Slack (api)"));
+    }
+
+    #[test]
+    fn test_integration_serde() {
+        let i = Integration {
+            name: "GitHub".into(),
+            depth: IntegrationDepth::Plugin,
+            description: "PR integration".into(),
+        };
+        let json = serde_json::to_string(&i).unwrap();
+        let parsed: Integration = serde_json::from_str(&json).unwrap();
+        assert_eq!(parsed.name, "GitHub");
+        assert_eq!(parsed.depth, IntegrationDepth::Plugin);
     }
 
     #[test]
