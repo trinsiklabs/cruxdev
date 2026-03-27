@@ -137,7 +137,7 @@ All of these are maintainable by the AI autonomously.
 
 ## 6. Typefully Integration
 
-Primary posting channel. Bryan has an active Typefully account.
+Primary posting channel. The project owner has a Typefully account.
 
 **API:** `POST /api/v1/drafts/` with `content`, `schedule_date`, `threadify`
 **Rate:** 1-3 posts/day, varied timing (not all at the same time)

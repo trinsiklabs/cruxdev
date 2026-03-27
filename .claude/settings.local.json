@@ -99,7 +99,20 @@
       "Bash(pkill -9 -f pipenv)",
       "Bash(/opt/homebrew/opt/python@3.14/libexec/bin/python3.14 -m pytest tests/engine/ tests/dispatch/ tests/improvement/ tests/test_architecture.py tests/test_install.py tests/test_mcp_tools.py -q --tb=short --cov=src --cov-report=term-missing)",
       "Bash(/opt/homebrew/opt/python@3.14/bin/python3.14 -m pytest tests/engine/ tests/dispatch/ tests/improvement/ tests/test_architecture.py tests/test_install.py tests/test_mcp_tools.py -q --cov=src --cov-report=term-missing --cov-fail-under=100)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(PATH=\"$HOME/.cargo/bin:$PATH\" cargo build --release)",
+      "Bash(PATH=\"$HOME/.cargo/bin:$PATH\" cargo test)",
+      "Bash(PATH=\"$HOME/.cargo/bin:$PATH\" cargo clippy -- -D warnings)",
+      "Bash(cargo clippy:*)",
+      "Bash(cargo test:*)",
+      "Read(//Users/user/.cargo/bin/**)",
+      "Bash(source ~/.cargo/env)",
+      "Bash(cargo build:*)",
+      "Bash(export PATH=\"$HOME/.cargo/bin:$PATH\")",
+      "Bash(timeout 5 /Users/user/personal/cruxdev/rust/target/release/cruxdev mcp start)",
+      "Bash(gtimeout 5 /Users/user/personal/cruxdev/rust/target/release/cruxdev mcp start)",
+      "Bash(printf '{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"id\"\"\"\":1,\"\"\"\"method\"\"\"\":\"\"\"\"initialize\"\"\"\",\"\"\"\"params\"\"\"\":{\"\"\"\"protocolVersion\"\"\"\":\"\"\"\"2024-11-05\"\"\"\",\"\"\"\"capabilities\"\"\"\":{},\"\"\"\"clientInfo\"\"\"\":{\"\"\"\"name\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"version\"\"\"\":\"\"\"\"0.1\"\"\"\"}}}\\\\n{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"method\"\"\"\":\"\"\"\"notifications/initialized\"\"\"\"}\\\\n{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"id\"\"\"\":2,\"\"\"\"method\"\"\"\":\"\"\"\"tools/list\"\"\"\",\"\"\"\"params\"\"\"\":{}}\\\\n')",
+      "Bash(/Users/user/personal/cruxdev/rust/target/release/cruxdev mcp:*)"
     ]
   }
 }

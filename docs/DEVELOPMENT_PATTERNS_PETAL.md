@@ -5,7 +5,7 @@ Phoenix / Elixir / Tailwind / Ash / LiveView
 This document captures stack-specific patterns, conventions, and decisions for the BNI Growth Platform. It complements `DEVELOPMENT_PATTERNS.md` (methodology, planning, audit cycles) with the **how** of building in this specific stack.
 
 **Relationship to other files:**
-- **DEVELOPMENT_PATTERNS.md** — the methodology authority. Planning cycles, audit patterns, Bryan's prompt toolkit, anti-patterns. Stack-agnostic.
+- **DEVELOPMENT_PATTERNS.md** — the methodology authority. Planning cycles, audit patterns, the user's prompt toolkit, anti-patterns. Stack-agnostic.
 - **This file** — stack-specific patterns. How we structure Ash resources, test with ExUnit, use Petal Components, integrate GHL, etc.
 - **Build plan files** (`1-*.md`, `2-*.md`, etc.) — per-slice actionable plans with checkboxes. Created using the methodology from DEVELOPMENT_PATTERNS.md and the technical patterns from this file.
 
@@ -724,10 +724,10 @@ Seed data is in `priv/repo/seeds.exs` and is idempotent (safe to run multiple ti
 # 1. Westlake Select chapter (name, meeting day/time, location)
 # 2. Full seat roster with classifications
 # 3. Seed seat splits for any currently split seats
-# 4. Platform admin user (Bryan)
+# 4. Platform admin user (the user)
 ```
 
-The actual seat roster (which classifications, which are filled, which are split) comes from Bryan — this is configuration data, not generated.
+The actual seat roster (which classifications, which are filled, which are split) comes from the user — this is configuration data, not generated.
 
 ---
 

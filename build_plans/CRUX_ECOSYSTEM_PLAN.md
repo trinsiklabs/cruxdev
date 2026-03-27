@@ -461,7 +461,7 @@ token-budget: <max tokens>
 
 ### 4A. Design Rationale: Digest, Don't Track
 
-Bryan's explicit decision: do NOT track upstream OpenCode via rebasing/merging. OpenCode releases every 1-3 days with 823+ contributors. Merge hell is not worth it.
+the user's explicit decision: do NOT track upstream OpenCode via rebasing/merging. OpenCode releases every 1-3 days with 823+ contributors. Merge hell is not worth it.
 
 Instead: periodically read the git changes of monitored repos, analyze for concepts and approaches, and selectively integrate on merit. This is intelligence gathering, not fork maintenance.
 
@@ -710,7 +710,7 @@ What worked for Superpowers (93.9k stars, zero paid marketing):
 | Measurable results (convergence data) | CruxDev | "79 issues found across 11 passes" is a compelling story |
 | Anthropic marketplace submission | CruxDev | Follow Superpowers' path |
 | GitHub Trending | CruxDev, CruxCLI | Three separate repos = three shots at trending |
-| Origin blog post | All three | Bryan's practitioner story |
+| Origin blog post | All three | the user's practitioner story |
 | Inspiration → content pipeline | All three | "We analyzed OpenCode's latest release and..." |
 | Hacker News | CruxDev | "Show HN: CruxDev — autonomous convergence for AI coding" |
 
@@ -725,7 +725,7 @@ Build-in-public is not a separate marketing effort — it is a natural byproduct
 
 ### Progress Tracker — Phase 6
 
-- [ ] 6.1 Write origin blog post (Bryan's story)
+- [ ] 6.1 Write origin blog post (the user's story)
 - [ ] 6.2 Set up Typefully automation for all three repos
 - [ ] 6.3 Prepare Anthropic marketplace submission for CruxDev
 - [ ] 6.4 Create measurable results narrative (convergence data)
@@ -776,7 +776,7 @@ The first implementation pass of CruxDev (Phases 2-3) probably needs to happen m
 
 CruxDev works standalone without Crux (just like Superpowers works without any framework). When Crux is present, it makes CruxDev better — modes provide safety gates, knowledge entries provide context, MCP tools provide infrastructure.
 
-**Status:** Open — needs Bryan's confirmation.
+**Status:** Open — needs the user's confirmation.
 
 ### Q2: CruxCLI Fork Scope
 
@@ -784,7 +784,7 @@ CruxDev works standalone without Crux (just like Superpowers works without any f
 
 **Proposed answer:** Fork the full monorepo. The packages are interdependent, and cherry-picking creates maintenance burden. A full fork gives complete control. Strip packages you don't need later.
 
-**Status:** Open — needs Bryan's decision.
+**Status:** Open — needs the user's decision.
 
 ### Q3: Crux Positioning
 
@@ -792,7 +792,7 @@ CruxDev works standalone without Crux (just like Superpowers works without any f
 
 **Proposed answer:** Position by analogy: "Crux is to AI coding agents what .git is to version control — the infrastructure layer that makes everything else work." The platform play becomes clear when CruxDev and CruxCLI both demonstrably benefit from having Crux underneath.
 
-**Status:** Open — needs Bryan's refinement.
+**Status:** Open — needs the user's refinement.
 
 ### Q4: Cron Frequency for Autonomous Evolution
 
@@ -800,7 +800,7 @@ CruxDev works standalone without Crux (just like Superpowers works without any f
 
 **Proposed answer:** Start with daily. Increase frequency as confidence grows. The evolution pipeline should be safe to run frequently (safety gates prevent damage), but daily gives time to review outputs while building trust.
 
-**Status:** Open — needs Bryan's decision.
+**Status:** Open — needs the user's decision.
 
 ### Q5: Is CruxCLI + Crux Functional Enough Today for Development?
 

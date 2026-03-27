@@ -53,8 +53,8 @@ cruxdev.dev is live but not registered with any search engine or AI discovery sy
 
 ## Phase 5: Immediate Actions for cruxdev.dev
 
-- [ ] 5.1 Bryan registers cruxdev.dev in Google Search Console
-- [ ] 5.2 Bryan registers cruxdev.dev in Bing Webmaster Tools
+- [ ] 5.1 Register cruxdev.dev in Google Search Console
+- [ ] 5.2 Register cruxdev.dev in Bing Webmaster Tools
 - [ ] 5.3 Generate IndexNow key, add to deploy script
 - [ ] 5.4 Submit sitemap to both
 - [ ] 5.5 Submit priority URLs via GSC URL Inspection

@@ -1,6 +1,6 @@
 # CruxDev Adoption Process
 
-How to adopt any existing project into the Crux/CruxDev ecosystem. Stack-agnostic, principles-based. Hand this file to a Claude Code session and say: "Follow ADOPTION_PROCESS.md. Converge."
+How to adopt any existing project into the Crux/CruxDev ecosystem. Stack-agnostic, principles-based. Hand this file to any MCP-compatible coding agent and say: "Follow ADOPTION_PROCESS.md. Converge."
 
 This is the operational companion to ADOPTION_PLAYBOOK.md. The playbook defines the 9 phases in detail. This document tells the agent how to start — install Crux, install CruxDev, configure enforcement, and begin executing the playbook.
 

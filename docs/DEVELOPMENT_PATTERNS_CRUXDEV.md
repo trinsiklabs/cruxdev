@@ -14,7 +14,7 @@ This is the successor to DEVELOPMENT_PATTERNS.md. The core methodology is identi
 **When to read this file:**
 - At the start of any planning session in the Crux ecosystem
 - Before writing any new plan document for Crux, CruxCLI, or CruxDev
-- When Bryan says "follow the patterns" or references methodology
+- When User says "follow the patterns" or references methodology
 - NOT needed for routine work covered by CLAUDE.md
 
 ---
@@ -23,25 +23,25 @@ This is the successor to DEVELOPMENT_PATTERNS.md. The core methodology is identi
 
 ### 0A. The Core Difference from DEVELOPMENT_PATTERNS.md
 
-DEVELOPMENT_PATTERNS.md documents a process where Bryan drives convergence through repeated prompts:
+DEVELOPMENT_PATTERNS.md documents a process where the user drives convergence through repeated prompts:
 
 ```
-Bryan: "audit it"
-Claude: [audits, finds 14 issues, fixes]
-Bryan: "do it again"
-Claude: [audits, finds 8 issues, fixes]
-Bryan: "do it again"
-Claude: [audits, finds 0 issues]
-Bryan: "now audit the entire plan"
+User: "audit it"
+Agent: [audits, finds 14 issues, fixes]
+User: "do it again"
+Agent: [audits, finds 8 issues, fixes]
+User: "do it again"
+Agent: [audits, finds 0 issues]
+User: "now audit the entire plan"
 ...
 ```
 
-This works. It produces excellent results (79 issues caught across 11 passes). But it requires Bryan at every loop iteration.
+This works. It produces excellent results (79 issues caught across 11 passes). But it requires the user at every loop iteration.
 
 **DEVELOPMENT_PATTERNS_CRUXDEV.md replaces the human loop with autonomous convergence:**
 
 ```
-Bryan: "Plan and build [goal] with [constraints]. Converge."
+User: "Plan and build [goal] with [constraints]. Converge."
 Agent: [drives the ENTIRE cycle to completion autonomously]
   → writes plan
   → focused audit loop (each phase, until zero issues)
@@ -59,9 +59,9 @@ Agent: [drives the ENTIRE cycle to completion autonomously]
   → DONE: report convergence status
 ```
 
-**Same quality. Zero intermediate prompting.** The agent knows the termination conditions, safety valves, and escalation rules. Bryan provides the goal and constraints. The agent runs to completion.
+**Same quality. Zero intermediate prompting.** The agent knows the termination conditions, safety valves, and escalation rules. The user provides the goal and constraints. The agent runs to completion.
 
-### 0B. When to Escalate to Bryan
+### 0B. When to Escalate to the User
 
 The agent runs autonomously EXCEPT when:
 
@@ -184,7 +184,7 @@ When the agent receives a goal, it runs the full planning cycle autonomously:
            PLAN IS CONVERGED — proceed to execution
 ```
 
-**Key point:** The agent does NOT wait for Bryan to say "audit it" or "do it again" at any step. It drives each loop to its termination condition autonomously.
+**Key point:** The agent does NOT wait for the user to say "audit it" or "do it again" at any step. It drives each loop to its termination condition autonomously.
 
 ### 1B. Plan Document Format
 
@@ -321,7 +321,7 @@ Mid-execution checkpoint (at ~50% completion):
 5. Coverage check ≥ 100%
 ```
 
-Never write production code before its tests exist. If context/time forces a tradeoff, escalate to Bryan.
+Never write production code before its tests exist. If context/time forces a tradeoff, escalate to the user.
 
 ### 2D. Git Worktree Isolation (from Superpowers)
 
@@ -443,10 +443,10 @@ After all tasks are complete, the agent drives code and doc auditing to converge
 │   - One clean pass after fixing is NOT convergence            │
 │     (anchoring bias: ~30% false-negative rate)               │
 │                                                              │
-│ Safety valve: max 5 rounds → escalate to Bryan               │
+│ Safety valve: max 5 rounds → escalate to the user               │
 │                                                              │
 │ Diminishing returns: if after 3 rounds only LOW-severity     │
-│ issues remain, present to Bryan: "Accept with known gaps     │
+│ issues remain, present to the user: "Accept with known gaps     │
 │ or continue?" Don't spend 2 more rounds on cosmetics.        │
 │                                                              │
 │ Net-negative: if issue count increases for 2 consecutive     │
@@ -743,7 +743,7 @@ At the end of each convergence round, report:
 
 ### 8C. Escalation Format
 
-When escalating to Bryan, present:
+When escalating to the user, present:
 1. What happened (one sentence)
 2. Why the agent can't proceed (specific blocker)
 3. Options (numbered, 2-3 max, with tradeoffs)
@@ -758,7 +758,7 @@ When escalating to Bryan, present:
 | Absorbing CruxDev into Crux | Loses competitive positioning as separate product | Three products, three repos, three star counts. Always. |
 | Tracking upstream OpenCode | Merge hell, 823+ contributors, releases every 1-3 days | Digest, don't track. Inspiration registry. |
 | Single clean pass = convergence | ~30% false-negative rate from anchoring bias | Two consecutive independent clean passes required |
-| Human-driven audit loops | Requires Bryan at every iteration | Agent drives to completion autonomously |
+| Human-driven audit loops | Requires the user at every iteration | Agent drives to completion autonomously |
 | Premature convergence declaration | Undiscovered issues ship | Two clean passes, second from fresh agent |
 | Mixing skills and modes | Confusion about what controls what | Skills = process. Modes = behavior. Complementary layers. |
 | Cross-repo test dependencies | One repo's tests break when another changes | Each repo's tests pass independently |
@@ -778,16 +778,18 @@ When escalating to Bryan, present:
 | Structural-only website audit | Checks page existence/layout but not content accuracy. Stale tech refs, wrong dimension names, old prerequisites survive. BP027 failure: "Python 3.12+" on a Rust project, wrong code dimension names on 12 pages. | Website convergence = doc convergence on every page. Read every page, verify every claim against source code. |
 | Metric-only content update | Grep for numbers to update without reading surrounding prose. Misses wrong names, stale technology refs, inconsistent terminology. | Read full content. Numbers AND prose must match codebase. |
 | Aspirational documentation | Writing claims about features that don't exist as if they're implemented. BP030 failure: OpenClaw page claimed Jest/Vitest integration, ESLint support, TypeScript strict mode, Docker testing — none implemented. 8 of 18 claims FALSE. | Ship the code first, then document it. Every claim must reference the implementing code. "Roadmap" section for planned features. |
+| Personal names in product docs | Developer/owner names in documentation, website, or code comments. Product is not tied to a person. | Names never appear in product docs. Exception: CONTRIBUTORS.md, git author, competitor analysis citing public statements. Convergence check: `grep -ri "[name]" docs/ src/` = 0. |
+| Ecosystem lock-in language | Presenting one MCP client as the primary/default. Users on OpenClaw+GPT, Cursor+local models, etc. must see themselves as first-class. | Always list multiple clients. Per-client config in labeled sections. No "Install [specific client]" as prerequisite. Integration specifics managed per-integration, not in primary docs. |
 
 ---
 
-## 10. Bryan's Collaboration Style
+## 10. User Collaboration Patterns
 
 ### 10A. Concise, Imperative Prompts
 
-Bryan gives direction, not detail:
+The user gives direction, not detail:
 
-| Bryan says | What it means |
+| User says | What it means |
 |-----------|---------------|
 | "converge" | Run the full autonomous cycle. Don't stop until done or escalation needed. |
 | "fix these" | Apply fixes directly. Don't ask for permission, don't present options. |
@@ -795,13 +797,13 @@ Bryan gives direction, not detail:
 | "plan and build X" | Full lifecycle: plan → converge plan → execute → converge code+docs. |
 | "update patterns with everything you've seen" | Review all sessions, find gaps, update. Don't ask what to add. |
 | "1. yes 2. skip it." | Numbered responses to numbered decisions. Efficient, unambiguous. |
-| "not just [thing]. [broader scope]." | Scope correction. Claude went too narrow. Expand. |
+| "not just [thing]. [broader scope]." | Scope correction. The agent went too narrow. Expand. |
 
-### 10B. Bryan Corrects Scope, Not Detail
+### 10B. User Corrects Scope, Not Detail
 
-Bryan specifies what's missing, what's wrong, and what to do next. Claude fills in the detail autonomously. When Bryan corrects scope, that correction becomes a pattern.
+The user specifies what's missing, what's wrong, and what to do next. The agent fills in the detail autonomously. When the user corrects scope, that correction becomes a pattern.
 
-### 10C. Bryan's Quality Standard
+### 10C. Quality Standard
 
 - 100% coverage, no "90%+ floor"
 - Two consecutive clean passes, not one
@@ -813,7 +815,7 @@ Bryan specifies what's missing, what's wrong, and what to do next. Claude fills 
 
 ## 11. The Complete Autonomous Lifecycle (Reference)
 
-This is the full sequence the agent follows when Bryan says "Plan and build X. Converge."
+This is the full sequence the agent follows when the user says "Plan and build X. Converge."
 
 ```
 1. BRAINSTORM (if new feature / creative work)
@@ -867,7 +869,7 @@ This is the full sequence the agent follows when Bryan says "Plan and build X. C
    └── Convergence status, issue counts, coverage numbers, known gaps
 ```
 
-The agent does NOT wait for Bryan between any of these steps. It drives to completion and reports the result.
+The agent does NOT wait for the user between any of these steps. It drives to completion and reports the result.
 
 ---
 

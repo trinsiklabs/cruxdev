@@ -4,12 +4,12 @@
 
 CruxDev is an autonomous convergence framework for AI-driven development. It installs into any project as a Claude Code plugin and drives the agent to convergence without human intervention.
 
-**Owner:** Bryan (splntrb on GitHub), Trinsik Labs
+**Owner:** Trinsik Labs
 **Repo:** /Users/user/personal/cruxdev
 
 ## Core Rules
 
-1. **TDD for everything.** Tests before code. No exceptions without Bryan's explicit approval.
+1. **TDD for everything.** Tests before code. No exceptions without explicit project owner approval.
 2. **100% test coverage enforced.** `pytest --cov --cov-fail-under=100`. Verify with `--cov-report=term-missing`, not by assertion.
 3. **Drive convergence autonomously.** Do not wait for "do it again." Run audit-fix-re-audit loops to termination conditions defined in DEVELOPMENT_PATTERNS_CRUXDEV.md.
 4. **Two consecutive independent clean passes = convergence.** One clean pass is not convergence (anchoring bias).

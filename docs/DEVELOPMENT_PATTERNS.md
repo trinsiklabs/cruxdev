@@ -1,18 +1,18 @@
 # Development Patterns
 
-Extracted from BUILD_PLAN.md and the collaborative process between Bryan and Claude that produced it. These are the patterns, conventions, and methodologies we've established for Claude Code development on this project. Follow these for all future development rounds.
+Extracted from BUILD_PLAN.md and the collaborative process between the user and Claude that produced it. These are the patterns, conventions, and methodologies we've established for Claude Code development on this project. Follow these for all future development rounds.
 
 This document captures both **what** we build and **how** we plan and collaborate. The meta-process is as important as the technical patterns.
 
 **Relationship to other files:**
 - **CLAUDE.md** — the authority. Contains mandatory session rules, logging requirements, pipeline tools, and project-specific constraints. DEVELOPMENT_PATTERNS.md captures reusable methodology; CLAUDE.md contains the hard rules that override everything.
 - **BUILD_PLAN.md** — the current plan. Created using these patterns. When the plan is complete, it gets archived and a new one is created for the next development round.
-- **This file is living.** Bryan asks "update DEVELOPMENT_PATTERNS.md with everything you've seen" at the end of each planning session. New patterns are added, existing ones refined. This self-updating cycle is itself a pattern.
+- **This file is living.** the user asks "update DEVELOPMENT_PATTERNS.md with everything you've seen" at the end of each planning session. New patterns are added, existing ones refined. This self-updating cycle is itself a pattern.
 
 **When to read this file:**
 - At the start of any planning session (creating or auditing a BUILD_PLAN.md)
 - Before writing any new plan document
-- When Bryan says "follow the patterns" or references development methodology
+- When the user says "follow the patterns" or references development methodology
 - NOT needed for routine pipeline work (extraction, synthesis, etc.) — CLAUDE.md covers that
 
 ---
@@ -24,36 +24,36 @@ This document captures both **what** we build and **how** we plan and collaborat
 Building a plan is a multi-step collaborative process, not a single document write. The cycle we've established:
 
 ```
-1. Bryan describes the problem and goals (conversation)
+1. the user describes the problem and goals (conversation)
 2. Claude asks clarifying questions, proposes approach
-3. Bryan corrects misconceptions, adds constraints
+3. the user corrects misconceptions, adds constraints
    — e.g., "this burns API tokens, it needs to stay in Claude Code"
    — e.g., "facts need to be queued for review, corrections ripple"
 4. Claude writes the comprehensive plan document
-5. Bryan demands the plan be audited
+5. the user demands the plan be audited
 6. Claude audits against all known concerns, finds gaps (14 gaps in round 1)
-7. Bryan says "fix all"
+7. the user says "fix all"
 8. Claude applies all fixes
-9. Bryan demands a SECOND audit
+9. the user demands a SECOND audit
 10. Claude re-audits, finds MORE gaps introduced by fixes (8 in round 2)
-11. Bryan approves fixes
+11. the user approves fixes
 12. Claude applies, verifies totals
-13. Bryan adds new requirements (e.g., "add a code audit phase")
+13. the user adds new requirements (e.g., "add a code audit phase")
 14. Repeat audit cycle as needed
 15. Only THEN does building start
 ```
 
 **Key insight:** The first draft of a plan is never right. The audit cycle is where the plan becomes real. Don't resist being audited — embrace it. The plan gets dramatically better through each pass.
 
-### 0B. Bryan's Role in Planning
+### 0B. the user's Role in Planning
 
-Bryan is not a passive consumer of plans. He:
+the user is not a passive consumer of plans. He:
 
-- **Corrects architectural assumptions** — Claude proposed API calls; Bryan caught that it would burn tokens outside Pro Max and killed it. This changed the entire architecture.
+- **Corrects architectural assumptions** — Claude proposed API calls; the user caught that it would burn tokens outside Pro Max and killed it. This changed the entire architecture.
 - **Adds requirements mid-stream** — "facts get queued for review, corrections ripple to all related entries" was added during discussion, not in the initial scope.
-- **Demands audits** — "audit BUILD_PLAN.md. is it sane, coherent, complete?" This is not optional. Bryan will ask for this, and Claude should proactively offer it.
-- **Demands re-audits** — Fixing 14 gaps can introduce new gaps. Bryan knows this and will ask again. Claude should expect this.
-- **Holds quality gates** — Bryan won't say "good enough." The plan must converge to zero known issues before execution starts.
+- **Demands audits** — "audit BUILD_PLAN.md. is it sane, coherent, complete?" This is not optional. the user will ask for this, and Claude should proactively offer it.
+- **Demands re-audits** — Fixing 14 gaps can introduce new gaps. the user knows this and will ask again. Claude should expect this.
+- **Holds quality gates** — the user won't say "good enough." The plan must converge to zero known issues before execution starts.
 
 ### 0C. Claude's Role in Planning
 
@@ -67,33 +67,33 @@ Claude must:
 
 ### 0D. Constraint Discovery Through Conversation
 
-Some of the most important constraints emerge from Bryan correcting Claude's assumptions:
+Some of the most important constraints emerge from the user correcting Claude's assumptions:
 
-| What Claude Proposed | What Bryan Corrected | Resulting Constraint |
+| What Claude Proposed | What the user Corrected | Resulting Constraint |
 |---------------------|---------------------|---------------------|
 | Call Claude API for automated analysis | "This burns API tokens instead of happening in Claude Code with my Pro Max subscription" | All LLM work stays in Claude Code conversation |
 | Simple import pipeline | "Facts get queued for review, corrections ripple to all related entries" | Full review queue with correction propagation |
-| Skip testing for small scripts | CLAUDE.md mandates TDD for everything | TDD/BDD with 100% coverage, no exceptions without Bryan's approval |
+| Skip testing for small scripts | CLAUDE.md mandates TDD for everything | TDD/BDD with 100% coverage, no exceptions without the user's approval |
 
-**Pattern:** Claude proposes → Bryan corrects → constraint is codified in plan header → never violated again.
+**Pattern:** Claude proposes → the user corrects → constraint is codified in plan header → never violated again.
 
 ### 0E. The Complete Planning Flowchart
 
-This is the full cycle from problem statement to execution-ready plan, with the exact prompts Bryan uses at each stage. Every future development round should follow this flowchart.
+This is the full cycle from problem statement to execution-ready plan, with the exact prompts the user uses at each stage. Every future development round should follow this flowchart.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PHASE 1: PROBLEM DEFINITION                  │
 │                                                                 │
-│  Bryan: "I want X. Here's the problem. Here are my goals."     │
+│  the user: "I want X. Here's the problem. Here are my goals."     │
 │  Claude: Asks clarifying questions, proposes approach           │
-│  Bryan: Corrects assumptions, adds constraints                  │
+│  the user: Corrects assumptions, adds constraints                  │
 │    → "this burns API tokens, it needs to stay in Claude Code"   │
 │    → "facts need to be queued for review, corrections ripple"   │
 │  Claude: Revises approach based on corrections                  │
 │                                                                 │
-│  LOOP until Bryan says "write the plan":                        │
-│    Claude proposes → Bryan corrects → constraint codified       │
+│  LOOP until the user says "write the plan":                        │
+│    Claude proposes → the user corrects → constraint codified       │
 │                                                                 │
 │  Output: Shared understanding of scope + constraints            │
 └──────────────────────────────┬──────────────────────────────────┘
@@ -109,7 +109,7 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 │    - File inventory, risks, dependencies                        │
 │    - Definition of Done                                         │
 │                                                                 │
-│  Bryan: "extract everything about how we planned this into a    │
+│  the user: "extract everything about how we planned this into a    │
 │    development patterns file"                                   │
 │  Claude: Writes DEVELOPMENT_PATTERNS.md capturing methodology   │
 │                                                                 │
@@ -120,15 +120,15 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PHASE 3: FOCUSED AUDITS                      │
 │                                                                 │
-│  Bryan: "audit phase 6 for any and all issues"                  │
+│  the user: "audit phase 6 for any and all issues"                  │
 │  Claude: Audits single phase → finds issues → fixes them        │
 │    Round 1: 10 structural issues                                │
 │                                                                 │
-│  Bryan: "now do it again"                                       │
+│  the user: "now do it again"                                       │
 │  Claude: Re-audits same phase → finds issues fixes introduced   │
 │    Round 2: 8 logical issues                                    │
 │                                                                 │
-│  Bryan: "now do it again"                                       │
+│  the user: "now do it again"                                       │
 │  Claude: Re-audits → finds consistency/redundancy issues        │
 │    Round 3: 7 consistency issues                                │
 │                                                                 │
@@ -141,13 +141,13 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PHASE 4: FULL-PLAN AUDITS                    │
 │                                                                 │
-│  Bryan: "now audit the entire plan for issues, again"           │
+│  the user: "now audit the entire plan for issues, again"           │
 │  Claude: Audits ALL phases together → finds cross-phase issues  │
 │    Round 1: 14 cross-phase integration issues                   │
 │    (stale references, state machine name divergence,            │
 │     dependency graph errors, missing test coverage)             │
 │                                                                 │
-│  Bryan: "audit it again for any remaining issues"               │
+│  the user: "audit it again for any remaining issues"               │
 │  Claude: Re-audits full plan → finds residual issues            │
 │    Round 2: 8 more stale references + missing edge cases        │
 │                                                                 │
@@ -160,7 +160,7 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PHASE 5: VIABILITY ASSESSMENT                 │
 │                                                                 │
-│  Bryan: "if i tell you to run the plan exactly as planned,      │
+│  the user: "if i tell you to run the plan exactly as planned,      │
 │    and then after you run it, i tell you to audit and fix any   │
 │    issues, over and over, until you report there aren't any     │
 │    left to fix, will the plan succeed?"                         │
@@ -175,7 +175,7 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 │    4. Answer YES or NO with SPECIFIC numbered caveats           │
 │    5. Each caveat must be concrete and fixable                  │
 │                                                                 │
-│  Bryan: "fix these in the plan as much as possible"             │
+│  the user: "fix these in the plan as much as possible"             │
 │  Claude: Fixes each caveat directly in the plan                 │
 │                                                                 │
 │  Example caveats found across two viability passes:             │
@@ -196,12 +196,12 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PHASE 5B: UPDATE PATTERNS FILE                │
 │                                                                 │
-│  Bryan: "update DEVELOPMENT_PATTERNS.md with everything         │
+│  the user: "update DEVELOPMENT_PATTERNS.md with everything         │
 │    you've seen since we created it"                             │
 │  Claude: Reviews all new patterns from audits + viability       │
 │    → Adds new sections, updates existing ones                   │
 │                                                                 │
-│  Bryan: "now audit the DEVELOPMENT_PATTERNS.md file for gaps    │
+│  the user: "now audit the DEVELOPMENT_PATTERNS.md file for gaps    │
 │    in capturing what we've done"                                │
 │  Claude: Audits patterns file against actual work done          │
 │    → Finds missing patterns, redundancies, gaps                 │
@@ -234,7 +234,7 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 │  Step 3: Execute from task list, not from the plan file          │
 │    - TaskUpdate → in_progress when starting                     │
 │    - TaskUpdate → completed when done                           │
-│    - Tasks give Bryan real-time progress visibility              │
+│    - Tasks give the user real-time progress visibility              │
 │    - Tasks persist across sessions without reading the plan      │
 │                                                                 │
 │  Output: Task list mirrors plan, execution tracked in tasks      │
@@ -244,7 +244,7 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    PHASE 6B: EXECUTION                            │
 │                                                                 │
-│  Bryan: "ok, execute the plan"                                  │
+│  the user: "ok, execute the plan"                                  │
 │  Claude: Works from Claude Code task list:                      │
 │    - TaskList to find next available task                        │
 │    - TaskUpdate → in_progress                                   │
@@ -263,7 +263,7 @@ This is the full cycle from problem statement to execution-ready plan, with the 
 │                                                                 │
 │  (Built into plan as Phase 6 / final phase)                     │
 │                                                                 │
-│  Bryan: "audit and fix any issues in the code, and in the docs, │
+│  the user: "audit and fix any issues in the code, and in the docs, │
 │    over and over, until you report there aren't any left to fix" │
 │  Claude: Audits code + docs in parallel (8 dimensions + 5 doc   │
 │    dimensions) → Finds N issues → fixes → re-runs tests         │
@@ -319,11 +319,11 @@ ls app/chat_db.py 2>&1                    # Already implemented?
 
 **Step 4: Report caveats.** Not "it should work" but "YES, with these specific issues that need fixing: [numbered list]." Each must be actionable.
 
-**Step 5: Fix and re-verify.** After fixing caveats, the viability check should be run again. This is why Bryan asked the viability question TWICE — the first pass found 2 caveats, the second pass (after DEVELOPMENT_PATTERNS.md was updated) found 5 more. Environment verification catches things that pure document auditing misses.
+**Step 5: Fix and re-verify.** After fixing caveats, the viability check should be run again. This is why the user asked the viability question TWICE — the first pass found 2 caveats, the second pass (after DEVELOPMENT_PATTERNS.md was updated) found 5 more. Environment verification catches things that pure document auditing misses.
 
 ### 0E-3. The Full Prompt Sequence (Reference)
 
-These are Bryan's actual prompts in order. Use this as a template for future development rounds:
+These are the user's actual prompts in order. Use this as a template for future development rounds:
 
 ```
 PLANNING PHASE:
@@ -363,7 +363,7 @@ VIABILITY PHASE:
   "fix these in the plan as much as possible"
   → Claude fixes all caveats in the plan document
 
-  (Bryan may ask viability question AGAIN after fixes — this is
+  (the user may ask viability question AGAIN after fixes — this is
    correct, because fixes can introduce new issues or reveal
    additional environment gaps. In our case, the second viability
    pass found 5 issues the first pass missed.)
@@ -376,7 +376,7 @@ PATTERNS UPDATE PHASE:
   "now audit the DEVELOPMENT_PATTERNS.md file for gaps in
    capturing what we've done/been doing"
   → Claude audits patterns against actual work, fixes gaps
-  (repeat if Bryan asks)
+  (repeat if the user asks)
 
 EXECUTION PHASE:
   "ok, execute the plan"
@@ -457,13 +457,13 @@ Do NOT update the plan for ephemeral state (current session progress, temp file 
 
 ### 0H. "Do It Again" — Forcing Convergence Through Repetition
 
-Bryan's most powerful quality tool is simply saying "do it again." After Claude audits and fixes issues, Bryan demands a re-audit. This is not distrust — it's the recognition that:
+the user's most powerful quality tool is simply saying "do it again." After Claude audits and fixes issues, the user demands a re-audit. This is not distrust — it's the recognition that:
 
 1. **Fixes introduce new issues.** Updating a function signature in Phase 1 without updating the Phase 4 test list creates a new gap. The first audit can't catch what doesn't exist yet.
 2. **Each pass finds different classes of problems.** Round 1 catches structural issues. Round 2 catches logical gaps exposed by structural fixes. Round 3 catches consistency/redundancy problems introduced by the first two rounds.
 3. **Convergence is empirically fast.** In our experience: 10 → 8 → 7 → 14 (broader scope) → 8 → 0 for document audits (5 passes, 47 issues). Adding viability passes: 2 + 5 = 7 more environment issues across 2 passes. For post-execution code+doc audits: 13 → 9 → 3 → 0 (4 passes, 25 issues). Grand total across all audit types: 11 passes, 79 issues. The curve drops to zero within 2-4 passes per scope level.
 
-**Bryan's exact pattern:**
+**the user's exact pattern:**
 ```
 "audit phase 6 for issues"     → 10 issues found, fixed
 "now do it again"               → 8 issues found, fixed
@@ -561,7 +561,7 @@ State constraints up front in the header. These are non-negotiable rules that ov
 **Rule:** TDD/BDD for everything. Tests before code. 100% coverage.
 ```
 
-Constraints flow from user decisions. If Bryan says "no API calls," that's a constraint. If CLAUDE.md says "TDD for everything," that's a rule. Don't bury these in phase details — they go in the header where every session sees them first.
+Constraints flow from user decisions. If the user says "no API calls," that's a constraint. If CLAUDE.md says "TDD for everything," that's a rule. Don't bury these in phase details — they go in the header where every session sees them first.
 
 ### 1C. Phase Design
 
@@ -656,7 +656,7 @@ rebuild_db_from_json() → int
 6. Coverage check ≥ 100%
 ```
 
-Never write production code before its tests exist. If context/time forces a tradeoff, tell Bryan explicitly and let him decide.
+Never write production code before its tests exist. If context/time forces a tradeoff, tell the user explicitly and let him decide.
 
 ### 2B. Test File Naming
 
@@ -859,7 +859,7 @@ Every session that works on a plan:
 6. Log to memory DB
 7. If context is getting heavy, checkpoint and stop
 
-**Why dual tracking (tasks + checkboxes):** Tasks give Bryan real-time progress visibility and persist across sessions without reading the plan. Checkboxes keep the plan file self-contained for archival. Both are updated — tasks are the primary execution tracker, checkboxes are the audit trail.
+**Why dual tracking (tasks + checkboxes):** Tasks give the user real-time progress visibility and persist across sessions without reading the plan. Checkboxes keep the plan file self-contained for archival. Both are updated — tasks are the primary execution tracker, checkboxes are the audit trail.
 
 **On resume:** `TaskList` shows exactly what's done, in progress, and pending. No need to grep checkboxes or re-read the plan.
 
@@ -891,7 +891,7 @@ Work units live in a dedicated directory (`memory/work_queue/`) and are self-des
 
 ### 5A. Nothing Is Assumed Correct
 
-All generated entries enter as `pending_review`. Bryan approves, corrects, or rejects. Only approved entries feed into downstream analysis.
+All generated entries enter as `pending_review`. the user approves, corrects, or rejects. Only approved entries feed into downstream analysis.
 
 ### 5B. Correction Propagation
 
@@ -1000,7 +1000,7 @@ Each round has a `phase` field (`"auditing"` / `"fixing"` / `"verifying"`) so cr
 
 **Progress tracker note:** Checkboxes represent the FINAL round only. Per-round progress lives in the state file. Don't check boxes until convergence.
 
-**Safety valve:** Max 5 rounds. If still finding issues at round 5, stop and triage with Bryan.
+**Safety valve:** Max 5 rounds. If still finding issues at round 5, stop and triage with the user.
 
 ### 7D. Issue Tracking Format
 
@@ -1198,11 +1198,11 @@ During development: narrate what you're doing and why. Think out loud. Don't sil
 
 ### 9B. Surface Findings
 
-After any batch import of non-meta entries, present a 500+ word narrative synthesis to Bryan. Entry counts are not findings. Bryan wants the insights, not the numbers.
+After any batch import of non-meta entries, present a 500+ word narrative synthesis to the user. Entry counts are not findings. the user wants the insights, not the numbers.
 
 ### 9C. Persist Narratives
 
-Any analytical prose written for Bryan must be logged as a reflection entry BEFORE being displayed. Sessions crash. Compaction erases context. The narrative is the work product — treat it as durable, not ephemeral.
+Any analytical prose written for the user must be logged as a reflection entry BEFORE being displayed. Sessions crash. Compaction erases context. The narrative is the work product — treat it as durable, not ephemeral.
 
 ### 9D. Log Everything
 
@@ -1241,7 +1241,7 @@ Use collision-safe directories for temp outputs: `/tmp/pp_pipeline_<run_id>/`. N
 |-------------|---------------|------|
 | Non-atomic writes | Lost iMessage processing — file corruption during write | Always write-then-rename for critical files |
 | No backups | No way to recover from bad imports or corruption | Rotating backups before every batch import |
-| Silently skipping tests | "Just a quick script" led to bugs | TDD for everything, Bryan decides exceptions |
+| Silently skipping tests | "Just a quick script" led to bugs | TDD for everything, the user decides exceptions |
 | Deferred logging | Session crashed, work lost because it wasn't logged yet | Log BEFORE moving to next task |
 | Stale markdown state | Documentation said 2,780 entries when DB had 4,493 | Query live, never cache counts |
 | DB rebuild drops data | `rebuild_db_from_json()` didn't create review tables | All tables must be created AND populated during rebuild |
@@ -1264,7 +1264,7 @@ Use collision-safe directories for temp outputs: `/tmp/pp_pipeline_<run_id>/`. N
 | Skipping Claude Code tasks | Prompt explicitly said "including creating claude code tasks" but Claude used plan checkboxes only — no TaskCreate calls, no real-time progress visibility | Always convert plan checkboxes to Claude Code tasks before execution. Audit checkboxes first, then TaskCreate for each. Execute from task list. |
 | Plan said "NOT STARTED" with existing code | CHAT_PROVENANCE_PLAN said "NOT STARTED" but Phases 1-2 were 80% built with 75 passing tests from a prior session | Viability assessment Step 3b: glob for every file the plan says to create. If files exist, update plan status and verify existing code against spec. |
 | Destructive rebuild without downstream chain | `build_memory.py --fast` drops chat tables silently. Server returned 500 because chat table rebuild wasn't chained after the main rebuild. | Any destructive operation must document (and ideally automate) its downstream rebuild requirements. "Drops X" must be paired with "then rebuild X by running Y." |
-| Coverage floor became the ceiling | Doc said "90%+" as the floor, but in practice that number became the target. Coverage was reported at 91% and treated as acceptable. Bryan's intent was always 100%. | If the coverage target is 100%, say 100%. Floors like "90%+" invite building to the floor. Explicit targets prevent ambiguity. |
+| Coverage floor became the ceiling | Doc said "90%+" as the floor, but in practice that number became the target. Coverage was reported at 91% and treated as acceptable. the user's intent was always 100%. | If the coverage target is 100%, say 100%. Floors like "90%+" invite building to the floor. Explicit targets prevent ambiguity. |
 | Coverage by coincidence | Test named `test_returns_none_on_struct_error` passed and appeared to cover the except handler, but actually hit an early-return guard on a different line. Lines 82-83 remained uncovered. | Never trust test names or intent as proof of coverage. Verify with `--cov-report=term-missing` that specific line numbers actually disappeared from the Missing column. |
 
 ---
@@ -1283,7 +1283,7 @@ python3 memory/query_memory.py "session_log" --type meta --limit 5  # recent his
 python3 memory/mem_pipeline.py status danielle  # pipeline state
 ```
 
-Read `memory/config.json` for API keys and paths. Never ask Bryan for these. Tell Bryan exactly what you know and what's missing.
+Read `memory/config.json` for API keys and paths. Never ask the user for these. Tell the user exactly what you know and what's missing.
 
 ### 12B. Mandatory Logging
 
@@ -1302,7 +1302,7 @@ After any batch import of non-meta entries, `add_entry.py` prints a `SURFACING R
 
 ```bash
 python3 memory/add_entry.py --check-unsurfaced  # are there unsurfaced findings?
-python3 memory/add_entry.py --mark-surfaced       # after presenting to Bryan
+python3 memory/add_entry.py --mark-surfaced       # after presenting to the user
 ```
 
 Hooks at `.claude/hooks/session-start-check.sh` and `.claude/hooks/session-logger.sh` enforce this — session start warns about unsurfaced findings, session stop checks and logs.
@@ -1317,7 +1317,7 @@ Sessions crash when context gets too large. When resuming after compaction:
 4. Check `memory/surfacing_ledger.json` — if the last import has no surfacing entry, STOP and surface before doing anything else
 5. Read the plan file — the progress tracker checkboxes tell you exactly where work stopped
 
-**Prevention:** Process large sources in chunks, log after each chunk. If context feels heavy, proactively tell Bryan and offer to checkpoint. Before any large processing operation, log first.
+**Prevention:** Process large sources in chunks, log after each chunk. If context feels heavy, proactively tell the user and offer to checkpoint. Before any large processing operation, log first.
 
 ### 12E. Deprecated Files — Do Not Write To
 
@@ -1384,13 +1384,13 @@ This keeps the main context clean for plan writing/editing while still gathering
 
 ---
 
-## 14. Bryan's Collaboration Style
+## 14. the user's Collaboration Style
 
 ### 14A. Concise, Imperative Prompts
 
-Bryan gives direction, not detail. His prompts are short and assume Claude knows the methodology:
+the user gives direction, not detail. His prompts are short and assume Claude knows the methodology:
 
-| Bryan says | What it means |
+| the user says | What it means |
 |-----------|---------------|
 | "do it again" | Re-run the same audit type on the same scope. Find issues the fixes introduced. |
 | "fix these" | Apply fixes directly to the plan/code. Don't ask for permission, don't present options. Just fix them. |
@@ -1398,23 +1398,23 @@ Bryan gives direction, not detail. His prompts are short and assume Claude knows
 | "will this succeed?" | Viability assessment. Check environment. Give YES/NO with specific numbered caveats. |
 | "update X with everything you've seen" | Review all sessions since X was last written. Add new patterns, update existing ones. Don't ask what to add — find the gaps yourself. |
 | "extract everything about how we did Y" | Create a new document capturing methodology, not just outcomes. Include the meta-process. |
-| "not just [thing]. [broader scope]." | Bryan is correcting Claude's scope. Claude went too narrow. Expand to include what Bryan specified. |
+| "not just [thing]. [broader scope]." | the user is correcting Claude's scope. Claude went too narrow. Expand to include what the user specified. |
 | "[viability question] fix any issues you find" | Combined prompt — answer the viability question AND fix issues in one pass. Claude must do both: assess, then fix. Saves a round-trip. |
 | "run the build plan... over and over, until... no issues left" | The "big bang" prompt. Execute entire plan + audit + converge in one go. See Section 17B. |
 | "continue until done, and all audits pass" | Resume after interruption with same convergence requirement. |
 | "1. yes 2. skip it." | Numbered responses to numbered decisions. Efficient, unambiguous. See Section 17D. |
 | "audit your checkboxes against the plan" | Meta-audit: is the progress tracker honest? Are deferred items tracked? |
-| "how should i have phrased my prompt to..." | Prompt refinement request. Help Bryan improve his prompt toolkit. See Section 17C. |
+| "how should i have phrased my prompt to..." | Prompt refinement request. Help the user improve his prompt toolkit. See Section 17C. |
 | "including prompts" | When updating patterns, explicitly capture the prompts used. The prompts ARE the methodology. |
 
-### 14B. Bryan Corrects Scope, Not Detail
+### 14B. the user Corrects Scope, Not Detail
 
-Bryan rarely specifies implementation details. He specifies:
+the user rarely specifies implementation details. He specifies:
 - **What's missing** — "not just the plan. how you and i interacted building the plan."
 - **What's wrong** — "this burns API tokens"
 - **What to do next** — "do it again", "fix these", "now audit the entire plan"
 
-Claude must fill in the detail autonomously. When Bryan says "extract everything about how we planned this into a development patterns file," Claude must decide what sections to create, what examples to include, what anti-patterns to document. If Claude goes too narrow, Bryan corrects scope — and that correction itself becomes a pattern (see Section 0D).
+Claude must fill in the detail autonomously. When the user says "extract everything about how we planned this into a development patterns file," Claude must decide what sections to create, what examples to include, what anti-patterns to document. If Claude goes too narrow, the user corrects scope — and that correction itself becomes a pattern (see Section 0D).
 
 ---
 
@@ -1464,9 +1464,9 @@ left to fix."
 
 This single prompt drives: plan execution → code audit → doc audit → fix → re-audit → convergence. The key phrase is **"over and over, until you report there aren't any left to fix"** — this forces the convergence loop.
 
-**Why this works:** It eliminates round-trips. Instead of Bryan saying "audit" then "fix" then "audit again" then "fix" four times, one prompt covers the entire loop. Claude knows the termination condition (zero issues) and drives toward it autonomously.
+**Why this works:** It eliminates round-trips. Instead of the user saying "audit" then "fix" then "audit again" then "fix" four times, one prompt covers the entire loop. Claude knows the termination condition (zero issues) and drives toward it autonomously.
 
-**Why the first version was insufficient:** Bryan's initial prompt said "run the build plan" but didn't explicitly include documentation audits or the multi-pass convergence requirement. This led to premature completion claims. The refined version above explicitly calls out:
+**Why the first version was insufficient:** the user's initial prompt said "run the build plan" but didn't explicitly include documentation audits or the multi-pass convergence requirement. This led to premature completion claims. The refined version above explicitly calls out:
 1. Code audits
 2. Documentation audits
 3. The iterative fix-audit loop
@@ -1511,7 +1511,7 @@ The project accumulates relationships (derived_from, contains, etc.) that refere
 # Dry run — see what would be cleaned
 python3 memory/relationship_repair.py --dry-run
 
-# Execute cleanup (with Bryan's approval)
+# Execute cleanup (with the user's approval)
 python3 memory/relationship_repair.py --execute
 ```
 
@@ -1558,9 +1558,9 @@ Then each test file's fixture monkeypatches its specific module's paths to point
 
 ---
 
-## 17. Prompt Patterns (Bryan's Prompt Toolkit)
+## 17. Prompt Patterns (the user's Prompt Toolkit)
 
-These are the prompts Bryan uses to drive development. Each prompt triggers a specific mode of work. Claude should recognize these patterns and respond with the appropriate methodology.
+These are the prompts the user uses to drive development. Each prompt triggers a specific mode of work. Claude should recognize these patterns and respond with the appropriate methodology.
 
 ### 17A. The Master Prompt Sequence
 
@@ -1638,12 +1638,12 @@ PHASE: POST-EXECUTION
   → Review everything that happened, add new patterns, capture prompts
 
 "how should i have phrased my prompt to encompass that as well?"
-  → Bryan asking Claude to help him refine his prompt toolkit
+  → the user asking Claude to help him refine his prompt toolkit
 ```
 
 ### 17B. The "Big Bang" Prompt — How to Get Full Convergence in One Shot
 
-Bryan's most important prompt discovery was that a single well-phrased prompt can drive the entire execution + audit + convergence cycle without further intervention. The key elements:
+the user's most important prompt discovery was that a single well-phrased prompt can drive the entire execution + audit + convergence cycle without further intervention. The key elements:
 
 | Element | Why It Matters | What Happens Without It |
 |---------|---------------|------------------------|
@@ -1655,7 +1655,7 @@ Bryan's most important prompt discovery was that a single well-phrased prompt ca
 | "over and over" | Forces iteration, not single-pass | One audit round declared "clean" prematurely |
 | "until you report there aren't any left to fix" | Defines termination condition | No clear stopping point → either premature or infinite |
 
-**The prompt Bryan wished he'd used from the start:**
+**The prompt the user wished he'd used from the start:**
 
 ```
 "Run the build plan exactly as planned. After execution, perform
@@ -1669,7 +1669,7 @@ The addition of **"two consecutive independent audit passes"** is what prevents 
 
 ### 17C. Prompt Refinement as a Pattern
 
-Bryan explicitly asked: "how should i have phrased my prompt to encompass that as well?" This reveals a meta-pattern: **the prompt itself is a tool that gets refined through use.**
+the user explicitly asked: "how should i have phrased my prompt to encompass that as well?" This reveals a meta-pattern: **the prompt itself is a tool that gets refined through use.**
 
 The progression:
 1. **V1:** "run the build plan" → too vague, no audit requirement
@@ -1686,21 +1686,21 @@ Each version was discovered by hitting a failure mode:
 
 ### 17D. Numbered Decision Prompts
 
-When Claude presents multiple pending decisions, Bryan responds with numbered answers:
+When Claude presents multiple pending decisions, the user responds with numbered answers:
 
 ```
 Claude: "Two decisions needed:
   1. Execute orphan cleanup? (4,678 relationships)
   2. Investigate lost work forensically?"
 
-Bryan: "1. yes  2. skip it. pointless at this point."
+the user: "1. yes  2. skip it. pointless at this point."
 ```
 
 This is efficient — no ambiguity about which decision maps to which answer. Claude should present decisions as numbered lists to enable this pattern.
 
 ### 17E. The Checkpoint Audit Prompt
 
-Mid-execution, Bryan can request an audit of the execution itself:
+Mid-execution, the user can request an audit of the execution itself:
 
 ```
 "audit your list of checkboxes for following the build plan
@@ -1737,11 +1737,11 @@ When orphaned data accumulates (relationships, stale entries, abandoned work uni
 
 1. **Dry run first** — always show what would be changed before changing it
 2. **Backup before cleanup** — `relationships.backup.YYYYMMDD_HHMMSS.json`
-3. **Get Bryan's approval** — present the numbers, let him decide
+3. **Get the user's approval** — present the numbers, let him decide
 4. **Execute with logging** — record what was removed
 5. **Verify after** — re-run the dry run to confirm 0 remaining issues
 
-In our execution: dry run showed 4,678 orphans → Bryan approved → cleanup executed → verification confirmed 0 both-orphaned remaining, 7,208 relationships kept.
+In our execution: dry run showed 4,678 orphans → the user approved → cleanup executed → verification confirmed 0 both-orphaned remaining, 7,208 relationships kept.
 
 ### 18C. Test Count as Health Metric
 

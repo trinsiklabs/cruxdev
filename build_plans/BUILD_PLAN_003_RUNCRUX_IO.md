@@ -63,7 +63,7 @@ runcrux.io/
 4. **Features**: 4 cards — Modes (24 specialized), Knowledge (organic, cross-project), Safety (7-gate pipeline), Analytics (daily digest)
 5. **How it works**: 3 steps — Install (one command) → Connect (MCP to your tool) → Work (context persists, corrections accumulate)
 6. **Integrations**: Logos — Claude Code, OpenCode, Cursor, Windsurf
-7. **Testimonial/quote**: From Bryan or early users
+7. **Testimonial/quote**: From the user or early users
 8. **Final CTA**: "Install Crux in 5 minutes" → quickstart
 
 ---

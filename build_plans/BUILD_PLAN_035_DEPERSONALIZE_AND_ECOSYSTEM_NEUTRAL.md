@@ -7,7 +7,7 @@
 
 Two issues that must be fixed before public distribution:
 
-1. **Personal names in documents.** DEVELOPMENT_PATTERNS_CRUXDEV.md contains "Bryan" 20+ times. Names must never appear in product documentation — the product is not tied to a person.
+1. **Personal names in documents.** DEVELOPMENT_PATTERNS_CRUXDEV.md contains "the user" 20+ times. Names must never appear in product documentation — the product is not tied to a person.
 
 2. **Ecosystem lock-in language.** The site and docs present Claude Code as the primary/default platform. CruxDev is an MCP server that works with ANY MCP client — Claude Code, OpenClaw, CruxCLI, Cursor (if MCP-enabled), or any future client. No single ecosystem should be elevated above others.
 
@@ -17,7 +17,7 @@ Two issues that must be fixed before public distribution:
 - No developer names, owner names, or contributor names in docs, website, or code comments
 - Exception: CONTRIBUTORS.md or git commit author (standard open source practice)
 - Exception: competitor analysis may reference founders by name when citing their public statements
-- Convergence check: `grep -ri "Bryan\|[owner name]" docs/ src/ --include="*.md" --include="*.rs"` must return zero
+- Convergence check: `grep -ri "the user\|[owner name]" docs/ src/ --include="*.md" --include="*.rs"` must return zero
 
 ### Rule: Ecosystem-neutral language
 - Never present one MCP client as primary/default
@@ -28,8 +28,8 @@ Two issues that must be fixed before public distribution:
 
 ## Phase 1: Fix DEVELOPMENT_PATTERNS_CRUXDEV.md
 
-- [ ] 1.1 Replace "Bryan" with "the user" or "the project owner" throughout
-- [ ] 1.2 Rename "§10. Bryan's Collaboration Style" → generic section about user interaction patterns
+- [ ] 1.1 Replace "the user" with "the user" or "the project owner" throughout
+- [ ] 1.2 Rename "§10. the user's Collaboration Style" → generic section about user interaction patterns
 - [ ] 1.3 Remove any personal preferences that aren't universal patterns
 - [ ] 1.4 Keep the patterns themselves — they're good; just depersonalize
 

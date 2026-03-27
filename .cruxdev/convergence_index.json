@@ -1,0 +1,1318 @@
+[
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_start_convergence0/plan.md",
+    "convergence_id": "d86f4660",
+    "status": "active",
+    "started_at": 1774544592.595743,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/d86f4660.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "19555444",
+    "status": "active",
+    "started_at": 1774544592.599175,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/19555444.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "e0baa895",
+    "status": "escalated",
+    "started_at": 1774544592.603913,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e0baa895.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "b6fce40e",
+    "status": "active",
+    "started_at": 1774544592.6092942,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/b6fce40e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_next_task0/plan.md",
+    "convergence_id": "3d2e7b51",
+    "status": "active",
+    "started_at": 1774544592.612322,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/3d2e7b51.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_result0/plan.md",
+    "convergence_id": "a1891443",
+    "status": "active",
+    "started_at": 1774544592.615608,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a1891443.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "7046e80a",
+    "status": "active",
+    "started_at": 1774544592.619286,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7046e80a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "177734af",
+    "status": "active",
+    "started_at": 1774544592.622489,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/177734af.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "071f0982",
+    "status": "active",
+    "started_at": 1774544592.625015,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/071f0982.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "20fab355",
+    "status": "active",
+    "started_at": 1774544592.627658,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/20fab355.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_return0/plan.md",
+    "convergence_id": "e2984e5e",
+    "status": "active",
+    "started_at": 1774544592.631191,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e2984e5e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "b6822951",
+    "status": "active",
+    "started_at": 1774544592.633791,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/b6822951.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "a29c5e0c",
+    "status": "active",
+    "started_at": 1774544592.637246,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a29c5e0c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_status0/plan.md",
+    "convergence_id": "e0a2a077",
+    "status": "active",
+    "started_at": 1774544592.640536,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e0a2a077.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_cancel0/plan.md",
+    "convergence_id": "8cbcb1f6",
+    "status": "active",
+    "started_at": 1774544592.643441,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/8cbcb1f6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_full_convergence_loop0/plan.md",
+    "convergence_id": "a6f21fec",
+    "status": "converged",
+    "started_at": 1774544592.646739,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a6f21fec.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-506/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "f2db711c",
+    "status": "active",
+    "started_at": 1774544592.668571,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f2db711c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_start_convergence0/plan.md",
+    "convergence_id": "275e5a27",
+    "status": "active",
+    "started_at": 1774544645.299399,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/275e5a27.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "3add1fe2",
+    "status": "active",
+    "started_at": 1774544645.303663,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/3add1fe2.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "51901e51",
+    "status": "escalated",
+    "started_at": 1774544645.308018,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/51901e51.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "95eb858d",
+    "status": "active",
+    "started_at": 1774544645.317487,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/95eb858d.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_next_task0/plan.md",
+    "convergence_id": "20fa4add",
+    "status": "active",
+    "started_at": 1774544645.320983,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/20fa4add.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_result0/plan.md",
+    "convergence_id": "5a46cdb4",
+    "status": "active",
+    "started_at": 1774544645.324044,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/5a46cdb4.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "52addb4c",
+    "status": "active",
+    "started_at": 1774544645.327638,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/52addb4c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "b34a1c07",
+    "status": "active",
+    "started_at": 1774544645.331594,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/b34a1c07.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "bc8ad67f",
+    "status": "active",
+    "started_at": 1774544645.334715,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/bc8ad67f.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "214edea6",
+    "status": "active",
+    "started_at": 1774544645.338063,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/214edea6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_return0/plan.md",
+    "convergence_id": "ef3277b5",
+    "status": "active",
+    "started_at": 1774544645.341438,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/ef3277b5.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "9fe4467e",
+    "status": "active",
+    "started_at": 1774544645.344825,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9fe4467e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "7a2a7692",
+    "status": "active",
+    "started_at": 1774544645.347936,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7a2a7692.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_status0/plan.md",
+    "convergence_id": "f888d41a",
+    "status": "active",
+    "started_at": 1774544645.35099,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f888d41a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_cancel0/plan.md",
+    "convergence_id": "31ca2340",
+    "status": "active",
+    "started_at": 1774544645.354223,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/31ca2340.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_full_convergence_loop0/plan.md",
+    "convergence_id": "87cacd7a",
+    "status": "converged",
+    "started_at": 1774544645.358355,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/87cacd7a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-507/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "23101559",
+    "status": "active",
+    "started_at": 1774544645.383657,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/23101559.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_start_convergence0/plan.md",
+    "convergence_id": "d15d9252",
+    "status": "active",
+    "started_at": 1774551528.132086,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/d15d9252.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "0d2cd8c0",
+    "status": "active",
+    "started_at": 1774551528.1361291,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/0d2cd8c0.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "b0f3c462",
+    "status": "escalated",
+    "started_at": 1774551528.1400561,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/b0f3c462.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "44deb62e",
+    "status": "active",
+    "started_at": 1774551528.148641,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/44deb62e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_next_task0/plan.md",
+    "convergence_id": "50e29cc5",
+    "status": "active",
+    "started_at": 1774551528.151764,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/50e29cc5.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_result0/plan.md",
+    "convergence_id": "522b028a",
+    "status": "active",
+    "started_at": 1774551528.155196,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/522b028a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "ee392097",
+    "status": "active",
+    "started_at": 1774551528.159293,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/ee392097.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "77e8916e",
+    "status": "active",
+    "started_at": 1774551528.164729,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/77e8916e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "fcd04e98",
+    "status": "active",
+    "started_at": 1774551528.168227,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/fcd04e98.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "3ed9b57b",
+    "status": "active",
+    "started_at": 1774551528.171638,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/3ed9b57b.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_return0/plan.md",
+    "convergence_id": "7ef52ca3",
+    "status": "active",
+    "started_at": 1774551528.1754508,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7ef52ca3.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "b9c3e48d",
+    "status": "active",
+    "started_at": 1774551528.1799948,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/b9c3e48d.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "e999e303",
+    "status": "active",
+    "started_at": 1774551528.183676,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e999e303.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_status0/plan.md",
+    "convergence_id": "66236986",
+    "status": "active",
+    "started_at": 1774551528.187901,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/66236986.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_cancel0/plan.md",
+    "convergence_id": "0d3db08a",
+    "status": "active",
+    "started_at": 1774551528.193312,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/0d3db08a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_full_convergence_loop0/plan.md",
+    "convergence_id": "16b89aab",
+    "status": "converged",
+    "started_at": 1774551528.197939,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/16b89aab.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-508/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "9e66f716",
+    "status": "active",
+    "started_at": 1774551528.222264,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9e66f716.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_start_convergence0/plan.md",
+    "convergence_id": "6039185f",
+    "status": "active",
+    "started_at": 1774552469.98156,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/6039185f.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "c9c06a89",
+    "status": "active",
+    "started_at": 1774552469.9854872,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c9c06a89.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "acdc676e",
+    "status": "escalated",
+    "started_at": 1774552469.9896011,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/acdc676e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "eec431a9",
+    "status": "active",
+    "started_at": 1774552469.9975271,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/eec431a9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_next_task0/plan.md",
+    "convergence_id": "8a3b6c96",
+    "status": "active",
+    "started_at": 1774552470.001079,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/8a3b6c96.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_result0/plan.md",
+    "convergence_id": "41535bce",
+    "status": "active",
+    "started_at": 1774552470.0044858,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/41535bce.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "526c4a38",
+    "status": "active",
+    "started_at": 1774552470.008944,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/526c4a38.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "7ec97858",
+    "status": "active",
+    "started_at": 1774552470.012565,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7ec97858.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "897e3aa9",
+    "status": "active",
+    "started_at": 1774552470.016062,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/897e3aa9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "89aee421",
+    "status": "active",
+    "started_at": 1774552470.019495,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/89aee421.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_return0/plan.md",
+    "convergence_id": "eaa47ab1",
+    "status": "active",
+    "started_at": 1774552470.0229719,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/eaa47ab1.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "75a131a0",
+    "status": "active",
+    "started_at": 1774552470.026926,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/75a131a0.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "778c9f14",
+    "status": "active",
+    "started_at": 1774552470.031929,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/778c9f14.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_status0/plan.md",
+    "convergence_id": "a083c332",
+    "status": "active",
+    "started_at": 1774552470.035722,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a083c332.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_cancel0/plan.md",
+    "convergence_id": "cb08facf",
+    "status": "active",
+    "started_at": 1774552470.0391,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/cb08facf.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_full_convergence_loop0/plan.md",
+    "convergence_id": "52b87578",
+    "status": "converged",
+    "started_at": 1774552470.043027,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/52b87578.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-509/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "7252a5f6",
+    "status": "active",
+    "started_at": 1774552470.0702,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7252a5f6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_start_convergence0/plan.md",
+    "convergence_id": "f7382932",
+    "status": "active",
+    "started_at": 1774552521.708308,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f7382932.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "625ccedf",
+    "status": "active",
+    "started_at": 1774552521.712599,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/625ccedf.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "6e9d93ea",
+    "status": "escalated",
+    "started_at": 1774552521.7181509,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/6e9d93ea.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "dcf3b8ef",
+    "status": "active",
+    "started_at": 1774552521.727511,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/dcf3b8ef.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_next_task0/plan.md",
+    "convergence_id": "5c069ad6",
+    "status": "active",
+    "started_at": 1774552521.7309492,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/5c069ad6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_result0/plan.md",
+    "convergence_id": "7a841bc3",
+    "status": "active",
+    "started_at": 1774552521.7356951,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7a841bc3.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "9c4c49d7",
+    "status": "active",
+    "started_at": 1774552521.739771,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9c4c49d7.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "db23c305",
+    "status": "active",
+    "started_at": 1774552521.744111,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/db23c305.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "fd8ac40f",
+    "status": "active",
+    "started_at": 1774552521.748564,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/fd8ac40f.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "1dfb99f4",
+    "status": "active",
+    "started_at": 1774552521.75307,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/1dfb99f4.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_return0/plan.md",
+    "convergence_id": "bc20ee9c",
+    "status": "active",
+    "started_at": 1774552521.756775,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/bc20ee9c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "d07a6bb9",
+    "status": "active",
+    "started_at": 1774552521.761896,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/d07a6bb9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "61822d77",
+    "status": "active",
+    "started_at": 1774552521.7664971,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/61822d77.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_status0/plan.md",
+    "convergence_id": "9909424e",
+    "status": "active",
+    "started_at": 1774552521.771301,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9909424e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_cancel0/plan.md",
+    "convergence_id": "e763b1d6",
+    "status": "active",
+    "started_at": 1774552521.7752619,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e763b1d6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_full_convergence_loop0/plan.md",
+    "convergence_id": "8c175b27",
+    "status": "converged",
+    "started_at": 1774552521.7796988,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/8c175b27.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-510/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "7cefc00f",
+    "status": "active",
+    "started_at": 1774552521.805645,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7cefc00f.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_start_convergence0/plan.md",
+    "convergence_id": "f33ba275",
+    "status": "active",
+    "started_at": 1774552539.93336,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f33ba275.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "a7af9013",
+    "status": "active",
+    "started_at": 1774552539.9379551,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a7af9013.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "4e14abb3",
+    "status": "escalated",
+    "started_at": 1774552539.9427662,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/4e14abb3.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "341715f9",
+    "status": "active",
+    "started_at": 1774552539.953042,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/341715f9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_next_task0/plan.md",
+    "convergence_id": "665b03c5",
+    "status": "active",
+    "started_at": 1774552539.957463,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/665b03c5.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_result0/plan.md",
+    "convergence_id": "c6e0bf11",
+    "status": "active",
+    "started_at": 1774552539.961967,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c6e0bf11.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "27a8443b",
+    "status": "active",
+    "started_at": 1774552539.96637,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/27a8443b.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "b4b3d372",
+    "status": "active",
+    "started_at": 1774552539.9707708,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/b4b3d372.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "1ff4b5b9",
+    "status": "active",
+    "started_at": 1774552539.975017,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/1ff4b5b9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "91e19ea0",
+    "status": "active",
+    "started_at": 1774552539.979813,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/91e19ea0.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_return0/plan.md",
+    "convergence_id": "5174e6c8",
+    "status": "active",
+    "started_at": 1774552539.98452,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/5174e6c8.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "795da7c5",
+    "status": "active",
+    "started_at": 1774552539.989182,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/795da7c5.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "250651dc",
+    "status": "active",
+    "started_at": 1774552539.994068,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/250651dc.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_status0/plan.md",
+    "convergence_id": "c58eb9b3",
+    "status": "active",
+    "started_at": 1774552539.999305,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c58eb9b3.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_cancel0/plan.md",
+    "convergence_id": "f173ca23",
+    "status": "active",
+    "started_at": 1774552540.004035,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f173ca23.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_full_convergence_loop0/plan.md",
+    "convergence_id": "d1d2dad8",
+    "status": "converged",
+    "started_at": 1774552540.0086432,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/d1d2dad8.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-511/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "1fcd7134",
+    "status": "active",
+    "started_at": 1774552540.036011,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/1fcd7134.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_start_convergence0/plan.md",
+    "convergence_id": "550cedda",
+    "status": "active",
+    "started_at": 1774552586.204274,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/550cedda.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "f0c77076",
+    "status": "active",
+    "started_at": 1774552586.2098591,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f0c77076.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "bd3de2dd",
+    "status": "escalated",
+    "started_at": 1774552586.214957,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/bd3de2dd.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "abe7582a",
+    "status": "active",
+    "started_at": 1774552586.225366,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/abe7582a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_next_task0/plan.md",
+    "convergence_id": "2aa6fb2a",
+    "status": "active",
+    "started_at": 1774552586.2295098,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/2aa6fb2a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_result0/plan.md",
+    "convergence_id": "d97f5286",
+    "status": "active",
+    "started_at": 1774552586.2333288,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/d97f5286.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "f8e97bfe",
+    "status": "active",
+    "started_at": 1774552586.2386901,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f8e97bfe.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "f3a3005c",
+    "status": "active",
+    "started_at": 1774552586.2435899,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f3a3005c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "bad0960e",
+    "status": "active",
+    "started_at": 1774552586.247581,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/bad0960e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "0328e068",
+    "status": "active",
+    "started_at": 1774552586.251691,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/0328e068.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_return0/plan.md",
+    "convergence_id": "d83b656d",
+    "status": "active",
+    "started_at": 1774552586.2553148,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/d83b656d.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "876732e9",
+    "status": "active",
+    "started_at": 1774552586.2601569,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/876732e9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "9c184cc1",
+    "status": "active",
+    "started_at": 1774552586.264168,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9c184cc1.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_status0/plan.md",
+    "convergence_id": "30ef71f6",
+    "status": "active",
+    "started_at": 1774552586.268487,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/30ef71f6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_cancel0/plan.md",
+    "convergence_id": "e7cf15e5",
+    "status": "active",
+    "started_at": 1774552586.2722292,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e7cf15e5.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_full_convergence_loop0/plan.md",
+    "convergence_id": "32b419e7",
+    "status": "converged",
+    "started_at": 1774552586.27682,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/32b419e7.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-512/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "1d8c3f5e",
+    "status": "active",
+    "started_at": 1774552586.35587,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/1d8c3f5e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_start_convergence0/plan.md",
+    "convergence_id": "9f7c19a9",
+    "status": "active",
+    "started_at": 1774554040.255473,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9f7c19a9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "46e59720",
+    "status": "active",
+    "started_at": 1774554040.260671,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/46e59720.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "f119583d",
+    "status": "escalated",
+    "started_at": 1774554040.2654898,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f119583d.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "f9677f28",
+    "status": "active",
+    "started_at": 1774554040.274693,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f9677f28.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_next_task0/plan.md",
+    "convergence_id": "395e04e9",
+    "status": "active",
+    "started_at": 1774554040.278998,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/395e04e9.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_result0/plan.md",
+    "convergence_id": "9e26f267",
+    "status": "active",
+    "started_at": 1774554040.284039,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9e26f267.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "f44e758c",
+    "status": "active",
+    "started_at": 1774554040.288599,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f44e758c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "c706070c",
+    "status": "active",
+    "started_at": 1774554040.293153,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c706070c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "3a6b21f0",
+    "status": "active",
+    "started_at": 1774554040.2973351,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/3a6b21f0.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "698e1135",
+    "status": "active",
+    "started_at": 1774554040.301667,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/698e1135.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_return0/plan.md",
+    "convergence_id": "30bf58ed",
+    "status": "active",
+    "started_at": 1774554040.306164,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/30bf58ed.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "5f786352",
+    "status": "active",
+    "started_at": 1774554040.310998,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/5f786352.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "bf6b172c",
+    "status": "active",
+    "started_at": 1774554040.3159559,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/bf6b172c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_status0/plan.md",
+    "convergence_id": "32bfca69",
+    "status": "active",
+    "started_at": 1774554040.320835,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/32bfca69.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_cancel0/plan.md",
+    "convergence_id": "4005f1e3",
+    "status": "active",
+    "started_at": 1774554040.3248482,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/4005f1e3.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_full_convergence_loop0/plan.md",
+    "convergence_id": "f82aea56",
+    "status": "converged",
+    "started_at": 1774554040.329024,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f82aea56.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-513/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "4ad7c079",
+    "status": "active",
+    "started_at": 1774554040.352788,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/4ad7c079.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_start_convergence0/plan.md",
+    "convergence_id": "dc8c13ec",
+    "status": "active",
+    "started_at": 1774554055.3169122,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/dc8c13ec.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "a90f34b4",
+    "status": "active",
+    "started_at": 1774554055.322038,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a90f34b4.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "7be6247f",
+    "status": "escalated",
+    "started_at": 1774554055.328068,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7be6247f.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "bfdac5d4",
+    "status": "active",
+    "started_at": 1774554055.339235,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/bfdac5d4.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_next_task0/plan.md",
+    "convergence_id": "c9cc7ad8",
+    "status": "active",
+    "started_at": 1774554055.344225,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c9cc7ad8.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_result0/plan.md",
+    "convergence_id": "00e3e35c",
+    "status": "active",
+    "started_at": 1774554055.3493462,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/00e3e35c.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "4e915683",
+    "status": "active",
+    "started_at": 1774554055.354034,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/4e915683.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "7184409e",
+    "status": "active",
+    "started_at": 1774554055.359343,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7184409e.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "69ca5003",
+    "status": "active",
+    "started_at": 1774554055.363879,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/69ca5003.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "bb32621b",
+    "status": "active",
+    "started_at": 1774554055.368084,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/bb32621b.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_return0/plan.md",
+    "convergence_id": "c5c79aca",
+    "status": "active",
+    "started_at": 1774554055.37248,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c5c79aca.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "ad97f1b2",
+    "status": "active",
+    "started_at": 1774554055.3782558,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/ad97f1b2.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "2559a675",
+    "status": "active",
+    "started_at": 1774554055.3833652,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/2559a675.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_status0/plan.md",
+    "convergence_id": "5398801a",
+    "status": "active",
+    "started_at": 1774554055.3880079,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/5398801a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_cancel0/plan.md",
+    "convergence_id": "64cb12e2",
+    "status": "active",
+    "started_at": 1774554055.3925278,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/64cb12e2.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_full_convergence_loop0/plan.md",
+    "convergence_id": "82da2599",
+    "status": "converged",
+    "started_at": 1774554055.397105,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/82da2599.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-514/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "f8fa616d",
+    "status": "active",
+    "started_at": 1774554055.42365,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/f8fa616d.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_start_convergence0/plan.md",
+    "convergence_id": "64f1a3b1",
+    "status": "active",
+    "started_at": 1774554109.7393332,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/64f1a3b1.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "083574eb",
+    "status": "active",
+    "started_at": 1774554109.743926,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/083574eb.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "36d06ec6",
+    "status": "escalated",
+    "started_at": 1774554109.7491462,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/36d06ec6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "0e9e13c6",
+    "status": "active",
+    "started_at": 1774554109.758968,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/0e9e13c6.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_next_task0/plan.md",
+    "convergence_id": "73cd99b1",
+    "status": "active",
+    "started_at": 1774554109.763055,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/73cd99b1.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_result0/plan.md",
+    "convergence_id": "92dc4765",
+    "status": "active",
+    "started_at": 1774554109.767626,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/92dc4765.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "12ed98a0",
+    "status": "active",
+    "started_at": 1774554109.7722611,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/12ed98a0.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "0f4c365f",
+    "status": "active",
+    "started_at": 1774554109.777025,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/0f4c365f.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "0dff4ef3",
+    "status": "active",
+    "started_at": 1774554109.781031,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/0dff4ef3.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "c0c74278",
+    "status": "active",
+    "started_at": 1774554109.7854972,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c0c74278.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_return0/plan.md",
+    "convergence_id": "4765d1bd",
+    "status": "active",
+    "started_at": 1774554109.7893429,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/4765d1bd.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "4f4c154b",
+    "status": "active",
+    "started_at": 1774554109.7936032,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/4f4c154b.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "a811a578",
+    "status": "active",
+    "started_at": 1774554109.798312,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a811a578.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_status0/plan.md",
+    "convergence_id": "026c5719",
+    "status": "active",
+    "started_at": 1774554109.803047,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/026c5719.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_cancel0/plan.md",
+    "convergence_id": "de64e3aa",
+    "status": "active",
+    "started_at": 1774554109.8075662,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/de64e3aa.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_full_convergence_loop0/plan.md",
+    "convergence_id": "8c9f0687",
+    "status": "converged",
+    "started_at": 1774554109.811805,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/8c9f0687.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-515/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "81a498fa",
+    "status": "active",
+    "started_at": 1774554109.83518,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/81a498fa.json"
+  },
+  {
+    "plan_file": "/Users/user/personal/cruxdev/build_plans/BUILD_PLAN_014_RUST_MIGRATION.md",
+    "convergence_id": "cb556272",
+    "status": "active",
+    "started_at": 1774558176.035167,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/cb556272.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_start_convergence0/plan.md",
+    "convergence_id": "e1b5a944",
+    "status": "active",
+    "started_at": 1774558851.1958232,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e1b5a944.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_escalated_upd0/plan.md",
+    "convergence_id": "e44bd7eb",
+    "status": "active",
+    "started_at": 1774558851.202108,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e44bd7eb.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_submit_escalated_updates_0/plan.md",
+    "convergence_id": "e251e24b",
+    "status": "escalated",
+    "started_at": 1774558851.2096808,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e251e24b.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_start_convergence_with_fi0/plan.md",
+    "convergence_id": "53eb5019",
+    "status": "active",
+    "started_at": 1774558851.221361,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/53eb5019.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_next_task0/plan.md",
+    "convergence_id": "92aff07d",
+    "status": "active",
+    "started_at": 1774558851.2259068,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/92aff07d.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_result0/plan.md",
+    "convergence_id": "06bbed53",
+    "status": "active",
+    "started_at": 1774558851.231541,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/06bbed53.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_with_f0/plan.md",
+    "convergence_id": "e71e91dd",
+    "status": "active",
+    "started_at": 1774558851.238393,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/e71e91dd.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_invali0/plan.md",
+    "convergence_id": "23742983",
+    "status": "active",
+    "started_at": 1774558851.244609,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/23742983.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_missin0/plan.md",
+    "convergence_id": "8829290a",
+    "status": "active",
+    "started_at": 1774558851.2494762,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/8829290a.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_not_ar0/plan.md",
+    "convergence_id": "a14579b2",
+    "status": "active",
+    "started_at": 1774558851.254851,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/a14579b2.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_return0/plan.md",
+    "convergence_id": "7959b05b",
+    "status": "active",
+    "started_at": 1774558851.259952,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/7959b05b.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_empty_0/plan.md",
+    "convergence_id": "4622c1e5",
+    "status": "active",
+    "started_at": 1774558851.266198,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/4622c1e5.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_submit_non_di0/plan.md",
+    "convergence_id": "9d4d4003",
+    "status": "active",
+    "started_at": 1774558851.2717938,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/9d4d4003.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_status0/plan.md",
+    "convergence_id": "5a2d1b24",
+    "status": "active",
+    "started_at": 1774558851.27703,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/5a2d1b24.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_cancel0/plan.md",
+    "convergence_id": "1b9efae2",
+    "status": "active",
+    "started_at": 1774558851.281672,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/1b9efae2.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_full_convergence_loop0/plan.md",
+    "convergence_id": "c1f29539",
+    "status": "converged",
+    "started_at": 1774558851.287315,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/c1f29539.json"
+  },
+  {
+    "plan_file": "/private/var/folders/m4/7z6mv1014pl9y5tgsr0g4p1c0000gn/T/pytest-of-user/pytest-516/test_convergence_next_task_wit0/plan.md",
+    "convergence_id": "85a6bc61",
+    "status": "active",
+    "started_at": 1774558851.315451,
+    "state_path": "/Users/user/personal/cruxdev/.cruxdev/convergence_state/85a6bc61.json"
+  }
+]
