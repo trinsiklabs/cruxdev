@@ -14,6 +14,7 @@ use super::state::*;
 pub const PLAN_DIMENSIONS: &[&str] = &["completeness", "feasibility", "risk_assessment", "dependency_ordering", "testability"];
 pub const CODE_DIMENSIONS: &[&str] = &["correctness", "completeness", "edge_cases", "error_handling", "security", "performance", "maintainability", "test_coverage"];
 pub const DOC_DIMENSIONS: &[&str] = &["accuracy", "completeness", "consistency", "clarity", "currency"];
+pub const FORM_DIMENSIONS: &[&str] = &["layout", "labels", "validation", "errors", "accessibility", "mobile", "cta", "trust", "performance"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {

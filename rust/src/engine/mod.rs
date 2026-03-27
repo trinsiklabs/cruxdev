@@ -2,6 +2,7 @@
 
 pub mod checklist;
 pub mod convergence;
+pub mod form_detect;
 pub mod index;
 pub mod persistence;
 pub mod plan_status;
