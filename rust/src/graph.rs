@@ -29,6 +29,7 @@ impl DependencyGraph {
         for entry in walkdir::WalkDir::new(project_dir)
             .into_iter()
             .filter_entry(|e| {
+                if e.depth() == 0 { return true; }
                 let name = e.file_name().to_string_lossy();
                 !name.starts_with('.') && name != "node_modules" && name != "target" && name != "__pycache__"
             })

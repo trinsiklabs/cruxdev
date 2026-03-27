@@ -15,6 +15,8 @@ pub const PLAN_DIMENSIONS: &[&str] = &["completeness", "feasibility", "risk_asse
 pub const CODE_DIMENSIONS: &[&str] = &["correctness", "completeness", "edge_cases", "error_handling", "security", "performance", "maintainability", "test_coverage"];
 pub const DOC_DIMENSIONS: &[&str] = &["accuracy", "completeness", "consistency", "clarity", "currency"];
 pub const FORM_DIMENSIONS: &[&str] = &["layout", "labels", "validation", "errors", "accessibility", "mobile", "cta", "trust", "performance"];
+pub const METRICS_DIMENSIONS: &[&str] = &["coverage", "collection", "actionability", "thresholds", "freshness", "anti_gaming", "accessibility"];
+pub const DASHBOARD_DIMENSIONS: &[&str] = &["hierarchy", "density", "visualization", "color", "real_time", "mobile", "accessibility", "performance", "actionability"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -306,6 +308,21 @@ pub fn get_next_task(
                 dims.push("e2e_testing".into());
                 dims.push("uat_testing".into());
             }
+            // Check for forms — add form audit dimensions if detected
+            let form_dir = if state.project_dir.is_empty() {
+                std::path::Path::new(&state.plan_file)
+                    .parent()
+                    .unwrap_or(std::path::Path::new("."))
+                    .to_string_lossy()
+                    .to_string()
+            } else {
+                state.project_dir.clone()
+            };
+            if super::form_detect::project_has_forms(&form_dir) {
+                for dim in FORM_DIMENSIONS {
+                    dims.push((*dim).into());
+                }
+            }
             Task {
                 task_type: "audit".into(),
                 description: format!("Website convergence (round {}). URL: {}", state.round, site_url),
@@ -507,6 +524,27 @@ mod tests {
         let task = get_next_task(&mut state, &sp, None, None, None);
         assert_eq!(task.task_type, "audit");
         assert!(task.description.contains("Website"));
+    }
+
+    #[test]
+    fn website_convergence_includes_form_dimensions_when_forms_detected() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".git")).unwrap();
+        std::fs::create_dir_all(dir.path().join("docs")).unwrap();
+        std::fs::write(dir.path().join("docs").join("DEPLOYMENT.md"), "# Deploy to https://site.dev").unwrap();
+        // Create a file with a form
+        std::fs::create_dir_all(dir.path().join("src")).unwrap();
+        std::fs::write(dir.path().join("src").join("contact.html"), "<form action='/submit'><input type='text'/></form>").unwrap();
+        let (mut state, _plan, sp) = setup(dir.path(), "# Plan\n- [ ] 1.1 task\n");
+        state.phase = ConvergencePhase::WebsiteConvergence;
+        state.project_dir = dir.path().to_str().unwrap().to_string();
+        persistence::save_state(&mut state, &sp).unwrap();
+        let task = get_next_task(&mut state, &sp, None, None, None);
+        assert_eq!(task.task_type, "audit");
+        // Should include form dimensions
+        assert!(task.dimensions.contains(&"layout".to_string()), "should have form layout dimension: {:?}", task.dimensions);
+        assert!(task.dimensions.contains(&"validation".to_string()), "should have form validation dimension");
+        assert!(task.dimensions.contains(&"accessibility".to_string()), "should have form accessibility dimension");
     }
 
     #[test]
