@@ -45,25 +45,31 @@ Build plan converged
 
 ## Implementation
 
-### After every build plan convergence:
+### After every build plan convergence — the full cycle:
 
-1. Run `./scripts/convergence_gate.sh` — automated checks
-2. Run self-adoption:
-   - `classify_project(project_dir: cruxdev)` — verify classification is accurate
-   - `cruxdev_status(project_dir: cruxdev)` — verify counts are correct
-   - `analyze_gaps(project_dir: cruxdev)` — find missing docs/templates
-   - `check_build_freshness(project_dir: cruxdev)` — verify binary current
-3. If findings:
-   - Categorize: real gap vs tool bug vs process gap
-   - Create build plan for each category
+1. **Convergence gate** — `./scripts/convergence_gate.sh` (automated checks)
+2. **Self-adoption** — run adoption tools on CruxDev itself:
+   - `classify_project` — verify classification is accurate (no false positives)
+   - `cruxdev_status` — verify tool/skill/template counts are correct
+   - `analyze_gaps` — find missing docs/templates
+   - `check_build_freshness` — verify binary current
+3. **Ground truth verification** — verify every claim is real:
+   - Every capability claim in docs → code exists that implements it
+   - Every metric → matches actual test/tool output
+   - Every skill → references real tools with correct names/params
+   - Every website page → claims verified against source code
+4. **If findings from steps 2 or 3:**
+   - Categorize: real gap vs tool bug vs process gap vs false claim
+   - Create build plan for each
    - Converge the build plan
-   - Go back to step 1
+   - Go back to step 1 (the full cycle reruns)
+5. **Zero findings from BOTH adoption AND GTV → proceed to step 6**
 
 ### Adoption process alignment audit:
 
-After fixing self-adoption findings but BEFORE declaring converged, verify the adoption process itself is current:
+After zero findings from steps 2-5, verify the measuring tools themselves are current:
 
-4. Audit the adoption process against current capabilities:
+6. Audit the adoption process against current capabilities:
    - Does `/adopt` skill reference all current MCP tools it should use?
    - Does ADOPTION_PROCESS.md describe the current tool set and project types?
    - Does ADOPTION_PLAYBOOK.md reflect current templates (228+), dimensions (39+), and project types (18)?
@@ -73,13 +79,34 @@ After fixing self-adoption findings but BEFORE declaring converged, verify the a
 5. If the adoption process is stale, fix it FIRST, then re-run self-adoption with the fixed process
 6. The measurement tool must be current before its measurements are trusted
 
+### Ground truth verification (GTV):
+
+After self-adoption and adoption alignment, verify every truth claim:
+
+7. GTV all claims to convergence:
+   - Every capability claim in docs → verified against implementing code (file + function)
+   - Every metric on the website → verified against actual test/tool output
+   - Every skill tool reference → verified against server.rs tool list
+   - Every template count → verified against filesystem
+   - Every dimension list → verified against router.rs constants
+   - Every competitive claim → verified against actual implementation
+   - If a claim cannot be verified, it must be removed or marked as roadmap
+8. GTV is not a single pass — it's to convergence (two consecutive clean passes)
+9. The first GTV pass finds claims. The second verifies the fixes. Zero unverified claims = converged.
+
+**GTV catches what adoption misses:**
+- Adoption finds structural gaps (missing files, wrong counts)
+- GTV finds semantic gaps (claims that sound right but aren't implemented)
+- Both are required. Neither alone is sufficient.
+
 ### Self-adoption is part of the convergence definition:
 
 A CruxDev build plan is NOT converged until:
-- [ ] Convergence gate passes
-- [ ] Self-adoption returns zero critical findings
-- [ ] Any tool bugs found during self-adoption are fixed
-- [ ] Any process gaps found are documented as anti-patterns
+- [ ] Convergence gate passes (automated)
+- [ ] Self-adoption returns zero critical findings (structural)
+- [ ] Ground truth verification finds zero unverified claims (semantic)
+- [ ] Any tool bugs found are fixed
+- [ ] Any process gaps are documented as anti-patterns
 - [ ] Adoption process verified current against all capabilities
 
 ## What This Changes
