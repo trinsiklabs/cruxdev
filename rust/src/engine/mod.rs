@@ -11,4 +11,5 @@ pub mod plan_validator;
 pub mod router;
 pub mod state;
 pub mod test_runner;
+pub mod toolchain;
 pub mod wal;
