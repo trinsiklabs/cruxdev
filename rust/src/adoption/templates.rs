@@ -129,7 +129,74 @@ fn type_categories() -> HashMap<&'static str, Vec<&'static str>> {
     m.insert("consulting-client", vec!["business", "governance"]);
     m.insert("research", vec!["research", "governance"]);
     m.insert("campaign", vec!["business", "governance"]);
+    m.insert("book", vec!["book", "governance"]);
+    m.insert("book-series", vec!["book", "governance"]);
+    m.insert("podcast", vec!["podcast", "governance"]);
+    m.insert("newsletter", vec!["newsletter", "governance"]);
+    m.insert("youtube", vec!["youtube", "governance"]);
+    m.insert("course", vec!["course", "governance"]);
+    m.insert("open-source", vec!["code", "opensource", "governance"]);
+    m.insert("composite", vec!["business", "code", "governance"]);
     m
+}
+
+/// Discover templates from the filesystem `templates/` directory.
+/// Returns template files organized by project type subdirectory.
+pub fn discover_templates(templates_dir: &str) -> HashMap<String, Vec<String>> {
+    let mut result: HashMap<String, Vec<String>> = HashMap::new();
+    let root = std::path::Path::new(templates_dir);
+
+    if !root.exists() {
+        return result;
+    }
+
+    for entry in std::fs::read_dir(root).into_iter().flatten().flatten() {
+        if !entry.path().is_dir() {
+            continue;
+        }
+        let type_name = entry.file_name().to_string_lossy().to_string();
+        let mut files = Vec::new();
+
+        for file in walkdir::WalkDir::new(entry.path())
+            .into_iter()
+            .filter_map(|e| e.ok())
+        {
+            if file.path().is_file()
+                && file.path().extension().is_some_and(|e| e == "md")
+            {
+                let rel = file.path()
+                    .strip_prefix(entry.path())
+                    .unwrap_or(file.path())
+                    .to_string_lossy()
+                    .to_string();
+                files.push(rel);
+            }
+        }
+
+        files.sort();
+        if !files.is_empty() {
+            result.insert(type_name, files);
+        }
+    }
+
+    result
+}
+
+/// Get templates for a project type from the filesystem templates directory.
+pub fn get_filesystem_templates(templates_dir: &str, project_type: &str) -> Vec<String> {
+    let all = discover_templates(templates_dir);
+
+    // Map project type to template directory name
+    let dir_name = match project_type {
+        "software-existing" | "software-greenfield" => "software",
+        "business-existing" | "business-new" => "business",
+        "product-saas" => "software",
+        "book-series" => "book",
+        "open-source" => "opensource",
+        other => other,
+    };
+
+    all.get(dir_name).cloned().unwrap_or_default()
 }
 
 /// Get applicable templates for a project type and maturity.
@@ -205,5 +272,53 @@ mod tests {
         let ts = get_templates_for_type("unknown-type", "minimal");
         // Should fall back to code + governance
         assert!(!ts.templates.is_empty());
+    }
+
+    #[test]
+    fn test_discover_templates_from_filesystem() {
+        let dir = tempfile::tempdir().unwrap();
+        let book_dir = dir.path().join("book");
+        std::fs::create_dir_all(&book_dir).unwrap();
+        std::fs::write(book_dir.join("BOOK_OUTLINE.md"), "# Outline").unwrap();
+        std::fs::write(book_dir.join("CHAPTER_TEMPLATE.md"), "# Chapter").unwrap();
+
+        let podcast_dir = dir.path().join("podcast");
+        std::fs::create_dir_all(&podcast_dir).unwrap();
+        std::fs::write(podcast_dir.join("SHOW_FORMAT.md"), "# Format").unwrap();
+
+        let templates = discover_templates(dir.path().to_str().unwrap());
+        assert_eq!(templates.get("book").unwrap().len(), 2);
+        assert_eq!(templates.get("podcast").unwrap().len(), 1);
+    }
+
+    #[test]
+    fn test_get_filesystem_templates_by_type() {
+        let dir = tempfile::tempdir().unwrap();
+        let sw_dir = dir.path().join("software");
+        std::fs::create_dir_all(&sw_dir).unwrap();
+        std::fs::write(sw_dir.join("README.md"), "# README").unwrap();
+        std::fs::write(sw_dir.join("API.md"), "# API").unwrap();
+
+        let files = get_filesystem_templates(dir.path().to_str().unwrap(), "software-existing");
+        assert_eq!(files.len(), 2);
+    }
+
+    #[test]
+    fn test_get_filesystem_templates_empty() {
+        let dir = tempfile::tempdir().unwrap();
+        let files = get_filesystem_templates(dir.path().to_str().unwrap(), "book");
+        assert!(files.is_empty());
+    }
+
+    #[test]
+    fn test_new_type_categories() {
+        let cats = type_categories();
+        assert!(cats.contains_key("book"));
+        assert!(cats.contains_key("podcast"));
+        assert!(cats.contains_key("newsletter"));
+        assert!(cats.contains_key("youtube"));
+        assert!(cats.contains_key("course"));
+        assert!(cats.contains_key("open-source"));
+        assert!(cats.contains_key("composite"));
     }
 }
