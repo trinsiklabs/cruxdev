@@ -215,7 +215,18 @@ List every page the site needs at launch. For each page:
 - Secondary navigation: dropdowns, sidebar, contextual links
 - Utility navigation: login, search, language selector
 - Footer navigation: legal, social, secondary links
+- Community links: GitHub Issues for bug reports/feature requests, GitHub Discussions for questions
 - No "islands of information" — every page reachable and cross-linked
+
+### 4.2.1 GitHub Integration (for projects using GitHub)
+
+Every project website should include:
+- **"Report a Bug" / "Request a Feature"** link pointing to `github.com/{owner}/{repo}/issues/new/choose` (with issue templates if configured)
+- **"Discuss"** link pointing to GitHub Discussions (if enabled)
+- **"Contribute"** link pointing to CONTRIBUTING.md
+- **Star count badge** (live via GitHub API or shields.io)
+- **Placement:** Footer (always visible), docs sidebar, and help/support page
+- These links feed the autonomous issue monitoring pipeline (see GROWTH_STRATEGY.md §8)
 
 ### 4.3 Navigation Design
 
