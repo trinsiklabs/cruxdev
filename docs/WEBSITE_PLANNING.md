@@ -669,22 +669,42 @@ Apply all 5 doc audit dimensions to every website page:
 
 ## Phase 11: Launch
 
-### 11.1 Launch Day
+### 11.1 Search Engine & AI Registration (MANDATORY)
+
+See `docs/SEARCH_REGISTRATION_GUIDE.md` for detailed step-by-step instructions.
+
+- [ ] Register in Google Search Console (verify ownership, submit sitemap, submit priority URLs)
+- [ ] Register in Bing Webmaster Tools (import from GSC or manual — also covers DuckDuckGo, Yahoo, and ChatGPT search)
+- [ ] Set up IndexNow key (file at site root + deploy script integration)
+- [ ] Verify robots.txt allows search and AI crawlers
+- [ ] Verify llms.txt is current at site root
+- [ ] Verify sitemap.xml is accessible and current
+- [ ] Verify schema.org structured data on key pages
+- [ ] Add IndexNow ping and Google sitemap ping to deploy script
+
+### 11.2 Launch Day
 
 - [ ] Remove `noindex` directives
 - [ ] Submit sitemap to Google Search Console and Bing Webmaster Tools
+- [ ] Ping IndexNow with all page URLs
 - [ ] Verify redirects active
 - [ ] Monitor server performance and error logs in real-time
 - [ ] Have rollback plan ready
 - [ ] Announce on planned channels
 
-### 11.2 Post-Launch Verification (First 48 Hours)
+### 11.3 Post-Launch Verification (First 48 Hours)
 
-- [ ] All pages indexing correctly
+- [ ] All pages indexing correctly (check GSC URL Inspection)
 - [ ] Analytics data flowing
 - [ ] Error logs clean
 - [ ] Forms and conversions tested on production
 - [ ] Social sharing verified (OG images, descriptions)
+
+### 11.4 Post-Deploy Indexing (On Every Deploy)
+
+- [ ] IndexNow ping with changed URLs
+- [ ] Google sitemap ping: `curl "https://www.google.com/ping?sitemap=https://yoursite.com/sitemap-index.xml"`
+- [ ] Verify new pages indexed within 1 week (check GSC)
 
 ---
 
