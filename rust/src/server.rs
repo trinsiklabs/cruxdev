@@ -13,6 +13,18 @@ use std::sync::{LazyLock, Mutex};
 use crate::engine::{convergence, persistence, plan_status, plan_validator, wal, index, router};
 use crate::engine::state::ConvergenceState;
 
+// --- Parameter types (Growth config) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct InitGrowthConfigParam {
+    /// Project name
+    pub project_name: String,
+    /// GitHub repo (e.g. "owner/repo")
+    pub repo: String,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+}
+
 // --- Parameter types (Growth engine) ---
 
 #[derive(Deserialize, JsonSchema)]
@@ -1780,7 +1792,7 @@ impl CruxDevServer {
     }
 
     // 47. run_growth_cycle
-    #[tool(description = "Run autonomous growth cycle: changelog → release notes → X post → README check → llms.txt → metrics. Dry-run by default.")]
+    #[tool(description = "Run autonomous growth cycle from .cruxdev/growth.toml config. Dry-run by default.")]
     async fn run_growth_cycle(&self, params: Parameters<RunGrowthCycleParam>) -> String {
         let p = &params.0;
         let dry_run = p.dry_run.unwrap_or(true);
@@ -1791,6 +1803,16 @@ impl CruxDevServer {
             proj.to_string()
         };
 
+        // Load config
+        let config = match crate::growth::config::load_config(&proj_dir) {
+            Ok(c) => c,
+            Err(e) => return serde_json::json!({"error": e}).to_string(),
+        };
+
+        // Validate
+        let warnings = crate::growth::config::validate_config(&config);
+
+        let repo = if p.repo.is_empty() { &config.project.repo } else { &p.repo };
         let mut actions: Vec<serde_json::Value> = Vec::new();
 
         // 1. Generate release notes
@@ -1798,46 +1820,91 @@ impl CruxDevServer {
         actions.push(serde_json::json!({"action": "release_notes", "content_preview": &notes[..notes.len().min(200)]}));
 
         // 2. Check README health
-        let readme_health = crate::growth::readme::check_readme(&proj_dir, 0, 0);
+        let readme_health = crate::growth::readme::check_readme(
+            &proj_dir, 0, config.readme.tool_count,
+        );
         actions.push(serde_json::json!({"action": "readme_check", "suggestions": readme_health.suggestions}));
 
-        // 3. Compose X post
+        // 3. Compose X post (from config)
         let x_post = crate::growth::typefully::compose_release_thread(
-            "CruxDev", "latest", &notes, 368, 49,
+            &config.project.name, "latest", &notes,
+            0, config.readme.tool_count,
         );
         actions.push(serde_json::json!({"action": "x_post", "content": &x_post[..x_post.len().min(280)]}));
 
-        // 4. Post to Typefully (if not dry run and API key available)
-        if !dry_run {
-            if let Some(api_key) = crate::growth::typefully::api_key_from_env() {
-                let result = crate::growth::typefully::post_draft(&api_key, &x_post, true).await;
+        // 4. Post to Typefully (if enabled in config, not dry run, and API key available)
+        if !dry_run && config.typefully.enabled {
+            if let Some(api_key) = crate::growth::config::resolve_api_key(&config.typefully.api_key_env) {
+                let result = crate::growth::typefully::post_draft(
+                    &api_key, &x_post, config.typefully.threadify_releases,
+                ).await;
                 actions.push(serde_json::json!({"action": "typefully_post", "success": result.success, "error": result.error}));
             } else {
-                actions.push(serde_json::json!({"action": "typefully_post", "skipped": true, "reason": "TYPEFULLY_API_KEY not set"}));
+                actions.push(serde_json::json!({"action": "typefully_post", "skipped": true, "reason": format!("{} not set", config.typefully.api_key_env)}));
             }
         }
 
-        // 5. Collect growth metrics
-        match crate::growth::metrics::collect_metrics(&p.repo) {
-            Ok(metrics) => {
-                let metrics_path = format!("{proj_dir}/.cruxdev/growth/metrics.jsonl");
-                let _ = std::fs::create_dir_all(format!("{proj_dir}/.cruxdev/growth"));
-                if !dry_run {
-                    let _ = crate::growth::metrics::append_metrics(&metrics_path, &metrics);
+        // 5. Collect growth metrics (if enabled in config)
+        if config.metrics.tracking_enabled {
+            match crate::growth::metrics::collect_metrics(repo) {
+                Ok(metrics) => {
+                    let metrics_path = std::path::Path::new(&proj_dir)
+                        .join(&config.metrics.metrics_file);
+                    if let Some(parent) = metrics_path.parent() {
+                        let _ = std::fs::create_dir_all(parent);
+                    }
+                    if !dry_run {
+                        let _ = crate::growth::metrics::append_metrics(
+                            metrics_path.to_str().unwrap_or(""), &metrics,
+                        );
+                    }
+                    actions.push(serde_json::json!({"action": "metrics", "stars": metrics.stars, "forks": metrics.forks, "open_issues": metrics.open_issues}));
                 }
-                actions.push(serde_json::json!({"action": "metrics", "stars": metrics.stars, "forks": metrics.forks, "open_issues": metrics.open_issues}));
-            }
-            Err(e) => {
-                actions.push(serde_json::json!({"action": "metrics", "error": e}));
+                Err(e) => {
+                    actions.push(serde_json::json!({"action": "metrics", "error": e}));
+                }
             }
         }
 
         serde_json::json!({
-            "repo": p.repo,
+            "config": config.project.name,
+            "repo": repo,
             "dry_run": dry_run,
+            "warnings": warnings,
             "actions_count": actions.len(),
             "actions": actions,
         }).to_string()
+    }
+
+    // 50. init_growth_config
+    #[tool(description = "Create a default .cruxdev/growth.toml configuration file for the growth cycle.")]
+    async fn init_growth_config(&self, params: Parameters<InitGrowthConfigParam>) -> String {
+        let p = &params.0;
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+
+        match crate::growth::config::create_default_config(&proj_dir, &p.project_name, &p.repo) {
+            Ok(path) => {
+                // Load and validate
+                let config = crate::growth::config::load_config(&proj_dir).unwrap();
+                let warnings = crate::growth::config::validate_config(&config);
+                serde_json::json!({
+                    "success": true,
+                    "path": path,
+                    "warnings": warnings,
+                    "next_steps": [
+                        "Edit .cruxdev/growth.toml to customize settings",
+                        format!("Set {} env var for Typefully posting", config.typefully.api_key_env),
+                        "Run run_growth_cycle with dry_run=true to test",
+                    ],
+                }).to_string()
+            }
+            Err(e) => serde_json::json!({"error": e}).to_string(),
+        }
     }
 
     // 48. growth_status
