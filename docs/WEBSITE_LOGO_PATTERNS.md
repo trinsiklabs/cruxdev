@@ -116,7 +116,54 @@ Logo automatically inherits text color — no image swapping, no flicker.
 - **Inline SVG** eliminates a network request entirely
 - **Preload if external:** `<link rel="preload" href="/logo.svg" as="image" type="image/svg+xml">`
 
-## 7. Common Mistakes
+## 7. SVG Analysis (Before Deployment)
+
+Every logo SVG must be analyzed before use on a website:
+
+### viewBox audit
+- Read the `viewBox` attribute — this defines the SVG canvas size
+- Check actual content bounds — where do the paths actually draw?
+- If the content occupies <80% of the viewBox, the SVG has excessive padding
+- A 1280x1024 viewBox with a 200x200 icon means the visible logo at h-12 (48px) is only ~7px tall
+
+### Fix: crop the viewBox
+- Open in Inkscape/Figma → "Fit page to selection" / "Resize to fit"
+- Or manually compute tight bounding box from path coordinates and update viewBox
+- Alternatively: use the PNG export at known dimensions (icon-192.png at explicit w/h)
+
+### Checklist before using a logo SVG
+- [ ] viewBox matches content bounds (no excessive padding)
+- [ ] At target height (32-40px), the icon is actually visible and recognizable
+- [ ] No Inkscape/editor metadata bloating file size (strip `sodipodi:`, `inkscape:` namespaces)
+- [ ] Transparent background rect has `fill-opacity: 0` (not a white rect)
+- [ ] Test at actual rendered size, not just in the SVG editor at 100% zoom
+
+### When to use PNG instead of SVG
+- Logo SVG has uncropped viewBox and you can't edit it → use PNG at explicit dimensions
+- Logo has complex gradients or effects that render inconsistently across browsers
+- File size: if SVG > 10KB after cleanup, PNG may be smaller at target resolution
+
+## 8. Logo-to-Site Color Alignment (Convergence Step)
+
+When a logo is added or updated, the convergence process must check:
+
+1. **Extract logo colors** — identify primary and secondary colors from the SVG/PNG
+2. **Compare to site accent** — does the site's accent color match the logo palette?
+3. **Prompt the user:** "The logo uses [colors]. The site accent is [color]. Should the site color scheme align with the logo?"
+4. **If yes:** Update `--color-accent` and related tokens to match logo colors
+5. **If no:** Document the intentional divergence
+
+### Color extraction from SVG
+- Parse `fill` and `stroke` attributes in SVG paths
+- Ignore `fill-opacity: 0` (transparent backgrounds)
+- Group by frequency — the most-used color is primary, second is secondary
+
+### Alignment rules
+- Light mode accent → logo's darker color (for contrast on light backgrounds)
+- Dark mode accent → logo's lighter color (for contrast on dark backgrounds)
+- Button text on accent → verify contrast (4.5:1 minimum)
+
+## 9. Common Mistakes
 
 | Mistake | Fix |
 |---------|-----|

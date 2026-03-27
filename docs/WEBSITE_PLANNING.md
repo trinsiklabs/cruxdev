@@ -669,6 +669,41 @@ Apply all 5 doc audit dimensions to every website page:
 
 ## Phase 11: Launch
 
+### 11.0 Pre-Registration Checklist (BEFORE search engine registration)
+
+Complete these BEFORE registering with Google Search Console or Bing Webmaster Tools. First impressions with crawlers matter — a poorly performing or unsecured site indexed early is worse than a polished site indexed later.
+
+**Performance verification:**
+- [ ] Run Google PageSpeed Insights (https://pagespeed.web.dev/) on mobile AND desktop
+- [ ] Performance score >= 90 (green)
+- [ ] Accessibility score >= 90
+- [ ] Best Practices score >= 90
+- [ ] SEO score >= 90
+- [ ] Fix any red/orange issues before registration
+
+**CDN & Security (Cloudflare or equivalent):**
+- [ ] Site behind CDN (Cloudflare recommended — free tier covers most needs)
+- [ ] SSL/TLS certificate active (HTTPS only, no mixed content)
+- [ ] DNS proxied through CDN for DDoS protection
+- [ ] HTTP/2 or HTTP/3 enabled
+- [ ] Caching rules configured (static assets: 1 year, HTML: short TTL)
+- [ ] Security headers: HSTS, X-Content-Type-Options, X-Frame-Options
+
+**Logo & Branding:**
+- [ ] Favicon is the actual brand logo (not framework default)
+- [ ] Complete favicon set: ico, svg, apple-touch-icon, 192, 512, manifest
+- [ ] Logo SVG has cropped viewBox (content fills >80% of canvas)
+- [ ] Logo visible at 40px height in header
+- [ ] Site color scheme aligned with logo palette
+
+**Content readiness:**
+- [ ] All pages content-converged (BP028 §10.2.1)
+- [ ] Zero stale claims (ground truth verified)
+- [ ] Zero hardcoded dark-only color classes
+- [ ] llms.txt current
+- [ ] robots.txt allows crawlers
+- [ ] sitemap.xml accessible and current
+
 ### 11.1 Search Engine & AI Registration (MANDATORY)
 
 See `docs/SEARCH_REGISTRATION_GUIDE.md` for detailed step-by-step instructions.
