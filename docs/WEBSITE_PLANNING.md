@@ -588,6 +588,13 @@ Apply all 5 doc audit dimensions to every website page:
 - Verify every prerequisite against actual requirements
 - Two consecutive clean passes across ALL pages before declaring converged
 
+**Ground truth verification (MANDATORY):**
+- Every technical capability claim must reference the specific file and function that implements it
+- If no code implements the claim, the claim cannot be on the page
+- "Works today" and "roadmap" must be clearly separated — never present planned features as current capabilities
+- Integration pages are highest risk — verify every claimed integration actually exists in the codebase
+- Run the audit: for each claim, can you point to the code? If not, remove the claim.
+
 **Dark mode / theme verification:**
 - Zero hardcoded dark-only color classes in any page file (no `text-white`, `bg-dark-*`, etc.)
 - Every color reference uses semantic CSS variables that switch between modes

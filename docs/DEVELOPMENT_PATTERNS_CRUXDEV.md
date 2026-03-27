@@ -777,6 +777,7 @@ When escalating to Bryan, present:
 | Skipping code review after implementation | "It compiles" ≠ "it's correct" | Two-stage review: spec compliance + code quality (Superpowers) |
 | Structural-only website audit | Checks page existence/layout but not content accuracy. Stale tech refs, wrong dimension names, old prerequisites survive. BP027 failure: "Python 3.12+" on a Rust project, wrong code dimension names on 12 pages. | Website convergence = doc convergence on every page. Read every page, verify every claim against source code. |
 | Metric-only content update | Grep for numbers to update without reading surrounding prose. Misses wrong names, stale technology refs, inconsistent terminology. | Read full content. Numbers AND prose must match codebase. |
+| Aspirational documentation | Writing claims about features that don't exist as if they're implemented. BP030 failure: OpenClaw page claimed Jest/Vitest integration, ESLint support, TypeScript strict mode, Docker testing — none implemented. 8 of 18 claims FALSE. | Ship the code first, then document it. Every claim must reference the implementing code. "Roadmap" section for planned features. |
 
 ---
 
