@@ -29,7 +29,7 @@ collection_interval_minutes = 60
 [readme]
 auto_optimize = true
 test_count_source = "cargo test"
-tool_count = 50
+tool_count = 52
 
 [llms_txt]
 auto_update = true
