@@ -1,6 +1,6 @@
 # Competitors
 
-**Last Updated:** 2026-03-24
+**Last Updated:** 2026-03-27
 **Project:** CruxDev — Autonomous Convergence Framework
 **Research Method:** 5-pass iterative deepening per RESEARCH_PATTERNS.md (broad → academic → practitioner → contrarian → primary sources)
 
@@ -37,15 +37,23 @@ CruxDev is the only framework that drives AI coding agents through multi-dimensi
 - No safety gates beyond git isolation (no timeout, no rollback counter, no net-negative)
 - No session bus / cross-project coordination
 - Enforces 85-95% coverage, not 100%
+- No autonomous git workflow (commit/push/PR/merge)
+- No GitHub issue monitoring or triage
+- No form-specific audit dimensions
+- No research-converged methodology docs driving audit criteria
 
 **Our moat vs them:**
 - Convergence engine with two-consecutive-clean-pass criterion
-- 8-dimension code audit + 5-dimension doc audit
+- 8-dimension code audit + 5-dimension doc audit + 9-dimension form audit
 - Autonomous execution without re-prompting
 - Safety gates: timeout, 3-failure rollback, net-negative detection, phase-specific max rounds
 - Session bus for cross-project coordination
 - Evolution pipeline for autonomous self-improvement
 - 100% coverage enforcement (not 85-95%)
+- Autonomous git workflow: commit → push → PR → merge with safety gates (no force push, no git add -A, reject secrets/binaries)
+- GitHub issue monitoring with 5-layer prompt injection defense
+- Research-converged methodology docs (form patterns, competitors, research) baked into audit dimensions
+- 46 MCP tools (vs Superpowers' skill-based approach with no programmatic API)
 
 **Their moat vs us:**
 - 110K stars vs our early stage — massive mindshare
