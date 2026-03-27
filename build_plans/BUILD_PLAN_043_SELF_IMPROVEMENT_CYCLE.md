@@ -59,6 +59,20 @@ Build plan converged
    - Converge the build plan
    - Go back to step 1
 
+### Adoption process alignment audit:
+
+After fixing self-adoption findings but BEFORE declaring converged, verify the adoption process itself is current:
+
+4. Audit the adoption process against current capabilities:
+   - Does `/adopt` skill reference all current MCP tools it should use?
+   - Does ADOPTION_PROCESS.md describe the current tool set and project types?
+   - Does ADOPTION_PLAYBOOK.md reflect current templates (228+), dimensions (39+), and project types (18)?
+   - Does the template registry include all filesystem templates?
+   - Does the classifier detect all current project types without false positives?
+   - Does the gap analysis check against the correct template set for the detected type?
+5. If the adoption process is stale, fix it FIRST, then re-run self-adoption with the fixed process
+6. The measurement tool must be current before its measurements are trusted
+
 ### Self-adoption is part of the convergence definition:
 
 A CruxDev build plan is NOT converged until:
@@ -66,6 +80,7 @@ A CruxDev build plan is NOT converged until:
 - [ ] Self-adoption returns zero critical findings
 - [ ] Any tool bugs found during self-adoption are fixed
 - [ ] Any process gaps found are documented as anti-patterns
+- [ ] Adoption process verified current against all capabilities
 
 ## What This Changes
 
