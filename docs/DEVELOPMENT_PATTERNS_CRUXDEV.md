@@ -775,6 +775,8 @@ When escalating to Bryan, present:
 | Bloating patterns file with non-actionable observations | Patterns file becomes noise | Learnings admission gate: genuinely novel AND changes behavior (yoyo) |
 | Ad-hoc task ordering | Low-value work done before high-impact work | Gap analysis as north star: work on biggest gaps first (yoyo) |
 | Skipping code review after implementation | "It compiles" ≠ "it's correct" | Two-stage review: spec compliance + code quality (Superpowers) |
+| Structural-only website audit | Checks page existence/layout but not content accuracy. Stale tech refs, wrong dimension names, old prerequisites survive. BP027 failure: "Python 3.12+" on a Rust project, wrong code dimension names on 12 pages. | Website convergence = doc convergence on every page. Read every page, verify every claim against source code. |
+| Metric-only content update | Grep for numbers to update without reading surrounding prose. Misses wrong names, stale technology refs, inconsistent terminology. | Read full content. Numbers AND prose must match codebase. |
 
 ---
 

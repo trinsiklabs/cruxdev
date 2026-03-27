@@ -540,12 +540,59 @@ WCAG 2.1 AA is the minimum legal standard (US ADA, EU EAA). 5,000+ accessibility
 - [ ] Error states display correctly
 - [ ] 404 page exists and is helpful
 
-### 10.2 Content
+### 10.2 Content (Basic)
 
 - [ ] All copy proofread (no placeholder text)
 - [ ] All images display and have alt text
 - [ ] All media plays correctly
 - [ ] Favicon and social sharing images present
+
+### 10.2.1 Content Convergence (MANDATORY for software projects)
+
+**Rule:** Website convergence = doc convergence applied to every page. Every technical claim on every page must be verified against the current codebase. Two consecutive clean passes. No exceptions.
+
+Apply all 5 doc audit dimensions to every website page:
+
+1. **Accuracy** — Every technical claim verified against source code
+   - Technology stack references match current implementation (no stale "Python" on a Rust project)
+   - Audit dimension names match engine constants exactly
+   - Tool counts, test counts, coverage numbers match actual test output
+   - Prerequisites are current and complete
+   - FAQ schema content matches visible page content
+   - Comparison page claims about competitors are verifiable
+
+2. **Completeness** — No gaps in what's documented
+   - Every public feature/tool described somewhere on the site
+   - Every methodology doc referenced from the docs index
+   - No dead links (internal or external)
+
+3. **Consistency** — Pages agree with each other
+   - Same number/count appears identically everywhere (not 50 on one page and 52 on another)
+   - Dimension lists are identical across methodology, landing pages, comparison pages, FAQ schemas
+   - Terminology is consistent (same names for the same concepts)
+
+4. **Clarity** — Understandable to the target audience
+   - No jargon without explanation
+   - Code examples are runnable
+   - Progressive disclosure (basics first, detail linked)
+
+5. **Currency** — Up to date with current state
+   - Metrics match latest test run
+   - No references to removed technologies, deprecated APIs, or old versions
+   - "Last updated" dates are current where shown
+
+**Process:**
+- Read every page in full (not just check structure or search for numbers)
+- Verify every hardcoded metric against `cargo test` / test suite output
+- Verify every dimension list against `router.rs` constants
+- Verify every prerequisite against actual requirements
+- Two consecutive clean passes across ALL pages before declaring converged
+
+**Anti-patterns (from BUILD_PLAN_027 failure):**
+- **Structural-only audit** — checking page existence and layout without reading content. This let "Python 3.12+" survive as a prerequisite on a Rust project.
+- **Metric-only search** — grep for numbers to update without reading surrounding prose. This let wrong dimension names ("tests, architecture, style" instead of actual engine names) persist across 12 pages.
+- **Trusting pre-migration content** — assuming pages written for an earlier technology stack are still accurate after a migration.
+- **Skipping FAQ schemas** — JSON-LD structured data contains claims that search engines and AI systems serve to users. Stale claims in schemas are worse than stale claims in visible text because they're harder to spot.
 
 ### 10.3 Cross-Browser & Device
 
