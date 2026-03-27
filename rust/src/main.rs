@@ -3,6 +3,7 @@ pub mod bus;
 pub mod cli;
 pub mod competitors;
 pub mod dispatch;
+pub mod domain;
 pub mod engine;
 pub mod evolution;
 pub mod git;

@@ -1,6 +1,6 @@
 # BUILD_PLAN_038: Domain Architecture — Parent Projects with Typed Sub-Projects
 
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Priority:** Strategic (foundational architecture shift)
 **Depends on:** BP034 (universal project management), BP037 (templates)
 
