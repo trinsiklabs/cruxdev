@@ -1,5 +1,6 @@
 //! Convergence engine — state machine, persistence, WAL, checklist, routing.
 
+pub mod build_freshness;
 pub mod checklist;
 pub mod convergence;
 pub mod form_detect;

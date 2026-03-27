@@ -13,6 +13,22 @@ use std::sync::{LazyLock, Mutex};
 use crate::engine::{convergence, persistence, plan_status, plan_validator, wal, index, router};
 use crate::engine::state::ConvergenceState;
 
+// --- Parameter types (Build freshness) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct CheckBuildFreshnessParam {
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct RebuildStaleParam {
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+    /// Dry run (default: true)
+    pub dry_run: Option<bool>,
+}
+
 // --- Parameter types (Growth config) ---
 
 #[derive(Deserialize, JsonSchema)]
@@ -1975,6 +1991,65 @@ impl CruxDevServer {
 
         let result = crate::growth::typefully::post_draft(&api_key, &p.content, threadify).await;
         serde_json::json!(result).to_string()
+    }
+
+    // 51. check_build_freshness
+    #[tool(description = "Check if build artifacts (binaries, bundles, sites) are current or stale. Auto-detects targets from Cargo.toml, package.json, go.mod, Dockerfile.")]
+    async fn check_build_freshness(&self, params: Parameters<CheckBuildFreshnessParam>) -> String {
+        let proj = params.0.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+
+        let targets = crate::engine::build_freshness::detect_build_targets(&proj_dir);
+        let results = crate::engine::build_freshness::check_all_freshness(&proj_dir, &targets);
+
+        let stale_count = results.iter().filter(|r| r.stale).count();
+        serde_json::json!({
+            "targets_found": targets.len(),
+            "stale_count": stale_count,
+            "all_fresh": stale_count == 0,
+            "results": results,
+        }).to_string()
+    }
+
+    // 52. rebuild_stale
+    #[tool(description = "Rebuild all stale build artifacts. Dry-run by default.")]
+    async fn rebuild_stale(&self, params: Parameters<RebuildStaleParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+
+        let targets = crate::engine::build_freshness::detect_build_targets(&proj_dir);
+        let stale: Vec<_> = targets.iter()
+            .filter(|t| crate::engine::build_freshness::check_freshness(&proj_dir, t).stale)
+            .collect();
+
+        if dry_run {
+            return serde_json::json!({
+                "dry_run": true,
+                "stale_targets": stale.iter().map(|t| serde_json::json!({
+                    "artifact": t.artifact,
+                    "command": t.command,
+                    "type": t.artifact_type,
+                })).collect::<Vec<_>>(),
+            }).to_string();
+        }
+
+        let results = crate::engine::build_freshness::rebuild_all_stale(&proj_dir, &targets);
+        let all_ok = results.iter().all(|r| r.success);
+        serde_json::json!({
+            "rebuilt": results.len(),
+            "all_succeeded": all_ok,
+            "results": results,
+        }).to_string()
     }
 }
 
