@@ -1,25 +1,76 @@
-# BUILD_PLAN_044: Build-In-Public Pipeline — Blog + X Posts from Build Plans
+# BUILD_PLAN_044: Universal Content Pipeline — Blog + X Posts from Any Project Event
 
 **Status:** NOT STARTED
 **Priority:** High
-**Depends on:** BP022 (growth engine), BP018 (competitive feedback loop)
+**Depends on:** BP022 (growth engine), BP018 (competitive feedback loop), BP034 (universal project management)
 
 ## Context
 
-Every build plan convergence, every issue resolved, every new competitor discovered is content. Currently this content is generated but goes nowhere — changelog entries and X posts saved to `.cruxdev/evolution/posts/` but never published. BIP (build-in-public) from Crux's unused implementation provides the trigger system. CruxDev needs the full pipeline: event → classify → generate → publish.
+Every project produces events that are content. A software feature shipped, a book chapter completed, a podcast episode published, a competitive gap closed — each is a blog post and/or X post waiting to happen. The content trigger system must be universal across all 18 project types, not software-specific.
 
-## Content Triggers
+Currently content is generated but goes nowhere — changelog entries and X posts saved to `.cruxdev/evolution/posts/` but never published. BIP (build-in-public) from Crux's unused implementation provides the trigger system. CruxDev needs the full pipeline: event → classify by project type → generate from type-specific template → audit → publish.
 
+## Universal Content Triggers (All Project Types)
+
+### Software
 | Event | Blog? | X Post? | Template |
 |-------|-------|---------|----------|
-| Build plan converged (new feature) | YES | YES | "How we built X" / feature announcement |
-| New competitor discovered | YES | YES | Competitive analysis + comparison |
+| Feature shipped (build plan converged) | YES | YES | "How we built X" |
 | Competitive gap closed | YES | YES | "We now match X on Y" |
-| GitHub issue resolved | CANDIDATE | YES | "Fixed: [title]" acknowledgment |
+| New competitor discovered | YES | YES | Comparison analysis |
+| GitHub issue resolved | CANDIDATE | YES | "Fixed: [title]" |
 | New integration | YES | YES | Integration announcement |
-| New methodology doc | YES | YES | Thought leadership / deep dive |
+| New methodology doc | YES | YES | Thought leadership |
 | Bug fix (minor) | NO | MAYBE | Only if publicly reported |
-| Internal refactor | NO | NO | Nobody cares |
+
+### Book / Book Series
+| Event | Blog? | X Post? | Template |
+|-------|-------|---------|----------|
+| Chapter completed | YES | YES | Teaser excerpt, writing process |
+| Book published / launched | YES | YES | Launch announcement thread |
+| New book in series | YES | YES | Series update, what's next |
+| Cover reveal | YES | YES | Visual post |
+| Milestone (word count, draft done) | NO | YES | Progress update |
+
+### Podcast
+| Event | Blog? | X Post? | Template |
+|-------|-------|---------|----------|
+| Episode published | YES | YES | Show notes + key takeaways |
+| Notable guest booked | YES | YES | Guest preview |
+| Season launched | YES | YES | Season announcement |
+| Milestone (downloads, episodes) | NO | YES | Metrics post |
+
+### Newsletter
+| Event | Blog? | X Post? | Template |
+|-------|-------|---------|----------|
+| Issue published | MAYBE | YES | Highlight/teaser |
+| Subscriber milestone | NO | YES | Growth update |
+| Special edition | YES | YES | Deep content post |
+
+### YouTube
+| Event | Blog? | X Post? | Template |
+|-------|-------|---------|----------|
+| Video published | YES | YES | Written companion + link |
+| Channel milestone | NO | YES | Metrics post |
+| Series launched | YES | YES | Series announcement |
+
+### Business
+| Event | Blog? | X Post? | Template |
+|-------|-------|---------|----------|
+| Product launch | YES | YES | Launch announcement |
+| Milestone (revenue, users) | MAYBE | YES | Growth update |
+| Partnership | YES | YES | Partnership announcement |
+
+### Open Source
+| Event | Blog? | X Post? | Template |
+|-------|-------|---------|----------|
+| Release published | YES | YES | Release notes + highlights |
+| Major contributor joined | MAYBE | YES | Welcome/spotlight |
+| Milestone (stars, forks) | NO | YES | Community metrics |
+
+## Content Trigger Registry
+
+The system maps `(project_type, event_type) → content_templates`. Each project type registers its triggers. The engine is generic — content rules are per-type.
 
 ## Phase 1: Deep Research — Pattern Docs
 
