@@ -1,6 +1,6 @@
 # Competitors
 
-**Last Updated:** 2026-03-27
+**Last Updated:** 2026-03-27 (post-session: 22 build plans converged, 52 tools, 419 tests)
 **Project:** CruxDev — Autonomous Convergence Framework
 **Research Method:** 5-pass iterative deepening per RESEARCH_PATTERNS.md (broad → academic → practitioner → contrarian → primary sources)
 
@@ -41,19 +41,32 @@ CruxDev is the only framework that drives AI coding agents through multi-dimensi
 - No GitHub issue monitoring or triage
 - No form-specific audit dimensions
 - No research-converged methodology docs driving audit criteria
+- No build artifact freshness detection
+- No multi-platform binary distribution
+- No competitive feedback loop (manual competitive updates only)
+- No TypeScript/Node.js toolchain detection
+- No ecosystem-neutral design (tied to one vendor)
+- No OpenClaw integration
 
 **Our moat vs them:**
 - Convergence engine with two-consecutive-clean-pass criterion
-- 8-dimension code audit + 5-dimension doc audit + 9-dimension form audit
+- 9-dimension code audit + 5-dimension doc audit + 9 form + 7 metrics + 9 dashboard dimensions (39 total audit dimensions)
 - Autonomous execution without re-prompting
 - Safety gates: timeout, 3-failure rollback, net-negative detection, phase-specific max rounds
 - Session bus for cross-project coordination
-- Evolution pipeline for autonomous self-improvement
+- Evolution pipeline: 5-beat autonomous loop (gather, evaluate, integrate, post, engage)
 - 100% coverage enforcement (not 85-95%)
 - Autonomous git workflow: commit → push → PR → merge with safety gates (no force push, no git add -A, reject secrets/binaries)
 - GitHub issue monitoring with 5-layer prompt injection defense
-- Research-converged methodology docs (form patterns, competitors, research) baked into audit dimensions
-- 46 MCP tools (vs Superpowers' skill-based approach with no programmatic API)
+- Build artifact freshness gate: auto-detects stale binaries/bundles/sites across Rust, Node, Go, Docker
+- Multi-platform binaries: macOS ARM + Intel + Linux x86_64 via GitHub Actions
+- OpenClaw integration (MCP stdio) — first convergence engine in the 247K-star AI agent ecosystem
+- TypeScript toolchain detection: Jest/Vitest, ESLint/Biome, coverage parsing, npm audit, tsconfig strict
+- Competitive feedback loop: auto-detects when build plans change competitive position
+- Autonomous growth engine: Typefully posting, GitHub Releases, README optimization, metrics tracking
+- 10 research-converged methodology docs baked into audit dimensions (form, metrics, dashboard, color/contrast, DRY, research, competitors, growth, logo, MCP server)
+- Ecosystem-neutral: works with any MCP client (not locked to one vendor)
+- 52 MCP tools, 419 tests, single 5.1MB Rust binary
 
 **Their moat vs us:**
 - 110K stars vs our early stage — massive mindshare

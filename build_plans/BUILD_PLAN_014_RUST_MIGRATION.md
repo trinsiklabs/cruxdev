@@ -1,7 +1,7 @@
 # BUILD_PLAN_014: CruxDev Rust Migration
 
 **Created:** 2026-03-26
-**Status:** IN PROGRESS
+**Status:** CONVERGED (superseded by BP015)
 **Goal:** Rewrite CruxDev from Python to Rust. Single binary, zero runtime dependencies, matching crux's architecture. Same MCP tools, same convergence engine, same behavior — in Rust.
 
 **Source:** 84 Python modules, 11,007 lines → target ~5,000-7,000 lines of Rust

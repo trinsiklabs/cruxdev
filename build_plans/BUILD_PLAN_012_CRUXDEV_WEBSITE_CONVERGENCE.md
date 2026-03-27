@@ -1,7 +1,7 @@
 # BUILD_PLAN_012: CruxDev Website Convergence
 
 **Created:** 2026-03-26
-**Status:** IN PROGRESS
+**Status:** CONVERGED (superseded by BP027/032)
 **Goal:** Bring cruxdev.dev to current CruxDev standards — all nav pages populated, landing pages created, SEO keyword registry, structured data, deployment ready.
 
 **Go-to-market name:** CruxDev

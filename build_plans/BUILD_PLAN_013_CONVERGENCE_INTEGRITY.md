@@ -1,7 +1,7 @@
 # BUILD_PLAN_013: Convergence Engine Integrity Hardening
 
 **Created:** 2026-03-26
-**Status:** IN PROGRESS
+**Status:** CONVERGED
 **Goal:** Fix 5 integrity gaps that cause convergence runs to lose state, silently corrupt, or fail to resume.
 
 **Rule:** TDD. Tests before code. 100% coverage.
@@ -60,7 +60,7 @@
 
 **Purpose:** The `**Status:**` line in build plan markdown must reflect actual engine state.
 
-- [ ] 4.1 When convergence starts, update plan file `**Status:** NOT STARTED` → `**Status:** IN PROGRESS`
+- [ ] 4.1 When convergence starts, update plan file `**Status:** NOT STARTED` → `**Status:** CONVERGED`
 - [ ] 4.2 When convergence completes, update → `**Status:** CONVERGED`
 - [ ] 4.3 When escalated, update → `**Status:** ESCALATED`
 - [ ] 4.4 Use regex replacement — don't rewrite the whole file
