@@ -8,11 +8,23 @@ CruxDev drives AI coding agents to completion without human re-prompting. It wra
 
 One clean audit pass catches ~70% of issues. The other ~30% hide behind anchoring bias — the same agent re-checking its own work finds nothing new. CruxDev's two-pass criterion eliminates this.
 
+## Install
+
+```bash
+# One-liner (macOS / Linux — auto-detects platform)
+curl -fsSL https://cruxdev.dev/install.sh | sh
+```
+
+Or download from [GitHub Releases](https://github.com/trinsiklabs/cruxdev/releases/latest):
+- `cruxdev-aarch64-apple-darwin` (macOS Apple Silicon)
+- `cruxdev-x86_64-apple-darwin` (macOS Intel)
+- `cruxdev-x86_64-unknown-linux-gnu` (Linux)
+
 ## Quick Start
 
 ```bash
-# Install into your project
-install_cruxdev(project_dir=".")
+# Connect to your project (Claude Code)
+# Add to .mcp.json: { "mcpServers": { "cruxdev": { "command": "cruxdev", "args": ["mcp", "start"] } } }
 
 # Create a build plan
 create_plan_template(goal="Add user authentication")
