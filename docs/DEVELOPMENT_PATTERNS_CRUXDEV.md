@@ -382,7 +382,39 @@ This prevents patterns files from bloating with obvious or non-actionable observ
 
 Every plan execution MUST complete ALL of these convergence steps before reporting done. Skipping any step is a violation.
 
-### 3.0 Post-Execution Convergence Requirements
+### 3.0 Convergence Gate (Automated — MUST PASS)
+
+Before any build plan can be marked CONVERGED, run `scripts/convergence_gate.sh`. It checks:
+1. All tests pass
+2. Clippy clean (zero warnings)
+3. Zero personal names in docs
+4. Zero hardcoded dark-only CSS classes on site
+5. Test count on site matches actual test output
+6. Build artifacts fresh (not stale)
+7. Ecosystem-neutral language (no single-vendor prerequisites)
+
+**If the gate fails, the build plan is NOT converged.** Fix the issue and re-run.
+
+### 3.0.1 Existing Code Impact Audit (Manual — MUST COMPLETE)
+
+For every build plan, answer these questions BEFORE declaring convergence:
+- What existing MCP tools need updating to support this feature?
+- What existing skills reference tools that changed?
+- What website pages make claims about content that changed?
+- What does COMPETITORS.md need to reflect?
+- What does llms.txt need to reflect?
+
+If any answer is "yes, something needs updating" — update it. Then re-run the gate.
+
+### 3.0.2 Two-Pass Verification
+
+After all fixes from 3.0 and 3.0.1, do a FRESH second-pass audit:
+- Re-read every changed file as if seeing it for the first time
+- If the second pass finds ANYTHING, fix it and do a third pass
+- Two consecutive clean passes = converged
+- One pass with zero findings is NOT convergence (anchoring bias)
+
+### 3.1 Post-Execution Convergence Requirements
 
 After code convergence, four additional convergence loops are mandatory:
 
