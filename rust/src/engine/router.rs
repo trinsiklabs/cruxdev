@@ -18,6 +18,8 @@ pub const FORM_DIMENSIONS: &[&str] = &["layout", "labels", "validation", "errors
 pub const METRICS_DIMENSIONS: &[&str] = &["coverage", "collection", "actionability", "thresholds", "freshness", "anti_gaming", "accessibility"];
 pub const DASHBOARD_DIMENSIONS: &[&str] = &["hierarchy", "density", "visualization", "color", "real_time", "mobile", "accessibility", "performance", "actionability"];
 pub const WEBSITE_ESSENTIAL_PAGES: &[&str] = &["homepage", "quick_install", "quick_start", "documentation", "comparison_pages", "llms_txt", "robots_sitemap"];
+pub const MCP_SERVER_DIMENSIONS: &[&str] = &["tool_design", "security", "testing", "error_handling", "performance", "documentation", "skill_sync"];
+pub const SKILL_DIMENSIONS: &[&str] = &["design", "description", "mcp_sync", "testing", "safety", "documentation", "distribution"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
