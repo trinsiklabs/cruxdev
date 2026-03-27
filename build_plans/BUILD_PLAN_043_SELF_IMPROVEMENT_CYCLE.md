@@ -117,6 +117,31 @@ The convergence criterion for CruxDev is stricter than for any other project:
 
 This is intentional. CruxDev's quality standard must exceed what it asks of the projects it manages.
 
+## External Feedback Loop
+
+Projects using CruxDev are field-testing the adoption tools against real codebases. When adoption finds something wrong with the TOOL rather than the PROJECT, it should be reported upstream:
+
+```
+Project runs /adopt → finds gap → is this MY gap or a CruxDev gap?
+    │
+    ├── Project gap → fix it locally
+    │
+    └── CruxDev gap → file issue at github.com/trinsiklabs/cruxdev/issues
+        → CruxDev's issue monitor picks it up
+        → Evaluates → build plan → converge → self-adopt
+        → Improved tools ship
+        → ALL projects benefit on next adoption run
+```
+
+The cruxcli session demonstrated this: it filed the `setup_competitive_analysis` empty-file bug via session bus, CruxDev fixed the root cause, and the fix benefited every project.
+
+**How to distinguish project gap vs CruxDev gap:**
+- Template missing that should exist for this project type → CruxDev gap (template registry incomplete)
+- Classifier detects wrong project type → CruxDev gap (classifier bug)
+- Tool returns incorrect data → CruxDev gap (tool bug)
+- Gap analysis flags something that's intentionally absent → Project decision (not a gap)
+- Convergence process misses a real issue → CruxDev gap (process improvement needed)
+
 ## Anti-Pattern: Skipping Self-Adoption
 
 If self-adoption is skipped after a build plan, the tool quality stagnates and gaps accumulate silently. BP042 found 7 issues that existed across 30+ "converged" build plans because self-adoption was never run.
