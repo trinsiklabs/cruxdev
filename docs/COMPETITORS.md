@@ -74,7 +74,10 @@ CruxDev is the only framework that drives AI coding agents through multi-dimensi
 - Domain architecture: parent projects with typed sub-projects, cross-project convergence, multi-domain membership
 - 218 project templates across 16 categories (software, business, book, podcast, newsletter, YouTube, etc.)
 - SKILL.md standard: 7 skills migrated, skill-server synchronization enforcement
-- 52 MCP tools, 436 tests, single 5.1MB Rust binary
+- Self-improvement cycle: product improves itself through self-adoption after every build plan (unique — no competitor does this)
+- Universal content pipeline: 16 event types across all project types → blog posts + X posts
+- 14 research-converged methodology docs (form, metrics, dashboard, color, DRY, research, competitors, growth, logo, MCP server, AI skills, blog posts, X posts, website planning)
+- 52 MCP tools, 451 tests, single 5.1MB Rust binary
 
 **Their moat vs us:**
 - 110K stars vs our early stage — massive mindshare
