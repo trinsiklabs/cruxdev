@@ -1,7 +1,7 @@
 # BUILD_PLAN_014: CruxDev Rust Migration
 
 **Created:** 2026-03-26
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
 **Goal:** Rewrite CruxDev from Python to Rust. Single binary, zero runtime dependencies, matching crux's architecture. Same MCP tools, same convergence engine, same behavior — in Rust.
 
 **Source:** 84 Python modules, 11,007 lines → target ~5,000-7,000 lines of Rust
@@ -64,12 +64,12 @@
 
 **Purpose:** Create the Rust project structure alongside the existing Python.
 
-- [ ] 0.1 `cargo init` in cruxdev root (or a `rust/` subdirectory — decide: same root or separate?)
-- [ ] 0.2 Cargo.toml with all dependencies (match crux's Cargo.toml)
-- [ ] 0.3 Module structure: `src/engine/`, `src/bus/`, `src/competitors/`, etc.
-- [ ] 0.4 `main.rs` with clap CLI: `cruxdev mcp start`, `cruxdev status`
-- [ ] 0.5 CI: `cargo test` + `cargo clippy` in GitHub Actions
-- [ ] 0.6 Decision: coexistence strategy — both Python and Rust build/run during migration?
+- [x] 0.1 Create Rust project at `cruxdev/rust/` subdirectory during migration (Python keeps `src/`, Rust uses `rust/src/`). On cutover (Phase 7), move `rust/src/` → `src/` and remove Python.
+- [x] 0.2 Cargo.toml with all dependencies (match crux's Cargo.toml)
+- [x] 0.3 Module structure: `src/engine/`, `src/bus/`, `src/competitors/`, etc.
+- [x] 0.4 `main.rs` with clap CLI: `cruxdev mcp start`, `cruxdev status`
+- [x] 0.5 CI: `cargo test` + `cargo clippy` in GitHub Actions
+- [x] 0.6 Coexistence: Python MCP server stays active. Rust builds at `rust/target/`. Switch .mcp.json only at Phase 7 cutover.
 
 ---
 
@@ -172,14 +172,14 @@
 **Purpose:** Switch from Python to Rust, remove Python code.
 
 - [ ] 7.1 Feature parity audit: every Python MCP tool works identically in Rust
-- [ ] 7.2 Update all .mcp.json files across crux/cruxcli/cruxdev to point to Rust binary
-- [ ] 7.3 Update install.py → install.rs behavior (Rust binary writes MCP config)
+- [x] 7.2 Update all .mcp.json files across crux/cruxcli/cruxdev to point to Rust binary
+- [x] 7.3 Update install.py → install.rs behavior (Rust binary writes MCP config)
 - [ ] 7.4 Update docs/DEPLOYMENT.md, docs/WEBSITE.md, docs/CruxDev.md
 - [ ] 7.5 Update cruxdev.dev website: engine page, metrics
 - [ ] 7.6 Remove Python source (src/*.py) — keep tests as reference until Rust tests are confirmed equivalent
 - [ ] 7.7 Remove pyproject.toml, pytest config
-- [ ] 7.8 Update CLAUDE.md: test command = `cargo test`, no more pytest
-- [ ] 7.9 Final: `cargo build --release` → single binary, all tests pass
+- [x] 7.8 Update CLAUDE.md: test command = `cargo test`, no more pytest
+- [x] 7.9 Final: `cargo build --release` → single binary, all tests pass
 
 ---
 

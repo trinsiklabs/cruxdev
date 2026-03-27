@@ -1,0 +1,22 @@
+name: Rust CI
+
+on:
+  push:
+    paths:
+      - 'rust/**'
+  pull_request:
+    paths:
+      - 'rust/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test
+      - run: cargo clippy -- -D warnings
+      - run: cargo build --release

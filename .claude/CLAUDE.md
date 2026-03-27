@@ -25,11 +25,20 @@ Read `docs/DEVELOPMENT_PATTERNS_CRUXDEV.md` at the start of any planning session
 ## Test Commands
 
 ```bash
-# Run Python tests with coverage enforcement
-python3 -m pytest tests/ -v --tb=short --cov=src --cov-report=term-missing --cov-fail-under=100
+# Run Rust tests
+cd rust && cargo test
 
-# Run tests only (no coverage)
-python3 -m pytest tests/ -v --tb=short
+# Run Rust tests with output
+cd rust && cargo test -- --nocapture
+
+# Clippy lint (zero warnings required)
+cd rust && cargo clippy -- -D warnings
+
+# Build release binary
+cd rust && cargo build --release
+
+# Legacy Python tests (kept for reference during migration)
+python3 -m pytest tests/ -v --tb=short --cov=src --cov-report=term-missing --cov-fail-under=100
 ```
 
 ## Project Structure
