@@ -933,3 +933,104 @@ When modifying an existing function, document what it looks like now — not jus
 ### 14C. Agent Delegation for Research
 
 When checking existing code without loading it into main context, use explore agents. Keeps context clean for plan writing.
+
+## 15. DRY Principle — Don't Repeat Yourself
+
+**Research basis:** Hunt/Thomas (The Pragmatic Programmer), Sandi Metz ("The Wrong Abstraction"), Dan Abramov (AHA Programming), Martin Fowler (Refactoring), Google Testing Blog
+
+### 15A. The Real Definition
+
+DRY means: "Every piece of **knowledge** must have a single, unambiguous, authoritative representation within a system." (Hunt/Thomas, 1999)
+
+DRY is about **knowledge and intent**, not code text. Two identical code blocks representing different domain concepts are NOT violations. Two different-looking code blocks encoding the same business rule ARE a violation.
+
+### 15B. Where to Apply DRY
+
+| Domain | Apply DRY | Example |
+|--------|----------|---------|
+| Business logic | Yes | Pricing rules, validation, domain calculations — one authoritative source |
+| Configuration | Yes | DB strings, feature flags, env values — config in environment, referenced not copied |
+| Schemas/contracts | Yes | API contracts defined once, generate server stubs + client SDKs + docs |
+| Infrastructure | Yes | Terraform modules, CI/CD templates — parameterized, not copy-pasted |
+| Documentation restating code | Yes | Comments that restate logic (not intent) will drift |
+
+### 15C. Where NOT to Apply DRY
+
+| Domain | Why | Authority |
+|--------|-----|-----------|
+| **Tests** | Tests should be DAMP (Descriptive And Meaningful Phrases). Each test is a specification readable in isolation. Shared helpers create coupling. | Google Testing Blog, Kent Beck, Martin Fowler |
+| **Prototypes/spikes** | Abstracting before understanding the domain locks in wrong abstractions | Rule of Three |
+| **Cross-service boundaries** | Shared libraries create deployment coupling. Operational cost > maintenance cost of duplication. | Sam Newman, microservices literature |
+| **Incidental similarity** | Code that looks identical today but represents different concepts will evolve differently | Sandi Metz |
+| **< 3 instances** | You don't know the true shape of the abstraction yet | Rule of Three (Fowler/Roberts) |
+
+### 15D. Rule of Three
+
+- **First time:** Just do it.
+- **Second time:** Note the duplication, do it anyway.
+- **Third time:** Now extract — you have enough examples to see the true abstraction.
+
+The three instances must represent the **same concept changing for the same reason**. Three things that look similar but serve different domains are not candidates.
+
+### 15E. The Wrong Abstraction (Critical)
+
+> "Duplication is far cheaper than the wrong abstraction." — Sandi Metz
+
+The lifecycle of a wrong abstraction:
+1. See duplication → extract abstraction
+2. New requirement almost fits → add parameter/conditional
+3. Repeat until the abstraction is a complex, parameterized mess
+4. Nobody dares refactor because everything depends on it
+5. **Sunk cost fallacy keeps it alive**
+
+**Prescription:** When you find a wrong abstraction, **inline it back** (re-duplicate), then re-extract the correct abstraction from the now-visible concrete cases.
+
+### 15F. AHA Programming
+
+**Avoid Hasty Abstractions** (Kent C. Dodds, building on Metz). The middle ground: prefer duplication over the wrong abstraction, but don't be afraid to abstract when the pattern is truly clear after 3+ instances.
+
+### 15G. DRY in AI-Generated Code
+
+LLMs produce duplication by default — each function/module is generated somewhat independently. Specific risks:
+- Utility functions reimplemented across generated files
+- Similar error handling copied rather than shared
+- Schema/contract duplication across client and server
+
+**Mitigations:**
+- Post-generation duplication scanning (jscpd, SonarQube) in CI
+- Prompt engineering that references existing abstractions
+- Architecture tests enforcing structural rules
+- Code review specifically focused on DRY for AI-generated PRs
+
+### 15H. Detection Tools
+
+| Tool | Scope | Threshold |
+|------|-------|-----------|
+| jscpd | 150+ languages, tokenization | Configurable min tokens/lines |
+| SonarQube | Enterprise, tracks over time | Default: flag >3% |
+| PMD CPD | Language-agnostic | Configurable |
+| Clippy (Rust) | Redundant patterns | Built-in |
+| Pylint R0801 | Python duplicate-code | Configurable min lines |
+
+Industry benchmarks: < 5% excellent, 5-10% normal, > 15% maintenance risk.
+
+### 15I. Convergence Audit Integration
+
+The `duplication` dimension in code audits checks:
+- Duplication percentage (flag > 5%, fail > 15%)
+- Business logic has single authoritative representation
+- Schemas defined once with generation for other representations
+- Configuration values not hardcoded in multiple places
+
+**Exclusions:** Test code (DAMP), intentional boundary duplication (annotated), < 3 instances (Rule of Three).
+
+### 15J. Anti-Patterns
+
+| Anti-Pattern | Problem |
+|-------------|---------|
+| **Premature abstraction** | Extracting before 3 instances — wrong shape |
+| **Wrong abstraction** | Functions with boolean switches, growing parameter lists |
+| **Coupling through sharing** | Shared library prevents independent deployment |
+| **DRY cargo cult** | Extracting constants for strings used twice in different contexts |
+| **Utils dumping ground** | Unrelated functions in a "utils" module |
+| **Abstraction addiction** | Optimizing for line count over comprehension |

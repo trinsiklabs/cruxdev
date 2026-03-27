@@ -755,3 +755,206 @@ If there is *any* possibility of international users, architect for i18n from da
 12. **No AI visibility strategy** — optimizing only for Google ignores a growing discovery channel
 13. **Dark patterns in consent** — erode trust and increasingly carry legal penalties
 14. **Islands of information** — related content scattered with no cross-linking
+15. **No dark mode** — users expect OS-respecting themes; pure-light sites feel outdated
+16. **No quick start page** — users who can't get started in 5 minutes leave
+17. **No install page** — burying install instructions in a README loses users at the first step
+
+---
+
+## Appendix E: Dark Mode
+
+**Research basis:** Material Design dark theme guidelines, Apple HIG, web.dev, WCAG 2.1/2.2, Tailwind CSS v4
+
+### E.1 Detection
+- Use `prefers-color-scheme` media query for OS-level detection
+- Listen for live changes via `matchMedia('(prefers-color-scheme: dark)').addEventListener('change', ...)`
+- Set `<meta name="color-scheme" content="light dark">` and `:root { color-scheme: light dark; }` for native element theming (scrollbars, form controls)
+
+### E.2 CSS Strategy
+- Class-based with CSS custom properties (design tokens). NOT media-query-only (can't support toggle).
+- Tailwind v4: use `selector` or `class` strategy with `@custom-variant dark`
+- Define semantic tokens (bg-primary, text-primary, border-default) that switch between themes
+- Token architecture: Primitive → Semantic → Component layers
+
+### E.3 Color Design
+| Attribute | Light | Dark |
+|-----------|-------|------|
+| Background | #ffffff | **#121212** (NOT #000) |
+| Text body | #1a1a1a | **#e0e0e0** (NOT #fff) |
+| Text secondary | #666666 | #a0a0a0 |
+| Surface elevated | white + shadow | **lighter shade** (shadow invisible on dark) |
+| Accent colors | Full saturation | **Desaturate 20-30%**, increase lightness |
+
+- Pure black (#000) causes OLED smearing and excessive contrast
+- Pure white (#fff) body text causes halation for ~33% of users (astigmatism)
+- Surface hierarchy via lightness tiers (Material Design elevation overlay table: 0dp=#121212, 1dp=#1e1e1e, 4dp=#272727, 8dp=#2e2e2e)
+
+### E.4 Toggle UX
+- **Three-state:** System (default) / Light / Dark
+- Persist choice in `localStorage`
+- Icons: sun (light) / moon (dark) / monitor (system)
+
+### E.5 FOUC Prevention (Critical)
+Inline blocking script in `<head>` BEFORE stylesheets:
+```html
+<script>
+(function() {
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if (stored === 'dark' || (stored !== 'light' && prefersDark))
+    document.documentElement.classList.add('dark');
+})();
+</script>
+```
+
+### E.6 Images
+- SVG icons: use `currentColor` (auto-adapts)
+- Logos: provide light/dark variants (never CSS invert)
+- Photos: optionally reduce brightness 10% on dark backgrounds
+
+### E.7 Accessibility
+- WCAG AA (4.5:1 normal text, 3:1 large text) in BOTH modes
+- Test every color pair independently for both themes
+- Support `forced-colors` media query for Windows High Contrast
+- Never color-only status indicators
+
+### E.8 Anti-Patterns
+- Pure inversion (`filter: invert(1)`) — breaks images, brand colors
+- Pure black background — OLED smearing, eye strain
+- Same shadow values — invisible on dark
+- Binary toggle only — can't return to OS preference
+- Saturated colors on dark — optical vibration
+- Different font sizes per theme — causes CLS
+
+---
+
+## Appendix F: Quick Install Page
+
+**Research basis:** Stripe, Vercel, Tailwind CSS, Astro documentation patterns; Google Tech Writing; Write the Docs
+
+Every software project website must have a dedicated install page. Target: **completable in under 60 seconds.**
+
+### F.1 Page Structure
+1. **Prerequisites** — exact versions (e.g., "Node.js 18+ required"), with install links
+2. **Install command** — one-liner, primary package manager, copy button
+3. **Verification** — command + expected output ("you should see:")
+4. **Next step** — link to Quick Start guide
+
+### F.2 Platform Tabs
+- Auto-detect OS via `navigator.userAgent`, pre-select matching tab
+- Tabs: macOS / Linux / Windows (for CLI tools) or npm / yarn / pnpm / cargo (for packages)
+- Tab selection persists via localStorage
+- Each tab is independently complete
+- Maximum 4 options (more causes decision paralysis)
+
+### F.3 Verification Step (Required)
+Every install page must end with:
+- "Run this:" → `command --version`
+- "You should see:" → expected output block
+- This is the single most impactful element for user confidence
+
+### F.4 Copy-to-Clipboard
+- Every code block gets a copy button (top-right corner)
+- "Copied!" feedback for 1-2 seconds
+- Exclude shell prompts (`$`, `>`) from copied text
+
+### F.5 Troubleshooting
+- Collapsible section at page bottom
+- Top 3 issues only (from real support data)
+- Format: symptom → cause → fix (one command)
+- Final item: "Still stuck? [File an issue]"
+
+### F.6 Anti-Patterns
+- Prerequisites assumed, not stated
+- Multi-step install when one-liner is possible
+- No verification step
+- No "what's next" link
+- Showing all 6 package managers without recommendation
+
+---
+
+## Appendix G: Quick Start Guide
+
+**Research basis:** Stripe, Vercel, Tailwind, Astro, Supabase documentation; developer onboarding research; TTFV studies
+
+Every software project website must have a quick start guide. Target: **first meaningful result in under 5 minutes.**
+
+### G.1 The 7-Section Structure
+1. **One-sentence description** — what this tool does, for whom
+2. **Prerequisites** — what must be installed (bulleted, with versions)
+3. **Install** — the install command (or link to install page)
+4. **Initialize/Setup** — create project or config file (1-2 commands)
+5. **First meaningful action** — the "hello world" demonstrating core value
+6. **See the result** — expected output, screenshot, or URL
+7. **What's next** — 3-5 links to logical next topics
+
+### G.2 Time-to-First-Value
+| Rating | Time | Examples |
+|--------|------|---------|
+| Gold | < 2 min | Vercel |
+| Good | < 5 min | Stripe, Astro |
+| Acceptable | < 10 min | Complex tools |
+| Failure | > 15 min | Users abandon |
+
+Measure with a stopwatch on a fresh machine, zero prior knowledge.
+
+### G.3 Code Examples
+- Every block must include imports/requires
+- Every block must be runnable as-is (no `...` or `// your code here`)
+- Show file path above code block (e.g., `src/main.rs`)
+- Use realistic, domain-relevant data (not `foo`/`bar`)
+- Show expected output after execution
+- Test code examples in CI
+
+### G.4 Progressive Disclosure
+- Quick start shows ONE use case: the most common one
+- One linear path, no branching
+- Advanced options link to separate pages
+- Maximum 1-2 callout boxes ("Note" / "Pro tip")
+- If a step has options, pick the recommended one
+
+### G.5 "What's Next" Section (Required)
+- 3-5 links, ordered by likely next action
+- Each link gets a one-line description
+- Include: deeper tutorial, core concepts, API reference, examples
+- This prevents the "now what?" drop-off (#1 cause of post-install abandonment)
+
+### G.6 Framework-Specific Paths
+- If multiple frameworks supported, offer separate paths from the start
+- Each path is complete and self-contained
+- Use tab groups or separate pages
+- Limit to 4-6 options; "Other" for the rest
+
+### G.7 Keeping Current
+- Test all code examples in CI
+- Pin versions, update with releases
+- Include snippet files from tested sources (not inline-only code)
+- Review quick start in every release checklist
+
+### G.8 Anti-Patterns
+- Wall of text before first action
+- Outdated code examples
+- Incomplete snippets (missing imports)
+- No verification step
+- No "what's next" section
+- Using "just" or "simply" (minimizes difficulty)
+- Mixing conceptual and procedural content
+- Too many choices too early
+
+---
+
+## Appendix H: Website Essential Pages Checklist
+
+Every project website must evaluate whether it needs these pages. Website convergence checks for their presence:
+
+| Page | Required When | Key Criteria |
+|------|-------------|-------------|
+| **Homepage** | Always | Hero, value prop, trust metrics, primary CTA |
+| **Quick Install** | Software projects | < 60 seconds, verification step, copy buttons |
+| **Quick Start** | Software projects | < 5 minutes TTFV, 7-section structure, runnable code |
+| **Documentation** | Projects with API/config | Organized, searchable, current |
+| **Comparison (vs/)** | Projects with competitors | Feature table, honest strengths/weaknesses |
+| **Blog/Changelog** | Active projects | Regular updates, build-in-public content |
+| **About/Team** | Projects seeking trust | Who builds this, why |
+| **llms.txt** | All projects | AI discoverability |
+| **robots.txt + sitemap** | All projects | Search engine access |
