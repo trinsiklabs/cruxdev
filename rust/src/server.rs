@@ -490,6 +490,7 @@ impl ServerHandler for CruxDevServer {
                  SECURITY: NEVER put API keys in config files. NEVER use git add -A."
                     .into(),
             ),
+            capabilities: rmcp::model::ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
         }
     }
@@ -754,11 +755,41 @@ impl CruxDevServer {
     async fn cruxdev_status(&self, params: Parameters<ProjectDirParam>) -> String {
         let dir = params.0.project_dir.unwrap_or_else(|| ".".to_string());
         let report = crate::status::get_status(&dir);
+
+        // Template count
+        let templates_dir = self.project_dir.join("templates");
+        let template_types = crate::adoption::templates::discover_templates(
+            templates_dir.to_str().unwrap_or("templates"),
+        );
+        let template_count: usize = template_types.values().map(|v| v.len()).sum();
+
+        // Skill count
+        let skills_dir = self.project_dir.join(".claude/skills");
+        let skill_count = std::fs::read_dir(&skills_dir)
+            .map(|entries| entries.filter_map(|e| e.ok()).filter(|e| e.path().is_dir()).count())
+            .unwrap_or(0);
+
+        // Domain detection
+        let is_domain = crate::domain::is_domain(&dir);
+
+        // Build freshness
+        let build_targets = crate::engine::build_freshness::detect_build_targets(&dir);
+        let stale_count = build_targets.iter()
+            .filter(|t| crate::engine::build_freshness::check_freshness(&dir, t).stale)
+            .count();
+
         serde_json::json!({
             "healthy": report.healthy,
             "checks": report.checks.iter().map(|c| serde_json::json!({
                 "name": c.name, "passed": c.passed, "message": c.message
             })).collect::<Vec<_>>(),
+            "tools": 52,
+            "skills": skill_count,
+            "templates": template_count,
+            "template_types": template_types.keys().collect::<Vec<_>>(),
+            "is_domain": is_domain,
+            "build_targets": build_targets.len(),
+            "stale_artifacts": stale_count,
         }).to_string()
     }
 
@@ -952,12 +983,25 @@ impl CruxDevServer {
     async fn classify_project(&self, params: Parameters<ProjectDirParam>) -> String {
         let dir = params.0.project_dir.unwrap_or_else(|| ".".to_string());
         let result = crate::adoption::classify::classify_project(&dir);
+
+        // Get available templates for this project type
+        let templates_dir = self.project_dir.join("templates");
+        let fs_templates = crate::adoption::templates::get_filesystem_templates(
+            templates_dir.to_str().unwrap_or("templates"),
+            result.primary_type.as_str(),
+        );
+
+        // Check if this is a domain
+        let is_domain = crate::domain::is_domain(&dir);
+
         serde_json::json!({
             "primary_type": result.primary_type.as_str(),
             "secondary_types": result.secondary_types.iter().map(|t| t.as_str()).collect::<Vec<_>>(),
             "maturity": result.maturity.as_str(),
             "confidence": result.confidence,
             "signals": result.signals,
+            "available_templates": fs_templates.len(),
+            "is_domain": is_domain,
         }).to_string()
     }
 
@@ -981,19 +1025,32 @@ impl CruxDevServer {
     async fn get_templates(&self, params: Parameters<GetTemplatesParam>) -> String {
         let p = &params.0;
         let maturity = p.maturity.as_deref().unwrap_or("minimal");
+
+        // Built-in templates (hardcoded baseline)
         let ts = crate::adoption::templates::get_templates_for_type(&p.project_type, maturity);
         let by_cat = ts.by_category();
         let cat_counts: HashMap<String, usize> = by_cat.iter().map(|(k, v)| (k.clone(), v.len())).collect();
+
+        // Filesystem templates (218+ per project type)
+        let templates_dir = self.project_dir.join("templates");
+        let fs_templates = crate::adoption::templates::get_filesystem_templates(
+            templates_dir.to_str().unwrap_or("templates"),
+            &p.project_type,
+        );
+
         serde_json::json!({
-            "total": ts.templates.len(),
-            "required": ts.required().len(),
-            "templates": ts.templates.iter().map(|t| serde_json::json!({
+            "builtin_total": ts.templates.len(),
+            "builtin_required": ts.required().len(),
+            "builtin_templates": ts.templates.iter().map(|t| serde_json::json!({
                 "category": t.category,
                 "name": t.name,
                 "filename": t.filename,
                 "requirement": t.requirement.as_str(),
             })).collect::<Vec<_>>(),
-            "by_category": cat_counts,
+            "builtin_by_category": cat_counts,
+            "filesystem_templates": fs_templates,
+            "filesystem_total": fs_templates.len(),
+            "total": ts.templates.len() + fs_templates.len(),
         }).to_string()
     }
 

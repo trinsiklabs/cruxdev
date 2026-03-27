@@ -8,6 +8,7 @@
 # Exit code: number of failures (0 = all clear)
 
 set -o pipefail
+export PATH="$HOME/.cargo/bin:$PATH"
 FAILURES=0
 WARNINGS=0
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
