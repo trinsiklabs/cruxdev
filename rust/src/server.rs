@@ -82,6 +82,22 @@ pub struct PrioritizeWorkParam {
     pub limit: Option<usize>,
 }
 
+#[derive(Deserialize, JsonSchema)]
+pub struct GtvScanContentParam {
+    /// Path to the file to scan for claims
+    pub file_path: String,
+    /// Project directory for verification (default: cwd)
+    pub project_dir: Option<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct GtvScanAllParam {
+    /// Directory to scan (all .md and .astro files)
+    pub directory: String,
+    /// Project directory for verification (default: cwd)
+    pub project_dir: Option<String>,
+}
+
 // --- Parameter types (Competitive impact) ---
 
 #[derive(Deserialize, JsonSchema)]
@@ -2887,6 +2903,112 @@ impl CruxDevServer {
             "showing": top.len(),
             "next": next,
             "items": top,
+        }).to_string()
+    }
+
+    // 63. gtv_scan_content
+    #[tool(description = "Ground Truth Verification: scan a file for claims (numeric, feature, status, path, URL) and verify each against the actual project state. Returns verified/failed/uncertain for each claim.")]
+    async fn gtv_scan_content(&self, params: Parameters<GtvScanContentParam>) -> String {
+        let p = &params.0;
+        let proj_dir = p.project_dir.as_deref().map(std::path::PathBuf::from)
+            .unwrap_or_else(|| self.project_dir.clone());
+
+        let content = match std::fs::read_to_string(&p.file_path) {
+            Ok(c) => c,
+            Err(e) => return format!("{{\"error\": \"Could not read file: {e}\"}}"),
+        };
+
+        let claims = crate::gtv::scanner::extract_claims(&content);
+        let results = crate::gtv::verifier::verify_all(&claims, proj_dir.to_str().unwrap_or("."));
+
+        let verified = results.iter().filter(|r| r.verified).count();
+        let failed = results.iter().filter(|r| !r.verified && r.confidence == crate::gtv::Confidence::High).count();
+        let uncertain = results.iter().filter(|r| !r.verified && r.confidence != crate::gtv::Confidence::High).count();
+
+        let scan = crate::gtv::ScanResult {
+            file_path: p.file_path.clone(),
+            total_claims: claims.len(),
+            verified,
+            failed,
+            uncertain,
+            results,
+        };
+
+        serde_json::to_string_pretty(&scan).unwrap_or_else(|e| format!("{{\"error\": \"{e}\"}}"))
+    }
+
+    // 64. gtv_scan_all
+    #[tool(description = "Ground Truth Verification: scan all .md and .astro files in a directory for claims and verify each. Returns a summary with per-file results. Use before deploying to catch stale stats, broken links, and false feature claims.")]
+    async fn gtv_scan_all(&self, params: Parameters<GtvScanAllParam>) -> String {
+        let p = &params.0;
+        let proj_dir = p.project_dir.as_deref().map(std::path::PathBuf::from)
+            .unwrap_or_else(|| self.project_dir.clone());
+
+        let dir = std::path::Path::new(&p.directory);
+        if !dir.exists() {
+            return format!("{{\"error\": \"Directory not found: {}\" }}", p.directory);
+        }
+
+        let mut all_results: Vec<crate::gtv::ScanResult> = Vec::new();
+        let mut total_claims = 0usize;
+        let mut total_verified = 0usize;
+        let mut total_failed = 0usize;
+
+        // Walk directory for .md and .astro files
+        fn walk_dir(dir: &std::path::Path, files: &mut Vec<std::path::PathBuf>) {
+            if let Ok(entries) = std::fs::read_dir(dir) {
+                for entry in entries.flatten() {
+                    let path = entry.path();
+                    if path.is_dir() {
+                        walk_dir(&path, files);
+                    } else if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
+                        if ext == "md" || ext == "astro" {
+                            files.push(path);
+                        }
+                    }
+                }
+            }
+        }
+
+        let mut files = Vec::new();
+        walk_dir(dir, &mut files);
+        files.sort();
+
+        for file in &files {
+            if let Ok(content) = std::fs::read_to_string(file) {
+                let claims = crate::gtv::scanner::extract_claims(&content);
+                if claims.is_empty() { continue; }
+
+                let results = crate::gtv::verifier::verify_all(&claims, proj_dir.to_str().unwrap_or("."));
+                let verified = results.iter().filter(|r| r.verified).count();
+                let failed = results.iter().filter(|r| !r.verified && r.confidence == crate::gtv::Confidence::High).count();
+                let uncertain = results.len() - verified - failed;
+
+                total_claims += claims.len();
+                total_verified += verified;
+                total_failed += failed;
+
+                if failed > 0 {
+                    all_results.push(crate::gtv::ScanResult {
+                        file_path: file.display().to_string(),
+                        total_claims: claims.len(),
+                        verified,
+                        failed,
+                        uncertain,
+                        results,
+                    });
+                }
+            }
+        }
+
+        serde_json::json!({
+            "directory": p.directory,
+            "files_scanned": files.len(),
+            "total_claims": total_claims,
+            "total_verified": total_verified,
+            "total_failed": total_failed,
+            "passed": total_failed == 0,
+            "failed_files": all_results,
         }).to_string()
     }
 }
