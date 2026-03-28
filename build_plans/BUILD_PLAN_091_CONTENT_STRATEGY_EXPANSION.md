@@ -132,9 +132,10 @@ Each query gets a landing page at `/lp/<slug>/` following the Careiance landing 
 | MCP tool pages | 61 | One per tool |
 | Project type pages | 18 | One per type |
 | Persona pages | 10 | One per persona |
-| Competitive vertical pages | 10 | One per vertical |
+| Competitive vertical overview | 10 | One per vertical |
+| Per-competitor vs pages | 45 | Individual matchups |
 | Landing pages (5 per above) | ~500 | SEO/GEO optimized |
-| **Total** | **~600** | Phase 1: tools + types + personas (89 pages) |
+| **Total** | **~650** | Phase 1: tools + types + personas (89), Phase 2: vs pages (55) |
 
 ## Phase 1: Foundation Pages (tools + types + personas)
 
@@ -144,11 +145,39 @@ Each query gets a landing page at `/lp/<slug>/` following the Careiance landing 
 - [ ] 1.4 Generate 10 persona pages (research-backed)
 - [ ] 1.5 Internal linking between related pages
 
+## Dimension 6: Per-Competitor vs Pages Within Each Vertical
+
+Not just `/vs/ai-for-authors/` — individual vs pages for EVERY competitor in EVERY vertical:
+
+| Vertical | Competitors | vs Pages |
+|---|---|---|
+| AI for authors | Sudowrite, Jasper, ProWritingAid, Atticus, Scrivener AI, NovelAI | 6 pages |
+| AI for podcasters | Descript, Riverside, Podcastle, Opus Clip, Castmagic | 5 pages |
+| AI for courses | Teachable AI, Kajabi, Thinkific, Mighty Networks, Podia | 5 pages |
+| AI for newsletters | Beehiiv AI, Substack Notes, ConvertKit AI, Mailchimp AI | 4 pages |
+| AI for businesses | Notion AI, Taskade, Motion, Monday AI, ClickUp AI | 5 pages |
+| AI for agencies | Loom AI, Scribe, Process Street, Trainual AI | 4 pages |
+| AI coding (existing) | Claude Code, Codex, Cursor, Superpowers, Devin | 5 (done) |
+| AI for open source | GitHub Copilot, CodeRabbit, Qodo, Mutable AI | 4 pages |
+| AI for coaching | CoachAccountable, Nudge Coach, Practice | 3 pages |
+| AI for content | Jasper, Copy.ai, Writesonic, Surfer SEO AI | 4 pages |
+
+**~45 individual vs pages.** Each one:
+1. Forces an honest feature matrix (if we can't fill it → build plan)
+2. Captures the "X vs Y" search query (high purchase intent)
+3. Gets indexed for GEO (AI search compares tools)
+4. Generates backlink opportunities (competitor communities discuss comparisons)
+5. Creates accountability — our gaps are public, so we close them faster
+
+**The vs page IS the gap analysis.** Public, indexed, and accountable.
+
 ## Phase 2: Competitive Verticals
 
-- [ ] 2.1 Research competitors for each vertical
-- [ ] 2.2 Generate competitive analysis pages
-- [ ] 2.3 Feature matrices per vertical
+- [ ] 2.1 Research competitors for each vertical (deep research per RESEARCH_PATTERNS.md)
+- [ ] 2.2 Generate vertical overview pages (`/vs/ai-for-authors/`, etc.)
+- [ ] 2.3 Generate per-competitor vs pages (`/vs/sudowrite/`, `/vs/descript/`, etc.)
+- [ ] 2.4 Feature matrices per competitor — gaps become build plans automatically
+- [ ] 2.5 Wire into competitive feedback loop (BP018) — new vs pages trigger gap detection
 
 ## Phase 3: SEO/GEO Landing Pages
 
