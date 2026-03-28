@@ -29,6 +29,7 @@ pub const LOGO_DIMENSIONS: &[&str] = &["viewbox_optimization", "favicon_set", "d
 pub const POST_DEPLOYMENT_DIMENSIONS: &[&str] = &["health_endpoint", "smoke_tests", "ssl_verification", "asset_integrity", "rollback_plan", "notifications", "migration_check"];
 pub const E2E_TEST_DIMENSIONS: &[&str] = &["critical_paths", "user_journeys", "cross_browser", "error_scenarios", "performance", "accessibility"];
 pub const MOBILE_WEB_DIMENSIONS: &[&str] = &["touch_targets", "responsive_layout", "mobile_nav", "mobile_performance", "pwa_readiness", "mobile_accessibility"];
+pub const GEO_DIMENSIONS: &[&str] = &["llms_txt", "structured_data", "bing_indexed", "ai_crawler_access", "content_citability", "geo_monitoring"];
 pub const UAT_TEST_DIMENSIONS: &[&str] = &["role_coverage", "acceptance_criteria", "edge_cases", "data_integrity", "workflow_completeness"];
 pub const BDD_DIMENSIONS: &[&str] = &["feature_coverage", "scenario_quality", "step_reuse", "living_doc_freshness", "gherkin_code_traceability"];
 
@@ -506,6 +507,8 @@ pub fn get_next_task(
             }
             // Mobile web dimensions (all websites need mobile support)
             for dim in MOBILE_WEB_DIMENSIONS { dims.push((*dim).into()); }
+            // GEO dimensions (AI discoverability)
+            for dim in GEO_DIMENSIONS { dims.push((*dim).into()); }
             // Post-deployment verification dimensions
             if detect_deployable(&proj_dir) {
                 for dim in POST_DEPLOYMENT_DIMENSIONS { dims.push((*dim).into()); }
