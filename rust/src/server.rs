@@ -82,6 +82,16 @@ pub struct PrioritizeWorkParam {
     pub limit: Option<usize>,
 }
 
+// --- Parameter types (Competitive impact) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct CheckCompetitiveImpactParam {
+    /// Path to the build plan file
+    pub plan_file: String,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+}
+
 // --- Parameter types (Deployment verification) ---
 
 #[derive(Deserialize, JsonSchema)]
@@ -1042,6 +1052,7 @@ impl CruxDevServer {
         if next.task_type == "done" {
             result["post_convergence_actions"] = serde_json::json!({
                 "git_commit": "REQUIRED — commit all changes from this build plan with descriptive message, then push to remote.",
+                "competitive_impact": "REQUIRED — call check_competitive_impact(plan_file) to see if this changes competitive position.",
                 "self_adopt": "REQUIRED — classify project, check patterns integration, verify dimensions wired, deploy website if changed.",
                 "blog_post": "REQUIRED — verify blog post was generated and deployed. If not, generate manually.",
                 "priority_check": "RECOMMENDED — run prioritize_work to pick the next task."
@@ -2831,7 +2842,41 @@ impl CruxDevServer {
         }).to_string()
     }
 
-    // 59. prioritize_work
+    // 59. check_competitive_impact
+    #[tool(description = "Check whether a build plan changes the competitive landscape. Returns: impact type (differentiator/gap_closure/parity/none), affected gaps, and recommended actions.")]
+    async fn check_competitive_impact(&self, params: Parameters<CheckCompetitiveImpactParam>) -> String {
+        let p = &params.0;
+        let plan_content = match std::fs::read_to_string(&p.plan_file) {
+            Ok(c) => c,
+            Err(e) => return serde_json::json!({"error": format!("Cannot read plan: {e}")}).to_string(),
+        };
+
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." { self.project_dir.to_string_lossy().to_string() } else { proj.to_string() };
+
+        // Load gap features from COMPETITORS.md gap closure queue
+        let comp_path = std::path::Path::new(&proj_dir).join("docs/COMPETITORS.md");
+        let comp_content = std::fs::read_to_string(&comp_path).unwrap_or_default();
+
+        let gap_features: Vec<String> = comp_content.lines()
+            .skip_while(|l| !l.contains("Gap Closure Queue"))
+            .filter(|l| l.starts_with('|') && !l.contains("---") && !l.contains("Gap "))
+            .filter_map(|l| l.split('|').nth(1).map(|s| s.trim().to_string()))
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        let competitor_features: Vec<String> = comp_content.lines()
+            .skip_while(|l| !l.contains("Feature Matrix"))
+            .filter(|l| l.starts_with('|') && !l.contains("---") && !l.contains("Feature"))
+            .filter_map(|l| l.split('|').nth(1).map(|s| s.trim().to_string()))
+            .filter(|s| !s.is_empty())
+            .collect();
+
+        let result = crate::competitors::impact::classify_impact(&plan_content, &gap_features, &competitor_features);
+        serde_json::json!(result).to_string()
+    }
+
+    // 60. prioritize_work
     #[tool(description = "Scan all work sources (build plans, GitHub issues, competitive gaps, self-adoption findings, content backlog) and return a prioritized list. Use this to decide what to work on next in autonomous mode.")]
     async fn prioritize_work(&self, params: Parameters<PrioritizeWorkParam>) -> String {
         let p = &params.0;
