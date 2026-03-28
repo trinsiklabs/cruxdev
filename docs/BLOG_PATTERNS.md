@@ -116,13 +116,15 @@ Every blog post needs structured metadata. Use strict schemas with validation.
 ```yaml
 ---
 title: "Autonomous Convergence: How We Eliminated Manual QA Loops"
-description: "CruxDev's convergence engine runs audit-fix-re-audit loops without human intervention, reducing release cycles from days to hours."
-pubDate: 2026-03-15
-author: "Bryan"
+description: "CruxDev's convergence engine runs audit-fix-re-audit loops without human intervention."
+date: "2026-03-15T18:30"  # ISO datetime with timestamp — critical for BIP (multiple posts/day)
 tags: ["convergence", "automation", "quality"]
-category: "engineering"
 ---
 ```
+
+**Why timestamps, not just dates:** AI-driven Build-in-Public (BIP) pipelines can generate multiple posts per day. Date-only (`2026-03-15`) makes all posts from the same day appear identical in the listing. Always use ISO datetime with at least hour:minute precision (`2026-03-15T18:30`).
+
+**Author field:** Use organization name, not personal names. Depersonalization prevents lock-in to individuals and is better for ecosystem-neutral positioning.
 
 **Full schema (all optional fields):**
 

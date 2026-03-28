@@ -693,13 +693,14 @@ fn publish_blog_post(
         .to_string();
 
     let date = &ts[..8]; // YYYYMMDD
+    let time = &ts[9..13]; // HHMM (from YYYYMMDD-HHMMSS)
     let filename = format!("{date}-{slug}.md");
 
-    // Write with Astro-compatible frontmatter (includes layout for rendering)
+    // Write with Astro-compatible frontmatter (includes layout + timestamp for BIP)
+    let datetime = format!("{}-{}-{}T{}:{}", &date[..4], &date[4..6], &date[6..8], &time[..2], &time[2..4]);
+    let summary_line = content.lines().find(|l| !l.is_empty() && !l.starts_with('#')).unwrap_or("");
     let frontmatter = format!(
-        "---\nlayout: ../../layouts/BlogPost.astro\ntitle: \"{plan_name}\"\ndate: \"{}-{}-{}\"\nslug: \"{slug}\"\nsummary: \"{}\"\n---\n\n",
-        &date[..4], &date[4..6], &date[6..8],
-        content.lines().find(|l| !l.is_empty() && !l.starts_with('#')).unwrap_or(""),
+        "---\nlayout: ../../layouts/BlogPost.astro\ntitle: \"{plan_name}\"\ndate: \"{datetime}\"\nslug: \"{slug}\"\nsummary: \"{summary_line}\"\n---\n\n",
     );
 
     let full_content = format!("{frontmatter}{content}");
