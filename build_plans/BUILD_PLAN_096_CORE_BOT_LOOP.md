@@ -116,15 +116,57 @@ Leverage CruxCLI's existing provider infrastructure (Anthropic, OpenAI, OpenRout
 - [ ] 3.4 Log rotation for long-running operation
 - [ ] 3.5 Health endpoint (HTTP) for monitoring
 - [ ] 3.6 Metrics endpoint (Prometheus format)
-- [ ] 3.7 Adaptive sleep cycle:
-  - No work → 1 min → 5 min → 15 min → 1 hr (exponential backoff, cap at 1 hr)
-  - Work found → reset to 1 min
-  - Webhook received → wake immediately (0 sleep)
-  - High-activity burst → 10 sec between cycles
-  - Tracks work arrival rate over 24h rolling window
-  - Auto-adjusts: if work arrives every 30 min avg → sleep 10 min
-  - Self-tuning: measures response time vs idle cost, optimizes the ratio
-  - Dormant when idle, responsive when busy. Minimal token burn.
+- [ ] 3.7 Two-tier loop architecture — "sleep with one eye open":
+
+  **Tier 1: Sentinel loop (Rust-only, no LLM, runs every 5-30 seconds)**
+  Pure code. Zero token cost. Watches for wake triggers defined in `watch.yaml`:
+  ```yaml
+  # watch.yaml — maintained by the bot itself
+  watches:
+    - type: file_changed
+      paths: ["build_plans/*.md", ".cruxdev/**", "docs/**"]
+      debounce_seconds: 30
+
+    - type: github_webhook
+      port: 9876
+      events: ["issues.opened", "pull_request.opened", "issue_comment.created"]
+
+    - type: github_poll
+      repos: ["trinsiklabs/cruxdev", "trinsiklabs/crux", "trinsiklabs/cruxbot"]
+      interval_seconds: 300
+      check: open_issues_count_changed
+
+    - type: file_exists
+      path: ".cruxdev/evolution/WAKE"
+      action: delete_after_wake
+
+    - type: http_health
+      urls: ["https://cruxdev.dev", "https://runcrux.io"]
+      interval_seconds: 600
+      wake_on: status_not_200
+
+    - type: cron
+      schedule: "0 */4 * * *"
+      reason: "scheduled_evolution_cycle"
+
+    - type: cost_budget
+      daily_limit_usd: 10.0
+      action: sleep_until_midnight_if_exceeded
+  ```
+
+  **Tier 2: Full wake (LLM calls, convergence, the real work)**
+  Only fires when Tier 1 detects a trigger. Runs the full
+  CHECK → PRIORITIZE → CONVERGE → DELIVER → REFLECT → EVOLVE cycle.
+  Returns to Tier 1 sentinel when cycle completes.
+
+  **The bot maintains watch.yaml itself.** After self-evolution, it can add
+  new watches (e.g., "monitor this new competitor's releases page") or
+  adjust intervals based on observed activity patterns. The sentinel
+  config is a living document the bot writes to.
+
+  **Cost: ~0 when idle.** Tier 1 is pure Rust — file stat, HTTP HEAD,
+  git poll. No LLM calls. No tokens burned. The bot is always watching
+  but only thinking when there's something to think about.
 
 ## Phase 4: Safety for Unsupervised Operation
 
