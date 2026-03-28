@@ -2,7 +2,7 @@
 
 **Created:** 2026-03-18
 **Last Updated:** 2026-03-18
-**Status:** NOT STARTED
+**Status:** LIVING DOCUMENT
 **Goal:** Build the full Crux ecosystem — three tightly integrated products that form a lights-out AI coding machine surpassing Superpowers (93k+ stars) in both capability and attention.
 
 **Constraint:** Crux roadmap completion (including GitHub Actions support) is a prerequisite — the platform must be feature-complete before the products that depend on it.
