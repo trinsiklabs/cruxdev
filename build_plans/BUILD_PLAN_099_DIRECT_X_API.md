@@ -1,6 +1,6 @@
 # BUILD_PLAN_099: Direct X/Twitter API — Bypass Typefully for Posting
 
-**Status:** NOT STARTED
+**Status:** CONVERGED (superseded by BP105 — X posting queue + pure Rust OAuth 1.0a client)
 **Priority:** High (40 drafts stuck, no way to publish via API)
 **Triggered by:** Typefully v2 API only creates drafts — no scheduling or publishing
 

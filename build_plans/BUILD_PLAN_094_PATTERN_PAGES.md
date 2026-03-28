@@ -1,6 +1,6 @@
 # BUILD_PLAN_094: Pattern Docs as Public Pages — SEO/GEO Content from Existing Research
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS (9 pattern pages deployed at /patterns/)
 **Priority:** High (zero-effort content — docs already exist)
 
 ## Context
