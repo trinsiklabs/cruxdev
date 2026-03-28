@@ -1,6 +1,6 @@
 # BUILD_PLAN_101: Page-Level Convergence — Audit Every Page, Not Just the Project
 
-**Status:** IN PROGRESS
+**Status:** ESCALATED
 **Priority:** Critical (adoption fails without this)
 **Triggered by:** Adopted project passed 9/9 form dimensions at project level, but individual pages had fields floating left, "(Optional)" everywhere, tiny textareas. Not caught until human explicitly challenged.
 
@@ -27,11 +27,11 @@ The LLM rubber-stamps project-level audits because it can't see every page at on
 
 ## Tests
 
-- [ ] test_inventory_astro_pages
+- [x] test_inventory_astro_pages
 - [ ] test_inventory_phoenix_routes
-- [ ] test_classify_page_type_form
-- [ ] test_classify_page_type_dashboard
-- [ ] test_per_page_audit_task_generation
+- [x] test_classify_page_type_form
+- [x] test_classify_page_type_dashboard
+- [x] test_per_page_audit_task_generation
 - [ ] test_all_pages_must_pass_gate
 
 ## Verification
@@ -43,15 +43,15 @@ cd rust && cargo clippy -- -D warnings
 
 ## Phase 1: Page/Route Inventory
 
-- [ ] 1.1 New MCP tool: `inventory_routes(project_dir)` → returns all pages/routes
+- [x] 1.1 New MCP tool: `inventory_routes(project_dir)` → returns all pages/routes
   - Static sites: scan `src/pages/` directory, list every .astro/.html/.md file
   - Phoenix/LiveView: parse `router.ex` for all routes
   - Next.js: scan `app/` directory for page.tsx files
   - Rails: parse `routes.rb`
   - Django: parse `urls.py`
   - Generic: check for sitemap, crawl if available
-- [ ] 1.2 Classify each route by type: form, dashboard, list, detail, auth, static, API
-- [ ] 1.3 Map route types to applicable pattern docs:
+- [x] 1.2 Classify each route by type: form, dashboard, list, detail, auth, static, API
+- [x] 1.3 Map route types to applicable pattern docs:
   - Form pages → FORM_PATTERNS (17 dimensions)
   - All pages → COLOR_CONTRAST_PATTERNS (automated scanner)
   - All pages → MOBILE_WEB_PATTERNS (touch targets, responsive)
@@ -60,33 +60,33 @@ cd rust && cargo clippy -- -D warnings
 
 ## Phase 2: Per-Page Audit Task Generation
 
-- [ ] 2.1 During WebsiteConvergence phase, generate ONE audit task PER page
-- [ ] 2.2 Each task includes:
+- [x] 2.1 During WebsiteConvergence phase, generate ONE audit task PER page
+- [x] 2.2 Each task includes:
   - The specific URL/route to audit
   - The applicable pattern dimensions for that page type
   - The source code for that specific page (not the whole project)
   - Instruction: "Audit THIS PAGE against THESE dimensions. Read the actual code for this page."
-- [ ] 2.3 LLM must read the SPECIFIC file for each page, not just the project structure
-- [ ] 2.4 For live sites: LLM fetches the URL and checks rendered output too (not just source)
+- [x] 2.3 LLM must read the SPECIFIC file for each page, not just the project structure
+- [x] 2.4 For live sites: LLM fetches the URL and checks rendered output too (not just source)
 
 ## Phase 3: Automated Per-Page Checks (No LLM Needed)
 
-- [ ] 3.1 Contrast scanner already runs per-file — wire into per-page reporting
+- [x] 3.1 Contrast scanner already runs per-file — wire into per-page reporting
 - [ ] 3.2 HTML validation per page (are forms using correct input types, autocomplete, labels?)
 - [ ] 3.3 Accessibility lint per page (missing alt text, missing labels, missing aria)
-- [ ] 3.4 Link validation per page (internal links resolve)
+- [x] 3.4 Link validation per page (internal links resolve)
 - [ ] 3.5 Mobile meta tag check per page (viewport, touch targets via class analysis)
 
 ## Phase 4: Per-Page Findings Report
 
-- [ ] 4.1 Findings tagged with specific page/route, not just "the project"
-- [ ] 4.2 Convergence report shows per-page breakdown:
+- [x] 4.1 Findings tagged with specific page/route, not just "the project"
+- [x] 4.2 Convergence report shows per-page breakdown:
   ```
   /visit/westlake-select: 4 findings (label_positioning, required_indicators, textarea_usage, input_sizing)
   /chapters/westlake-select: 2 findings (color_contrast, text_sizing)
   /dashboard: 0 findings (clean)
   ```
-- [ ] 4.3 Convergence cannot complete until ALL pages pass, not just "the project"
+- [x] 4.3 Convergence cannot complete until ALL pages pass, not just "the project"
 
 ## Phase 5: Adoption Integration
 
