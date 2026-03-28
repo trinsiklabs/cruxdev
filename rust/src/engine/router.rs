@@ -486,17 +486,40 @@ pub fn get_next_task(
             if detect_dashboards(&proj_dir) {
                 for dim in DASHBOARD_DIMENSIONS { dims.push((*dim).into()); }
             }
-            // Color/contrast dimensions
+            // Color/contrast dimensions + automated scanning
             if detect_website_visual(&proj_dir) {
                 for dim in COLOR_CONTRAST_DIMENSIONS { dims.push((*dim).into()); }
                 for dim in LOGO_DIMENSIONS { dims.push((*dim).into()); }
             }
+            // Run automated contrast scanner
+            let contrast_violations = super::contrast_check::scan_project(&proj_dir);
+            let auto_findings: Vec<serde_json::Value> = contrast_violations.iter().map(|v| {
+                json!({
+                    "file": v.file,
+                    "line": v.line,
+                    "dimension": "wcag_aa_compliance",
+                    "severity": v.severity,
+                    "description": format!("{} on {} — estimated {:.1}:1 (requires {:.1}:1)", v.text_class, v.bg_class, v.estimated_ratio, v.required_ratio),
+                    "suggested_fix": v.fix,
+                })
+            }).collect();
+
+            let metadata = if auto_findings.is_empty() {
+                None
+            } else {
+                Some(json!({
+                    "auto_findings": auto_findings,
+                    "contrast_violations": auto_findings.len(),
+                    "note": "These contrast violations were detected automatically. Fix ALL before declaring convergence."
+                }))
+            };
+
             Task {
                 task_type: "audit".into(),
-                description: format!("Website convergence (round {}). URL: {}", state.round, site_url),
+                description: format!("Website convergence (round {}). URL: {} [{} contrast violations detected]", state.round, site_url, contrast_violations.len()),
                 files: website_files,
                 dimensions: dims,
-                finding: None, test_command: None, metadata: None,
+                finding: None, test_command: None, metadata,
                 recommended_tier: Some("standard".into()),
             }
         }

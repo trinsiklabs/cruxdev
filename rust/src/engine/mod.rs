@@ -2,6 +2,7 @@
 
 pub mod build_freshness;
 pub mod checklist;
+pub mod contrast_check;
 pub mod convergence;
 pub mod form_detect;
 pub mod index;
