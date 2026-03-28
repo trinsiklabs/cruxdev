@@ -497,3 +497,78 @@ Every week:
 | FUD (fear, uncertainty, doubt) | Erodes your credibility, not theirs | State facts, let users decide |
 | No moat inventory | Don't know what to protect or promote | Track your unique advantages actively |
 | Manual-only monitoring | Falls behind immediately | Automate what you can, schedule the rest |
+
+---
+
+## Phase 8: Vertical Content Expansion
+
+**Every project lives in one or more verticals.** A vertical is the market category where the project's users are choosing between alternatives. Competitive analysis isn't just about direct competitors — it's about understanding the entire vertical and using content to own it.
+
+### 8.1 Vertical Identification
+
+For each project, identify its verticals:
+- A book project → "AI for authors", "self-publishing tools", "writing assistants"
+- A SaaS product → "AI coding tools", "developer productivity", "code quality"
+- A coaching business → "AI for coaches", "coaching platforms", "client management"
+- A podcast → "AI for podcasters", "podcast production", "content repurposing"
+
+### 8.2 Content Dimensions per Vertical
+
+Each vertical generates 5 types of pages:
+
+| Dimension | Template | Example |
+|---|---|---|
+| **Feature/tool pages** | One page per major feature, in-depth with examples | `/features/manuscript-tracking/` |
+| **Persona pages** | One page per target user type | `/for/authors/`, `/for/entrepreneurs/` |
+| **Vertical overview** | "AI tools for X" comparison page | `/vs/ai-for-authors/` |
+| **Per-competitor vs pages** | Individual matchup with feature matrix | `/vs/sudowrite/`, `/vs/descript/` |
+| **Landing pages** | SEO/GEO pages for search queries in the vertical | `/lp/how-to-use-ai-to-write-a-book/` |
+
+### 8.3 The Content-Product Feedback Loop
+
+```
+Identify vertical
+  → Research competitors in that vertical
+  → Build per-competitor vs pages with feature matrices
+  → Gaps in the matrix = features we don't have
+  → Gaps become build plans
+  → Build plans converge → features ship
+  → Update vs pages (gap closed)
+  → Blog + X post about the new capability
+  → New pages attract users in that vertical
+  → Users file issues → new gaps identified
+  → Repeat
+```
+
+**The vs page IS the gap analysis.** It's public, indexed, and accountable. If we claim parity on a feature, it better work. If we show a gap, it better have a build plan.
+
+### 8.4 Vertical-Specific Audit Dimensions
+
+When a project has competitive pages, the convergence engine should audit:
+- Feature matrix accuracy (are our claims verifiable?)
+- Competitor info freshness (when was this last verified?)
+- Gap-to-build-plan traceability (does every gap have a plan?)
+- Landing page SEO (are we ranking for target queries?)
+- Persona coverage (do all target personas have a page?)
+
+### 8.5 Scale Formula
+
+For a project with N competitors across M verticals:
+- Feature pages: ~20 per project (major features only)
+- Persona pages: 5-10 per project
+- Vertical overviews: M pages
+- Per-competitor vs pages: N pages (across all verticals)
+- Landing pages: 5 × (20 + 10 + M + N) queries
+- **Total: approximately 150-650 pages per project**
+
+This is not manual — the convergence engine generates page templates, the LLM fills them during research convergence, and the BIP pipeline publishes them.
+
+### 8.6 This Is Universal
+
+This pattern applies to EVERY CruxDev-managed project with competitors and a website:
+- A Careiance book series → vs pages against other women's wellness authors
+- A SaaS product → vs pages against competing SaaS tools
+- A coaching practice → vs pages against other coaching platforms
+- An open source tool → vs pages against alternative tools
+
+The methodology is the same. The content adapts to the vertical.
