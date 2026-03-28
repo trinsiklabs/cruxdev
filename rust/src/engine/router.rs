@@ -433,6 +433,8 @@ pub fn get_next_task(
             if detect_business_project(&proj_dir) {
                 for dim in BUSINESS_DIMENSIONS { dims.push((*dim).into()); }
             }
+            // Security dimension requires frontier model; standard otherwise
+            let tier = if dims.contains(&"security".to_string()) { "frontier" } else { "standard" };
             Task {
                 task_type: "audit".into(),
                 description: format!("Audit code (round {}).", state.round),
@@ -441,7 +443,7 @@ pub fn get_next_task(
                 finding: None,
                 test_command: test_command.map(|tc| tc.to_vec()),
                 metadata: None,
-                recommended_tier: Some("standard".into()),
+                recommended_tier: Some(tier.into()),
             }
         }
 
