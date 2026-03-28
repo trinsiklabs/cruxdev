@@ -292,6 +292,9 @@ fn scan_self_adoption(project_dir: &str) -> Vec<WorkItem> {
         ("KV_CACHE", "CODE_DIMENSIONS"),
         ("COMPETITORS", "BUSINESS_DIMENSIONS"),
         ("BLOG", "CONTENT_DIMENSIONS"),
+        ("CROSS_MODEL_VALIDATION", "CODE_DIMENSIONS"),
+        ("POST_DEPLOYMENT", "POST_DEPLOYMENT_DIMENSIONS"),
+        ("COLOR_CONTRAST", "COLOR_CONTRAST_DIMENSIONS"),
     ];
 
     if let Ok(entries) = std::fs::read_dir(&docs_dir) {
