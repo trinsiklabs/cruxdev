@@ -116,6 +116,15 @@ Leverage CruxCLI's existing provider infrastructure (Anthropic, OpenAI, OpenRout
 - [ ] 3.4 Log rotation for long-running operation
 - [ ] 3.5 Health endpoint (HTTP) for monitoring
 - [ ] 3.6 Metrics endpoint (Prometheus format)
+- [ ] 3.7 Adaptive sleep cycle:
+  - No work → 1 min → 5 min → 15 min → 1 hr (exponential backoff, cap at 1 hr)
+  - Work found → reset to 1 min
+  - Webhook received → wake immediately (0 sleep)
+  - High-activity burst → 10 sec between cycles
+  - Tracks work arrival rate over 24h rolling window
+  - Auto-adjusts: if work arrives every 30 min avg → sleep 10 min
+  - Self-tuning: measures response time vs idle cost, optimizes the ratio
+  - Dormant when idle, responsive when busy. Minimal token burn.
 
 ## Phase 4: Safety for Unsupervised Operation
 
