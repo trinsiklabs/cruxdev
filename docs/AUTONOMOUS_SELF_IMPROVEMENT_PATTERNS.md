@@ -128,6 +128,16 @@ When a build plan converges, the post-convergence hook in `convergence_submit_re
 
 This is built into CruxDev — no project-specific setup needed.
 
+### 4.1b Close originating GitHub issues
+
+If a build plan has `Triggered by: #N` or `Triggered by: https://github.com/.../issues/N`, the post-convergence actions require closing that issue:
+
+```bash
+gh issue close N --repo owner/repo --comment "Fixed in BUILD_PLAN_NNN. Blog: https://cruxdev.dev/blog/..."
+```
+
+This closes the feedback loop: issue filed → build plan created → converged → issue closed with link to fix.
+
 ### 4.2 Typefully posting
 
 Ensure `TYPEFULLY_API_KEY` is set in the shell environment:

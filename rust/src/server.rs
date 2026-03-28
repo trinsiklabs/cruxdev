@@ -1055,6 +1055,7 @@ impl CruxDevServer {
                 "competitive_impact": "REQUIRED — call check_competitive_impact(plan_file) to see if this changes competitive position.",
                 "self_adopt": "REQUIRED — classify project, check patterns integration, verify dimensions wired, deploy website if changed.",
                 "blog_post": "REQUIRED — verify blog post was generated and deployed. If not, generate manually.",
+                "close_github_issue": "REQUIRED — if this build plan has a 'Triggered by:' line with a GitHub issue URL or #N, close that issue with a comment linking to the converged build plan and blog post. Use: gh issue close N --repo owner/repo --comment 'Fixed in BP_NNN. Blog: URL'",
                 "cross_project_issues": "REQUIRED — if this plan depends on another project (Crux, CruxCLI), file a GitHub issue on that project's repo with the dependency details. Do NOT wait for the user to tell you.",
                 "priority_check": "REQUIRED — run prioritize_work to pick the next task. If the top item is blocked on another project, file the upstream issue immediately, then move to the next item. NEVER stop because something is blocked."
             });
