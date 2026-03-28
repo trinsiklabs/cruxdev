@@ -257,7 +257,7 @@ fn scan_content_backlog(project_dir: &str) -> Vec<WorkItem> {
         .filter(|e| e.path().extension().is_some_and(|ext| ext == "md"))
         .count();
 
-    if converged_count > blog_count + 30 {
+    if converged_count > blog_count + 60 {
         let behind = converged_count - blog_count;
         items.push(WorkItem {
             source: "content_backlog".into(),
