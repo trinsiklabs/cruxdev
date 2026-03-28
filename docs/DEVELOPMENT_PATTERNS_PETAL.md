@@ -2,12 +2,15 @@
 
 Phoenix / Elixir / Tailwind / Ash / LiveView
 
-This document captures stack-specific patterns, conventions, and decisions for the BNI Growth Platform. It complements `DEVELOPMENT_PATTERNS.md` (methodology, planning, audit cycles) with the **how** of building in this specific stack.
+This document captures stack-specific patterns, conventions, and decisions for PETAL stack projects (Phoenix/Elixir/Tailwind/Ash/LiveView). It complements `DEVELOPMENT_PATTERNS.md` (methodology, planning, audit cycles) with the **how** of building in this specific stack.
 
 **Relationship to other files:**
 - **DEVELOPMENT_PATTERNS.md** — the methodology authority. Planning cycles, audit patterns, the user's prompt toolkit, anti-patterns. Stack-agnostic.
+- **DEVELOPMENT_PATTERNS_CRUXDEV.md** — the autonomous convergence methodology. Lights-out execution model.
+- **FORM_PATTERNS.md** — form design standards. All forms must pass the 9-dimension audit.
+- **WEBSITE_PLANNING.md** — website standards. SEO, accessibility, performance, security.
 - **This file** — stack-specific patterns. How we structure Ash resources, test with ExUnit, use Petal Components, integrate GHL, etc.
-- **Build plan files** (`1-*.md`, `2-*.md`, etc.) — per-slice actionable plans with checkboxes. Created using the methodology from DEVELOPMENT_PATTERNS.md and the technical patterns from this file.
+- **Build plan files** (`BUILD_PLAN_NNN_*.md`) — per-slice actionable plans with checkboxes.
 
 ---
 
@@ -26,8 +29,9 @@ Pinned to what's installed on the development machine. These are the versions we
 | AshPhoenix | ~> 2.3 | Phoenix/LiveView integration |
 | AshAuthentication | ~> 4.13 | Password + OAuth authentication |
 | AshAuthentication Phoenix | ~> 2.0 | Auth UI components |
-| AshOban | ~> 0.4 | Background job integration |
+| AshOban | ~> 0.7 | Background job integration |
 | Petal Components | ~> 3.0 | Open source LiveView component library |
+| daisyUI | 4.x | Tailwind CSS component plugin (themes, buttons, cards, etc.) |
 | PostgreSQL | 15+ | Running locally, standard port |
 | Node.js | 25.x | Asset pipeline only (Tailwind, esbuild) |
 | Tailwind CSS | 4.x | Via Phoenix asset pipeline |
@@ -68,20 +72,40 @@ lib/bni_platform/
 ├── chapters/              # Chapter management domain
 │   ├── chapters.ex        # Domain module
 │   ├── chapter.ex
-│   └── seat.ex
+│   ├── seat.ex
+│   └── changes/           # Ash change modules
+│       ├── assign_member_to_seat.ex
+│       ├── create_child_seats.ex
+│       ├── destroy_child_seats.ex
+│       └── unassign_member_from_seat.ex
 ├── members/               # Member profiles domain
 │   ├── members.ex
 │   ├── member.ex
-│   └── recruitment_claim.ex
+│   ├── recruitment_claim.ex
+│   └── changes/
+│       ├── update_seat_status_to_claimed.ex
+│       └── update_seat_status_to_open.ex
 ├── visitors/              # Visitor pipeline domain
 │   ├── visitors.ex
 │   ├── visitor.ex
-│   └── visit.ex
-└── ghl/                   # GHL integration (not an Ash domain)
-    ├── client.ex          # Behaviour
-    ├── http_client.ex     # Production Req-based impl
-    └── webhook_handler.ex
+│   ├── visit.ex
+│   └── changes/
+│       ├── enqueue_ghl_sync.ex
+│       └── set_seat_match.ex
+├── settings/              # System configuration domain
+│   ├── settings.ex
+│   ├── system_setting.ex
+│   └── ghl_config.ex
+├── ghl/                   # GHL integration (not an Ash domain)
+│   ├── client.ex          # Behaviour
+│   ├── http_client.ex     # Production Req-based impl
+│   └── webhook_handler.ex
+└── workers/               # Oban background jobs
+    ├── contact_sync_worker.ex
+    └── webhook_process_worker.ex
 ```
+
+**Convention:** Ash change modules go in a `changes/` subdirectory under their domain. Workers are kept in a top-level `workers/` directory since they can span domains.
 
 **Convention:** One Ash domain per bounded context. The domain module (`accounts.ex`, `chapters.ex`) defines the domain and lists its resources. Resources are never accessed directly — always through the domain's actions.
 
@@ -343,26 +367,34 @@ import PetalComponents.Card
 - **Visitor pipeline stage indicator** — shows where a visitor is in the funnel
 - **Embeddable registration form** — standalone form that works in iframes
 
-### Tailwind Integration
+### Tailwind + daisyUI Integration
 
-Petal uses Tailwind classes. Phoenix 1.8 uses Tailwind 4.x with CSS-based config (not the JS-based `tailwind.config.js` from v3):
+Petal uses Tailwind classes. Phoenix 1.8 uses Tailwind 4.x with CSS-based config (not the JS-based `tailwind.config.js` from v3). daisyUI provides the component layer (buttons, cards, modals, alerts, form controls, themes).
 
 ```css
-/* assets/css/app.css — Tailwind 4.x uses CSS-based config */
+/* assets/css/app.css — Tailwind 4.x + daisyUI */
 @import "tailwindcss" source(none);
 @source "../css";
 @source "../js";
 @source "../../lib/bni_platform_web";
 @source "../../deps/petal_components/lib";
 
+/* daisyUI plugin — provides component classes (btn, card, alert, etc.) and theme system */
+@plugin "../vendor/daisyui";
+@plugin "../vendor/daisyui-theme";
+@plugin "../vendor/heroicons";
+
 @theme {
   --color-bni-red: #CF2030;
   --color-bni-gray: #58595B;
 }
-
-@plugin "@tailwindcss/forms";
-@plugin "@tailwindcss/typography";
 ```
+
+**daisyUI conventions:**
+- Use daisyUI classes for component styling: `btn`, `btn-primary`, `card`, `alert`, `input`, `select`, `textarea`, `modal`
+- Use Tailwind utilities for layout, spacing, and responsive design
+- Theme customization via `@plugin "../vendor/daisyui-theme"` — supports light/dark modes
+- CoreComponents (button, input, table, header) override Petal where daisyUI styling is preferred — managed via `except` imports in `bni_platform_web.ex`
 
 ---
 
@@ -789,13 +821,162 @@ end
 
 ---
 
-## 12. Deployment (Future)
+## 12. Deployment
 
-Not in scope for slice 1 — development is local only. Deployment patterns will be added when we're ready to host.
+### Fly.io + Docker
+
+Production deployment uses Fly.io with a multi-stage Docker build:
+
+```
+fly.toml
+├── app = "bni-growth"
+├── primary_region = "iad"
+├── [deploy]
+│   └── release_command = "/app/bin/migrate"  # Runs migrations before deploy
+├── [http_service]
+│   ├── force_https = true
+│   └── min_machines_running = 1
+└── [[vm]]
+    └── size = "shared-cpu-1x"
+```
+
+**Dockerfile:** Multi-stage build (Elixir builder → runtime). Compiles assets, creates release, copies to minimal runtime image.
+
+### CI/CD Pipeline (GitHub Actions)
+
+Every push to `main` runs a two-job pipeline:
+
+```yaml
+jobs:
+  test:                    # Must pass before deploy
+    - setup-beam           # Elixir + OTP
+    - deps.get             # Install dependencies
+    - format --check       # Format enforcement
+    - credo --strict       # Lint enforcement
+    - compile --warnings   # Zero warnings
+    - test                 # Full test suite
+
+  deploy:                  # Only on main, after test passes
+    needs: test
+    - flyctl deploy --remote-only
+```
+
+PRs run the `test` job only (no deploy). The deploy job is gated on `github.ref == 'refs/heads/main'`.
+
+### Release Commands
+
+```bash
+fly deploy              # Deploy current code
+fly logs                # Stream production logs
+fly status              # Check app/machine status
+fly ssh console         # SSH into running machine
+fly postgres connect    # Connect to Fly Postgres
+```
 
 ---
 
-## 13. Anti-Patterns (PETAL-specific)
+## 13. Security Headers
+
+Every response includes security headers via a custom plug in `endpoint.ex`:
+
+```elixir
+defp security_headers(conn, _opts) do
+  conn
+  |> put_resp_header("strict-transport-security", "max-age=31536000; includeSubDomains")
+  |> put_resp_header("x-content-type-options", "nosniff")
+  |> put_resp_header("x-frame-options", "SAMEORIGIN")
+  |> put_resp_header("referrer-policy", "strict-origin-when-cross-origin")
+  |> put_resp_header("content-security-policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; " <>
+    "style-src 'self' 'unsafe-inline'; img-src 'self' data:; " <>
+    "font-src 'self'; connect-src 'self' wss:; frame-ancestors 'self'"
+  )
+end
+```
+
+**Notes:**
+- `unsafe-inline` is required for Phoenix LiveView and Tailwind
+- `wss:` in `connect-src` is required for LiveView WebSocket
+- The embed controller overrides `frame-ancestors` to allow iframe embedding: `frame-ancestors *`
+- HSTS is set to 1 year with `includeSubDomains`
+
+---
+
+## 14. Coverage Enforcement
+
+Test coverage is enforced via ExCoveralls:
+
+```elixir
+# mix.exs — project config
+test_coverage: [tool: ExCoveralls],
+preferred_cli_env: [coveralls: :test, "coveralls.detail": :test, "coveralls.html": :test]
+
+# mix.exs — deps
+{:excoveralls, "~> 0.18", only: :test}
+```
+
+```json
+// coveralls.json
+{
+  "minimum_coverage": 80,
+  "treat_no_relevant_lines_as_covered": true,
+  "skip_files": ["test/", "lib/bni_platform_web/telemetry.ex", ...]
+}
+```
+
+**Commands:**
+```bash
+mix coveralls                  # Coverage report to terminal
+mix coveralls.detail           # Line-level missing coverage
+mix coveralls.html             # HTML report in cover/
+```
+
+Target is 100% (per CLAUDE.md core rules). The `minimum_coverage` in coveralls.json is the hard gate — CI fails below this threshold.
+
+---
+
+## 15. Form Compliance
+
+All forms must pass the 9-dimension audit from `FORM_PATTERNS.md`:
+
+| Dimension | Key Requirements |
+|-----------|-----------------|
+| **layout** | Single column, logical grouping with `<fieldset>` + `<legend>` |
+| **labels** | Top-aligned, visible `<label>`, optional fields marked "(optional)" |
+| **validation** | Submit-only for short forms (<7 fields), reward-early-punish-late otherwise |
+| **errors** | Inline + error summary, multi-cue (icon + text + border), focus management |
+| **accessibility** | `novalidate` on form, `autocomplete` attributes, `aria-live` on error summary |
+| **mobile** | `type="tel"` / `type="email"`, min 48px touch targets, `autocomplete` |
+| **cta** | Outcome-focused text ("Reserve My Free Visit" not "Submit"), `phx-disable-with` loading state |
+| **trust** | Minimal fields, "(optional)" markers, post-submit clarity |
+| **performance** | No unnecessary `phx-change` validation, debounce if needed |
+
+**PETAL-specific form pattern:**
+
+```elixir
+# Use AshPhoenix.Form for Ash-backed forms
+form = AshPhoenix.Form.for_create(:register, as: "visitor", domain: BniPlatform.Visitors)
+
+# Template: novalidate, autocomplete, fieldset grouping, loading state
+<.form for={@form} phx-submit="register" novalidate>
+  <fieldset>
+    <legend class="text-sm font-semibold">Your Information</legend>
+    <.field field={@form[:name]} label="Full Name" required autocomplete="name" />
+    <.field field={@form[:email]} type="email" required autocomplete="email" />
+    <.field field={@form[:phone]} type="tel" required autocomplete="tel" />
+  </fieldset>
+
+  <button type="submit" class="btn btn-primary h-12" phx-disable-with="Saving...">
+    Reserve My Free Visit
+  </button>
+</.form>
+```
+
+**Embed forms** (non-LiveView) must use explicit `<label for="id">` attributes — Petal's `.field` component handles this automatically in LiveView, but static HTML forms need manual `for`/`id` binding.
+
+---
+
+## 16. Anti-Patterns (PETAL-specific)
 
 | Anti-Pattern | Do This Instead |
 |---|---|
@@ -811,3 +992,19 @@ Not in scope for slice 1 — development is local only. Deployment patterns will
 | Inline styles | Tailwind utility classes only |
 | Writing a hand-written mock module | Use Mox with the behaviour to generate mocks dynamically |
 | Using ExMachina insert/build with Ash resources | Use direct Ash action-based factory functions — ExMachina's Ecto strategy fails on Ash NotLoaded relationship structs |
+| Forms without `novalidate` attribute | Always add `novalidate` — HTML5 native validation is unreliable across assistive technologies |
+| Forms without `autocomplete` attributes | Always add `autocomplete="name"`, `autocomplete="email"`, `autocomplete="tel"`, etc. |
+| "Submit" button text | Use outcome-focused CTA: "Reserve My Free Visit", "Log In", "Create Account" |
+| Deploying without test gate | CI must run tests + credo + format before deploy |
+| Missing security headers | Every endpoint needs HSTS, CSP, X-Content-Type-Options at minimum |
+| `<label>` without `for` attribute in static HTML | Always bind `<label for="id">` to `<input id="id">` — WCAG 1.3.1 requirement |
+
+---
+
+## 17. Report Improvements
+
+Found a missing pattern, incorrect advice, or a better way? File a GitHub issue:
+
+**[Report a PETAL patterns improvement](https://github.com/trinsiklabs/cruxdev/issues/new?labels=patterns:petal&title=[PETAL]%20)**
+
+Use the `patterns:petal` label. CruxDev's issue monitoring system picks these up, evaluates them, and updates this document. All improvements flow through the BIP (Build-in-Public) pipeline — accepted changes generate a blog post and X announcement.

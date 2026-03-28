@@ -265,6 +265,48 @@ The playbook is stack-agnostic. Adapt these concepts to your stack:
 
 ---
 
+## Step 7: Feed Learnings Back into CruxDev
+
+**Every adoption improves the adoption process.** After completing the playbook, run this feedback loop:
+
+### 7a. Classifier improvement
+- Did the classifier detect this project's types correctly?
+- If not: add missing signals to `adoption/classify.rs` and add a test
+- New file patterns, directory names, or config files that indicate project types
+
+### 7b. Patterns improvement
+- Did any patterns doc have gaps exposed by this project?
+- Missing audit dimensions? Add them to `engine/router.rs` and wire into convergence
+- New project-type-specific dimensions? Document them
+- Update `ADOPTION_PROCESS.md` if the process itself had gaps
+
+### 7c. Template improvement
+- Were any templates missing for this project type?
+- Add new templates to `templates/` directory
+- Register them in the template discovery system
+
+### 7d. Non-software adoption path
+Not every project has code, tests, or CI. For non-software projects (books, businesses, courses, podcasts):
+
+| Software Step | Non-Software Equivalent |
+|---|---|
+| Test coverage | Manuscript tracking / content inventory |
+| Code audit (8 dimensions) | Content audit (voice, structure, completeness) |
+| CI/CD | Publishing pipeline / deployment |
+| Architecture | Project structure / information architecture |
+| E2E tests | Reader journey / user journey verification |
+| Coverage enforcement | Completeness tracking (all chapters, all modules) |
+
+### 7e. Blog post
+- Generate a blog post about what was learned during adoption
+- Include: what project type, what gaps were found, what was improved
+- Publish via BIP pipeline
+
+### 7f. File GitHub issue (if systemic)
+If the adoption exposed a pattern that affects ALL future adoptions, file a GitHub issue with the `adoption` label so it enters the priority queue.
+
+---
+
 ## Reference Paths
 
 | Resource | Path |

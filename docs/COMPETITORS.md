@@ -1,6 +1,6 @@
 # Competitors
 
-**Last Updated:** 2026-03-27 (45 build plans, 52 tools, 451 tests, 228 templates, harness positioning)
+**Last Updated:** 2026-03-27 (47 build plans, 52 tools, 451 tests, 228 templates, full harness competitive landscape)
 **Project:** CruxDev — Autonomous Convergence Harness
 **Research Method:** 5-pass iterative deepening per RESEARCH_PATTERNS.md
 **Category:** AI Harness Engineering — Autonomous Convergence subcategory
@@ -225,7 +225,7 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 
 | Name | Category | Why noted |
 |------|----------|-----------|
-| Claude Code | Execution substrate | We run on top of it. /loop + auto-accept, no convergence |
+| Cody (Sourcegraph) | Assistant | Context-aware, multi-repo search |
 | Cursor | IDE | Automations shipped March 2026. Self-driving is internal research |
 | Windsurf | IDE | Turbo Mode, 5 parallel agents, Devin merger |
 | Cline | VS Code agent | 59K stars, Plan/Act modes, no convergence |
@@ -246,22 +246,30 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 
 ## Feature Matrix
 
-| Feature | CruxDev | Superpowers | Backbeat | DeepSource | yoyo-evolve |
-|---------|:-------:|:-----------:|:--------:|:----------:|:-----------:|
-| Convergence detection (2 clean passes) | ✓ | — | — | — | — |
-| Multi-dimensional audit (8+5) | ✓ | — | 1 | 5 | — |
-| Autonomous execution | ✓ | Partial | ✓ | — | ✓ |
-| Safety gates (timeout/rollback/net-neg) | ✓ | Partial | Partial | — | Partial |
-| Cross-project coordination | ✓ | — | — | — | — |
-| Self-evolution pipeline | ✓ | — | — | — | ✓ |
-| Model tier routing + escalation | ✓ | — | — | — | — |
-| Doc alignment gate | ✓ | — | — | — | — |
-| Green-field execution | ✓ | ✓ | — | — | — |
-| Protected files enforcement | ✓ | — | — | — | — |
-| TDD enforcement | ✓ | ✓ | — | — | ✓ |
-| Research methodology (5-pass) | ✓ | — | — | — | — |
-| Session bus messaging | ✓ | — | — | — | — |
-| Open source | ✓ | ✓ | ✓ | Partial | ✓ |
+| Feature | CruxDev | Claude Code | Codex | Cursor | Manus | Superpowers | Backbeat | DeepSource | yoyo-evolve | DeepAgents |
+|---------|:-------:|:-----------:|:-----:|:------:|:-----:|:-----------:|:--------:|:----------:|:-----------:|:----------:|
+| Convergence detection (2 clean passes) | ✓ | — | — | — | — | — | — | — | — | — |
+| Multi-dimensional audit (39 dims) | ✓ | — | — | — | — | — | 1 | 5 | — | — |
+| LLM minimization (code drives loops) | ✓ | — | — | — | — | — | — | — | — | — |
+| Self-improvement (self-adoption) | ✓ | — | — | — | — | — | — | — | — | — |
+| Autonomous execution | ✓ | ✓ | ✓ | ✓ | ✓ | Partial | ✓ | — | ✓ | ✓ |
+| Multi-agent parallelism | — | ✓ | ✓ | ✓ | ✓ | — | — | — | — | ✓ |
+| Safety gates (timeout/rollback/net-neg) | ✓ | ✓ | ✓ | Partial | — | Partial | Partial | — | Partial | — |
+| Kernel-level sandboxing | — | — | ✓ | — | — | — | — | — | — | — |
+| Cross-project coordination | ✓ | — | — | — | — | — | — | — | — | — |
+| Self-evolution pipeline | ✓ | — | — | — | — | — | — | — | ✓ | — |
+| KV-cache-aware context engineering | — | — | — | — | ✓ | — | — | — | — | — |
+| Durable execution / checkpointing | — | — | — | — | — | — | — | — | — | ✓ |
+| Visual verification (screenshots) | — | — | — | ✓ | — | — | — | — | — | — |
+| Universal project types (18) | ✓ | — | — | — | — | — | — | — | — | — |
+| Doc alignment gate | ✓ | — | — | — | — | — | — | — | — | — |
+| TDD enforcement | ✓ | — | — | — | — | ✓ | — | — | ✓ | — |
+| Research methodology (5-pass) | ✓ | — | — | — | — | — | — | — | — | — |
+| MCP ecosystem (servers/tools) | 52 tools | 50+ curated | 20+ plugins | — | — | — | — | — | — | Hundreds |
+| Hook system (lifecycle events) | — | 12 events | — | — | — | — | — | — | — | — |
+| Voice input | — | ✓ | — | — | — | — | — | — | — | — |
+| Enterprise (HIPAA/SOC2/SSO) | — | ✓ | ✓ | — | — | — | — | ✓ | — | — |
+| Open source | ✓ | — | ✓ (CLI) | — | — | ✓ | ✓ | Partial | ✓ | ✓ |
 
 ---
 
@@ -292,11 +300,75 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 
 | Gap | Competitor | Classification | Status |
 |-----|-----------|---------------|--------|
+| KV-cache-aware context engineering | Manus | Must close | BP047 written, not started |
+| Durable execution / checkpointing | DeepAgents | Must close | BP047 written, not started |
+| Visual verification (screenshots) | Cursor | Should close (phased) | BP047 written, not started |
+| Multi-agent parallel execution | Claude Code, Codex | Should close | Not started |
+| Hook system (lifecycle events) | Claude Code | Should close | Not started |
+| Kernel-level sandboxing | Codex | Nice to have | Not started (Rust binary could use Seatbelt/Landlock) |
 | Skills auto-activate by context | Superpowers | Should close | Not started |
-| Anthropic marketplace inclusion | Superpowers | Should close | Not started |
 | Proven unattended evolution run | yoyo-evolve | Should close | Pipeline built, not yet run |
 | Cross-model validation (audit with different LLM) | COCO paper | Should close | Dispatch layer supports it, not wired |
 | Regression detection between passes | IEEE paper | Should close | Not started |
+| Post-convergence content pipeline | All (none have it) | Differentiator | Content pipeline built, not wired to convergence |
 | Audit trail UI/observability | Developer trust gap | Nice to have | State files exist, no UI |
-| 110K stars community | Superpowers | Intentional (build quality, community follows) | N/A |
-| Production dashboard | DeepSource | Nice to have | Not started |
+| 82K+ stars community | Claude Code | Intentional (build quality, community follows) | N/A |
+| Enterprise readiness (HIPAA/SOC2/SSO) | Claude Code, Codex | Future | Not started |
+
+---
+
+## Harness Competitors (New Category — Q1 2026)
+
+### Claude Code (Anthropic)
+- **URL:** https://code.claude.com
+- **GitHub:** ~82K stars (March 2026)
+- **Category:** Runtime coding harness (terminal-based)
+- **Revenue:** ~$2.5B annualized run rate (all Claude products, early 2026)
+- **Users:** 41-68% of developers actively using; 46% "most loved" (Pragmatic Engineer survey, 15K devs)
+- **Architecture:** Terminal agent with LLM-driven think-act-observe loop. Auto mode uses classifier model to gate each action. Agent Teams (research preview) enable multi-agent parallel execution in git worktrees. 1M token context window. MCP protocol for integrations (50+ curated, hundreds community).
+- **Strengths:** Massive ecosystem and community (82K stars, MCP standard adopted by OpenAI/Google), Agent Teams with git worktree isolation, sophisticated permission model (auto mode classifier + 12-event hook system), 1M token context, enterprise-ready (HIPAA, SOC2, SSO), voice input (20 languages), computer use/remote control, best blind code quality (wins 67% vs Codex 25%)
+- **Weaknesses:** No convergence detection (LLM self-assesses "done"), LLM drives the loop (no code-driven orchestration), rate limit instability (March 2026 "war log" of outages), confirmed context degradation in long sessions (instructions evaporate), ecosystem lock-in (Opus restricted from third-party), no self-improvement, no multi-dimensional audit, pricing opacity
+- **Our gap:** Multi-agent parallelism, hook system (12 lifecycle events), MCP ecosystem scale, enterprise readiness, voice input
+- **Our moat:** Autonomous convergence (mathematical "done" signal), LLM minimization, 39-dimension audit, self-improvement cycle, universal project types (18 vs code-only)
+- **Strategic position:** CruxDev is a convergence layer that runs ON TOP of Claude Code. Not competing — augmenting. Claude Code is execution-powerful but convergence-blind.
+
+### Codex (OpenAI)
+- **URL:** https://github.com/openai/codex
+- **GitHub:** ~67K stars (March 2026), 400 contributors, 640 releases
+- **Category:** Runtime coding harness (terminal CLI + cloud app)
+- **Architecture:** Stateless agent loop (full conversation shipped per request, no server-side state). OS-level sandboxing: Apple Seatbelt on macOS, Landlock LSM + seccomp BPF on Linux (deny-by-default, kernel-enforced). Cloud sandboxes: isolated containers per task, no network. Up to 6 concurrent subagents (explorer/worker/default roles). GPT-5.4 (1M context), GPT-5.3-Codex, Spark (1000+ tok/sec).
+- **Strengths:** Best-in-class kernel-level sandboxing (Seatbelt/Landlock/seccomp), fastest inference (Spark 1000+ tok/sec), cloud parallel execution (6 subagents in isolated containers), open source CLI, wins terminal/CLI benchmarks (75.1% vs 65.4%), 640 releases (extreme shipping velocity), 20+ curated plugins (launched March 26, 2026)
+- **Weaknesses:** No convergence detection, LLM drives the loop, weak on frontend/React tasks, quadratic prompt growth (stateless = full history per request), cache fragility (tool/model changes invalidate), smaller plugin ecosystem (20 vs hundreds), rate limit frustration (5-hour rolling windows), loses 67% of blind code quality comparisons vs Claude
+- **Our gap:** Kernel-level sandboxing, cloud sandbox pattern, parallel subagents, shipping velocity
+- **Our moat:** Autonomous convergence, LLM minimization, 39-dimension audit, self-improvement, universal project types
+- **Strategic position:** CruxDev augments Codex the same way it augments Claude Code. Codex is execution-fast but convergence-blind.
+
+### Cursor
+- **URL:** https://cursor.com
+- **Category:** IDE-integrated harness
+- **Revenue:** $2B ARR (March 2026), 1M+ daily active users
+- **Architecture:** VS Code fork with inline completions (Fusion model), Composer agent mode (8 parallel agents), Cloud Agents (autonomous VMs with browser/terminal)
+- **Strengths:** Best developer UX (IDE-native), self-testing agents (start app, interact, screenshot, video), cloud VM isolation, multi-model, tab autocomplete, 30% of their own PRs from cloud agents
+- **Weaknesses:** No convergence concept, no safety gates, reliability issues (data loss reports), context inflation (200K advertised, 70-120K usable), code quality at scale, closed source
+- **Our gap:** Self-testing with visual verification, IDE integration (but CruxDev plugs INTO Cursor via MCP)
+- **Our moat:** Autonomous convergence, LLM minimization, multi-dimensional audit, self-improvement
+
+### Manus
+- **URL:** https://manus.im (acquired by Meta, Dec 2025, $2B)
+- **Category:** General-purpose task harness
+- **Architecture:** Multi-agent (Planner → Executor), context engineering mastery (KV-cache optimization, append-only context, tool masking, error preservation)
+- **Strengths:** Best context engineering in the industry, 4x speed improvement through architecture alone, $125M+ ARR, empirically proven harness > model (5 rewrites, same model, each better)
+- **Weaknesses:** Acquired by Meta (independence lost), closed source, not code-specific, no convergence guarantee
+- **Our gap:** KV-cache-aware context engineering, controlled variation to prevent drift
+- **Our moat:** Autonomous convergence, code-specific multi-dimensional audit, open source, self-improvement
+
+### DeepAgents (LangChain)
+- **URL:** https://github.com/langchain-ai/deepagents
+- **Stars:** 17,796
+- **Category:** General-purpose harness built on LangGraph
+- **Architecture:** Middleware stack (TodoList + Filesystem + SubAgents), pluggable backends, durable execution via LangGraph checkpointing
+- **Strengths:** Best composability (middleware mix-and-match), durable execution (crash recovery), model-agnostic, LangChain ecosystem (hundreds of integrations), open source
+- **Weaknesses:** Abstraction tax (3 layers), young (v0.2), no convergence concept, high token cost
+- **Our gap:** Durable mid-task checkpointing, pluggable storage backends, ecosystem breadth
+- **Our moat:** Autonomous convergence, LLM minimization, safety gates, self-improvement
+

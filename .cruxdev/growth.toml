@@ -6,8 +6,8 @@ description = "Autonomous convergence framework for AI-driven development"
 
 [typefully]
 api_key_env = "TYPEFULLY_API_KEY"
+social_set_id = 288244
 max_posts_per_day = 3
-threadify_releases = true
 enabled = true
 
 [github]
@@ -17,8 +17,8 @@ issue_dry_run = true
 release_creation_enabled = false
 
 [content]
-website_repo = ""
-blog_dir = ""
+website_repo = "/Users/user/personal/cruxdev-dev"
+blog_dir = "/Users/user/personal/cruxdev-dev/src/pages/blog"
 vs_dir = "docs/vs"
 
 [metrics]
@@ -29,7 +29,7 @@ collection_interval_minutes = 60
 [readme]
 auto_optimize = true
 test_count_source = "cargo test"
-tool_count = 52
+tool_count = 55
 
 [llms_txt]
 auto_update = true
@@ -50,6 +50,9 @@ methodology_docs = [
     "COMPETITORS_PATTERN.md",
     "GROWTH_STRATEGY.md",
     "GROWTH_CYCLE_PUBLIC_INTERACTIONS.md",
+    "DRY_UI_COMPONENT_PATTERNS.md",
+    "DEVELOPMENT_PATTERNS_PETAL.md",
+    "DEVELOPMENT_PATTERNS_PADL.md",
 ]
 
 [ecosystem]
