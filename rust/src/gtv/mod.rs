@@ -2,6 +2,7 @@
 //!
 //! If CruxDev says it on a public page, it must be TRUE RIGHT NOW.
 
+pub mod cache;
 pub mod scanner;
 pub mod verifier;
 

@@ -32,6 +32,7 @@ pub const MOBILE_WEB_DIMENSIONS: &[&str] = &["touch_targets", "responsive_layout
 pub const GEO_DIMENSIONS: &[&str] = &["llms_txt", "structured_data", "bing_indexed", "ai_crawler_access", "content_citability", "geo_monitoring"];
 pub const UAT_TEST_DIMENSIONS: &[&str] = &["role_coverage", "acceptance_criteria", "edge_cases", "data_integrity", "workflow_completeness"];
 pub const BDD_DIMENSIONS: &[&str] = &["feature_coverage", "scenario_quality", "step_reuse", "living_doc_freshness", "gherkin_code_traceability"];
+pub const GTV_DIMENSIONS: &[&str] = &["file_existence", "compilation", "test_execution", "url_accessibility", "link_integrity", "stat_accuracy", "api_connectivity", "config_validity", "claim_verification"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {

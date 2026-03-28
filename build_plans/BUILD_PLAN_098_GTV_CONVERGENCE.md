@@ -1,6 +1,6 @@
 # BUILD_PLAN_098: Ground Truth Verification to Convergence
 
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Priority:** Critical (correctness foundation for Crux Bot)
 
 ## Context
@@ -96,6 +96,25 @@ Verify every claim made during convergence:
 - Star counts are recent (not from 3 months ago)
 - Pricing is current
 - URLs resolve
+
+## Files
+
+- `rust/src/gtv/cache.rs` — GTV cache with TTL per check type
+- `rust/src/gtv/mod.rs` — extend with GtvCheck, GtvResult, cache types (already exists)
+- `rust/src/engine/router.rs` — add GTV_DIMENSIONS constant
+- `rust/src/engine/convergence.rs` — add GTV_PRE and GTV_POST phases
+- `rust/src/server.rs` — wire GTV phases into convergence tool responses
+
+## Tests
+
+- [ ] test_gtv_cache_stores_and_retrieves
+- [ ] test_gtv_cache_ttl_expiry
+- [ ] test_gtv_cache_invalidation_on_file_change
+- [ ] test_gtv_pre_blocks_on_failure
+- [ ] test_gtv_post_verifies_claims
+- [ ] test_gtv_dimensions_in_router
+- [ ] test_gtv_force_bypasses_cache
+- [ ] test_gtv_cache_persistence_roundtrip
 
 ## Implementation for Crux Bot
 
