@@ -143,3 +143,50 @@ A single Rust binary that:
 - Can be stopped at any time safely
 
 **That's the CruxDev bot.**
+
+## Phase 7: Self-Evolution
+
+The bot doesn't just run tasks — it evolves itself.
+
+```
+Core evolution loop:
+1. OBSERVE — what went wrong? what took too long? what patterns repeated?
+2. DIAGNOSE — extract the root cause (missing pattern? missing dimension? missing template?)
+3. PLAN — write a build plan to fix the root cause
+4. CONVERGE — converge its own build plan (self-modifying code)
+5. VERIFY — run all tests, verify nothing regressed
+6. ADOPT — self-adoption: check if the fix improves the system
+7. ANNOUNCE — blog + X post about the self-improvement
+```
+
+### What Self-Evolution Looks Like
+
+| Observation | Self-Written Build Plan | Result |
+|---|---|---|
+| "Book audits keep flagging voice drift" | BP: Add voice fingerprinting dimension | New audit catches drift earlier |
+| "Astro pages fail with bare braces in JSON" | BP: Add JSON escaping to page generator | No more build failures |
+| "Evolution loop spammed 6000 posts" | BP: Add dedup + max-actions-per-cycle | Spam prevented |
+| "Form patterns missing label positioning" | BP: Research and add 10 form design sections | Better form audits |
+| "Typefully API returns 403" | BP: Research v2 API, fix social_set_id | Typefully working |
+
+Every one of those happened THIS SESSION. The bot already self-evolved — it just did it through a human-mediated Claude Code session instead of autonomously.
+
+### Safety for Self-Modification
+
+- All self-modifications on feature branches (never main)
+- PRs created, human reviews before merge
+- Full test suite must pass before PR is created
+- Rollback if tests fail after merge
+- Self-modification budget: max 3 self-evolution plans per day
+- Architecture tests verify core invariants survive modification
+- "Protected files" list: core engine files require human approval
+
+### The Compounding Advantage
+
+Each self-evolution cycle makes the next cycle better:
+- Better patterns → better audits → fewer issues → faster convergence
+- Better templates → better project setup → fewer adoption problems
+- Better classifiers → better dimension selection → more relevant audits
+- Better safety gates → fewer failures → more trust → more autonomy
+
+**No other bot does this.** AutoGPT loops. Devin runs once. Sweep fixes one issue. Crux Bot fixes the issue AND improves its ability to fix similar issues forever.
