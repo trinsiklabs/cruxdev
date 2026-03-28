@@ -1,6 +1,6 @@
 # BUILD_PLAN_087: Live Terminal Viewer — Watch CruxDev Work
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
 **Priority:** High (marketing + transparency)
 **Triggered by:** User wants visitors to see CruxDev working autonomously in real-time
 
