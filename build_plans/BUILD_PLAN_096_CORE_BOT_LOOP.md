@@ -1,6 +1,6 @@
 # BUILD_PLAN_096: Core Bot Loop — Software-Driven Continuous Agent
 
-**Status:** NOT STARTED
+**Status:** CONVERGED (implemented in cruxbot/src/ — core.rs daemon loop, cycle.rs full wake, sentinel.rs zero-cost watcher)
 **Priority:** Critical (THE product)
 **Depends on:** BP095 (bot architecture)
 
