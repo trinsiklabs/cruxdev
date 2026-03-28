@@ -41,7 +41,7 @@ The engine handles everything: plan audit, doc alignment, viability check, TDD e
 ## Numbers
 
 - **520 tests** (502 unit + 18 E2E), clippy clean
-- **63 MCP tools** — convergence, research, competitors, adoption, git, growth, issue monitoring, GTV scanning
+- **65 MCP tools** — convergence, research, competitors, adoption, git, growth, issue monitoring, GTV scanning
 - **137 audit dimensions** across 21 dimension sets
 - **55+ pattern documents** (45,000+ lines of stack-specific patterns)
 - **Single Rust binary** (5.1MB)
