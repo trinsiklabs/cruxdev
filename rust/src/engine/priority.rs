@@ -295,6 +295,14 @@ fn scan_self_adoption(project_dir: &str) -> Vec<WorkItem> {
         ("CROSS_MODEL_VALIDATION", "CODE_DIMENSIONS"),
         ("POST_DEPLOYMENT", "POST_DEPLOYMENT_DIMENSIONS"),
         ("COLOR_CONTRAST", "COLOR_CONTRAST_DIMENSIONS"),
+        ("SKILLS_AUTO_ACTIVATION", "SKILL_DIMENSIONS"),
+        ("MULTI_AGENT", "CODE_DIMENSIONS"),
+        ("VISUAL_VERIFICATION", "E2E_TEST_DIMENSIONS"),
+        ("KERNEL_SANDBOXING", "CODE_DIMENSIONS"),
+        ("LIFECYCLE_HOOK", "CODE_DIMENSIONS"),
+        ("REGRESSION_DETECTION", "CODE_DIMENSIONS"),
+        ("MOBILE_WEB", "MOBILE_WEB_DIMENSIONS"),
+        ("GEO", "GEO_DIMENSIONS"),
     ];
 
     if let Ok(entries) = std::fs::read_dir(&docs_dir) {
