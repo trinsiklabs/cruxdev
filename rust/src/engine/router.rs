@@ -33,6 +33,7 @@ pub const GEO_DIMENSIONS: &[&str] = &["llms_txt", "structured_data", "bing_index
 pub const UAT_TEST_DIMENSIONS: &[&str] = &["role_coverage", "acceptance_criteria", "edge_cases", "data_integrity", "workflow_completeness"];
 pub const BDD_DIMENSIONS: &[&str] = &["feature_coverage", "scenario_quality", "step_reuse", "living_doc_freshness", "gherkin_code_traceability"];
 pub const GTV_DIMENSIONS: &[&str] = &["file_existence", "compilation", "test_execution", "url_accessibility", "link_integrity", "stat_accuracy", "api_connectivity", "config_validity", "claim_verification"];
+pub const LLM_CALL_DIMENSIONS: &[&str] = &["call_classification", "convergence_strategy", "schema_validation", "prompt_injection_defense", "cost_awareness", "confabulation_detection"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -263,6 +264,18 @@ fn detect_media_project(project_dir: &str) -> bool {
     markers.iter().any(|m| root.join(m).exists() || root.join(m).is_dir())
 }
 
+/// Detect if project makes LLM calls (has LLM client, API keys, or LLM architecture docs).
+fn detect_llm_calls(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let markers = [
+        "src/llm.rs", "src/llm", "lib/llm",
+        "docs/LLM_INTERACTION_ARCHITECTURE.md",
+        "docs/LLM_CALL_CONVERGENCE_PATTERNS.md",
+        "src/dispatch", "lib/dispatch",
+    ];
+    markers.iter().any(|m| root.join(m).exists() || root.join(m).is_dir())
+}
+
 /// Detect if project is deployable (has deployment config).
 fn detect_deployable(project_dir: &str) -> bool {
     let root = Path::new(project_dir);
@@ -435,6 +448,10 @@ pub fn get_next_task(
             // Business dimensions
             if detect_business_project(&proj_dir) {
                 for dim in BUSINESS_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // LLM call safety dimensions (projects that make LLM calls)
+            if detect_llm_calls(&proj_dir) {
+                for dim in LLM_CALL_DIMENSIONS { dims.push((*dim).into()); }
             }
             // Security dimension requires frontier model; standard otherwise
             let tier = if dims.contains(&"security".to_string()) { "frontier" } else { "standard" };
@@ -830,6 +847,7 @@ mod tests {
             "UI_COMPONENT_DIMENSIONS",
             "COLOR_CONTRAST_DIMENSIONS",
             "LOGO_DIMENSIONS",
+            "LLM_CALL_DIMENSIONS",
         ];
 
         for dim_set in &dimension_sets {
