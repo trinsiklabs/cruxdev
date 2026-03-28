@@ -34,7 +34,7 @@ Per BLOG_POST_PATTERNS.md:
 ---
 layout: ../../layouts/BlogPost.astro
 title: "[Action verb] — [What was done]"
-date: "[ISO 8601 datetime]"
+date: "USE $(date +%Y-%m-%dT%H:%M) — actual system time, NEVER guess"
 slug: "[YYYYMMDD-kebab-case-slug]"
 tags: ["relevant", "tags"]
 summary: "[1-2 sentence summary with key metrics]"
@@ -54,6 +54,7 @@ summary: "[1-2 sentence summary with key metrics]"
 ```
 
 ### Rules
+- **Date MUST use system time**: run `date +%Y-%m-%dT%H:%M` and use that exact output. NEVER guess, estimate, or hardcode a time. The system clock is the source of truth.
 - Title starts with action verb (Built, Fixed, Shipped, Added, Converged)
 - Summary includes at least one numeric metric
 - Ground Truth section verifies claims against reality (GTV)
