@@ -276,14 +276,40 @@ fn scan_self_adoption(project_dir: &str) -> Vec<WorkItem> {
 
     let router_content = std::fs::read_to_string(&router_path).unwrap_or_default();
 
+    // Patterns docs covered by a different dimension set (not false positives)
+    let covered_aliases: &[(&str, &str)] = &[
+        ("X_POST", "CONTENT_DIMENSIONS"),
+        ("BLOG_POST", "CONTENT_DIMENSIONS"),
+        ("BLOG_TAGGING", "CONTENT_DIMENSIONS"),
+        ("BLOG_PAGINATION", "CONTENT_DIMENSIONS"),
+        ("DRY_UI_COMPONENT", "UI_COMPONENT_DIMENSIONS"),
+        ("WEBSITE_LOGO", "LOGO_DIMENSIONS"),
+        ("AI_SKILLS", "SKILL_DIMENSIONS"),
+        ("RESEARCH", "CONTENT_DIMENSIONS"),
+        ("AUTONOMOUS_SELF_IMPROVEMENT", "PLAN_DIMENSIONS"),
+        ("KV_CACHE", "CODE_DIMENSIONS"),
+        ("COMPETITORS", "BUSINESS_DIMENSIONS"),
+        ("BLOG", "CONTENT_DIMENSIONS"),
+    ];
+
     if let Ok(entries) = std::fs::read_dir(&docs_dir) {
         for entry in entries.flatten() {
             let name = entry.file_name().to_string_lossy().to_string();
             if name.contains("PATTERNS") && name.ends_with(".md") && !name.contains("DEVELOPMENT_PATTERNS") {
-                // Check if this patterns doc has corresponding dimensions in router
                 let stem = name.replace("_PATTERNS.md", "").replace(".md", "");
                 let dim_name = format!("{}_DIMENSIONS", stem.to_uppercase());
-                if !router_content.contains(&dim_name) {
+
+                // Check if covered by an alias
+                let is_aliased = covered_aliases.iter().any(|(pat, dim)| {
+                    stem.to_uppercase() == *pat && router_content.contains(dim)
+                });
+
+                if is_aliased || router_content.contains(&dim_name) {
+                    continue; // Covered — skip
+                }
+
+                // Genuinely missing
+                {
                     items.push(WorkItem {
                         source: "self_adoption".into(),
                         title: format!("{name} has no {dim_name} in router"),
