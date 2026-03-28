@@ -1,6 +1,6 @@
 # BUILD_PLAN_097: Crux Bot — New Project
 
-**Status:** NOT STARTED
+**Status:** CONVERGED (project exists at /Users/user/personal/cruxbot/)
 **Priority:** Critical (THE product)
 
 ## What Is Crux Bot

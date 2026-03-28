@@ -84,8 +84,8 @@ CruxVibe Platform
 
 ## Phase 0: Project Setup
 
-- [ ] 0.1 Phoenix project: `mix phx.new cruxvibe --live --no-dashboard`
-- [ ] 0.2 Add deps: ash, ash_postgres, ash_authentication, ash_phoenix, oban, stripity_stripe
+- [x] 0.1 Phoenix project: `mix phx.new cruxvibe --live --no-dashboard`
+- [x] 0.2 Add deps: ash, ash_postgres, ash_authentication, ash_phoenix, oban, stripity_stripe
 - [ ] 0.3 Configure Ash domains, Ecto repos, tenant context
 - [ ] 0.4 Multi-tenant setup per MULTI_TENANT_PATTERNS.md (shared DB + tenant_id + RLS)
 - [ ] 0.5 Stripe Connect setup per STRIPE_CONNECT_PATTERNS.md (Express accounts)

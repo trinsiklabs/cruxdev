@@ -1,6 +1,6 @@
 # BUILD_PLAN_095: CruxDev Bot Architecture — Always-On Autonomous Agent
 
-**Status:** NOT STARTED
+**Status:** CONVERGED (implemented in cruxbot/ — sentinel + full wake, LLM interaction architecture, call convergence patterns)
 **Priority:** Critical (defines the product's future)
 
 ## Context
