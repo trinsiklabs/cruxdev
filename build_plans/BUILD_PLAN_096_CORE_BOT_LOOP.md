@@ -83,13 +83,22 @@ loop {
 | Decision making | LLM decides everything | Engine decides structure, LLM does language |
 | Running time | Per session (hours) | Continuous (days/weeks/months) |
 
-## Phase 1: Direct LLM API Client
+## Phase 1: Multi-Provider LLM Client
 
-- [ ] 1.1 Add Anthropic API client to Rust binary (already have dispatch/anthropic.rs)
-- [ ] 1.2 `llm::call(prompt, tier) -> String` — call Claude API, handle rate limits, retries
-- [ ] 1.3 Tier routing: frontier for security, standard for code, fast for docs
-- [ ] 1.4 KV-cache optimization: stable prompt prefix, append-only context
-- [ ] 1.5 Cost tracking: log tokens per call, per convergence, per day
+Leverage CruxCLI's existing provider infrastructure (Anthropic, OpenAI, OpenRouter, local LLM).
+
+- [ ] 1.1 Import provider architecture from CruxCLI: API key management, model routing, auth
+- [ ] 1.2 Model optimization by task tier:
+  - **Core loop** (CHECK/PRIORITIZE/REFLECT): local LLM or cheapest (Haiku, Gemini Flash, local Llama)
+  - **Auditing**: standard (Sonnet) — workhorse
+  - **Security/architecture**: frontier (Opus) — highest capability
+  - **Content generation**: standard (Sonnet)
+  - **GTV checks**: code-only or cheapest (parse output, call APIs, check files — often no LLM needed)
+- [ ] 1.3 Cost tracking: per-call, per-convergence, per-day, per-model breakdown
+- [ ] 1.4 Auto-downgrade: if daily budget hit, switch to cheaper models or pause
+- [ ] 1.5 Local LLM fallback: if API down or rate-limited, use local for non-critical tasks
+- [ ] 1.6 Performance/cost efficiency scoring: track which model gives best results per dollar
+- [ ] 1.7 KV-cache optimization: stable prefix, append-only context
 
 ## Phase 2: Autonomous Task Execution
 

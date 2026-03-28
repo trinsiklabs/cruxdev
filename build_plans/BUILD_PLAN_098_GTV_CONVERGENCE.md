@@ -180,6 +180,48 @@ After EVERY convergence cycle:
   4. Only declare converged when ALL claims pass GTV
 ```
 
+## GTV Cache — Don't Re-Verify What Was Just Verified
+
+GTV checks are expensive (API calls, HTTP requests, test runs). Cache results with TTL:
+
+```rust
+pub struct GtvCache {
+    checks: HashMap<String, GtvCacheEntry>,
+}
+
+pub struct GtvCacheEntry {
+    result: GtvResult,
+    verified_at: DateTime,
+    ttl: Duration,
+}
+```
+
+### TTL by Check Type
+
+| Check Type | TTL | Rationale |
+|---|---|---|
+| File existence | 5 minutes | Files change during convergence |
+| Test execution | 10 minutes | Tests don't change between rounds |
+| URL accessibility | 1 hour | Websites don't go down frequently |
+| API connectivity | 30 minutes | APIs are stable short-term |
+| Stat accuracy | Per convergence | Stats change when code changes |
+| Competitor info | 7 days | Competitor features change slowly |
+| Link integrity | 1 hour | Links don't break often |
+
+### Cache Rules
+
+1. GTV_PRE can use cached results if within TTL
+2. GTV_POST always runs fresh for claims made THIS convergence
+3. Cache is per-project, persisted to `.cruxdev/gtv_cache.json`
+4. Cache is invalidated when relevant files change (file watcher)
+5. `--force-gtv` flag bypasses cache for full re-verification
+6. Stale cache entries are logged as warnings, not errors
+
+### Cost Impact
+
+Without cache: every convergence cycle runs 20-50 GTV checks (~30 seconds)
+With cache: first cycle runs all, subsequent cycles run 3-5 (changed items only)
+
 ## This Is What Makes the Bot Reliable
 
 AutoGPT says "done" when the LLM says done.
