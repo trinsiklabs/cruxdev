@@ -300,14 +300,14 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 
 | Gap | Competitor | Classification | Status |
 |-----|-----------|---------------|--------|
-| KV-cache-aware context engineering | Manus | Must close | BP047 written, not started |
-| Durable execution / checkpointing | DeepAgents | Must close | BP047 written, not started |
+| KV-cache-aware context engineering | Manus | Must close | **CLOSED** — BP049 converged, KV_CACHE_PATTERNS.md |
+| Durable execution / checkpointing | DeepAgents | Must close | **CLOSED** — BP050 converged, checkpoint after every round |
 | Visual verification (screenshots) | Cursor | Should close (phased) | BP047 written, not started |
 | Multi-agent parallel execution | Claude Code, Codex | Should close | Not started |
 | Hook system (lifecycle events) | Claude Code | Should close | Not started |
 | Kernel-level sandboxing | Codex | Nice to have | Not started (Rust binary could use Seatbelt/Landlock) |
 | Skills auto-activate by context | Superpowers | Should close | Not started |
-| Proven unattended evolution run | yoyo-evolve | Should close | Pipeline built, not yet run |
+| Proven unattended evolution run | yoyo-evolve | Should close | **CLOSED** — BP056 converged, cron every 4 hours |
 | Cross-model validation (audit with different LLM) | COCO paper | Should close | Dispatch layer supports it, not wired |
 | Regression detection between passes | IEEE paper | Should close | Not started |
 | Post-convergence content pipeline | All (none have it) | Differentiator | Content pipeline built, not wired to convergence |

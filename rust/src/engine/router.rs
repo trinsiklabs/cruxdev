@@ -27,6 +27,8 @@ pub const UI_COMPONENT_DIMENSIONS: &[&str] = &["variant_consistency", "token_usa
 pub const COLOR_CONTRAST_DIMENSIONS: &[&str] = &["wcag_aa_compliance", "color_system_consistency", "dark_mode_parity", "semantic_tokens", "focus_visibility"];
 pub const LOGO_DIMENSIONS: &[&str] = &["viewbox_optimization", "favicon_set", "dark_light_variants", "size_legibility"];
 pub const POST_DEPLOYMENT_DIMENSIONS: &[&str] = &["health_endpoint", "smoke_tests", "ssl_verification", "asset_integrity", "rollback_plan", "notifications", "migration_check"];
+pub const E2E_TEST_DIMENSIONS: &[&str] = &["critical_paths", "user_journeys", "cross_browser", "error_scenarios", "performance", "accessibility"];
+pub const UAT_TEST_DIMENSIONS: &[&str] = &["role_coverage", "acceptance_criteria", "edge_cases", "data_integrity", "workflow_completeness"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -545,10 +547,24 @@ pub fn get_next_task(
                 advance_to(state, state_path, ConvergencePhase::PatternsUpdate);
                 return get_next_task(state, state_path, source_files, doc_files, test_command);
             }
+            let mut dims: Vec<String> = Vec::new();
+            let proj_dir = resolve_proj_dir(state);
+            // Add E2E test dimensions if project has E2E tests
+            let has_e2e = std::path::Path::new(&proj_dir).join("docs/E2E_TEST_PATTERNS.md").exists()
+                || std::path::Path::new(&proj_dir).join("tests/e2e").is_dir()
+                || std::path::Path::new(&proj_dir).join("e2e").is_dir()
+                || std::path::Path::new(&proj_dir).join("test/e2e").is_dir();
+            if has_e2e {
+                for dim in E2E_TEST_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            let has_uat = std::path::Path::new(&proj_dir).join("docs/UAT_TEST_PATTERNS.md").exists();
+            if has_uat {
+                for dim in UAT_TEST_DIMENSIONS { dims.push((*dim).into()); }
+            }
             Task {
                 task_type: "test".into(),
                 description: format!("Run the full test suite (round {}).", state.round),
-                files: vec![], dimensions: vec![], finding: None,
+                files: vec![], dimensions: dims, finding: None,
                 test_command: test_command.map(|tc| tc.to_vec()),
                 metadata: None,
                 recommended_tier: Some("fast".into()),
