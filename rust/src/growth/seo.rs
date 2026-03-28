@@ -60,7 +60,7 @@ pub async fn check_seo_health(domain: &str) -> SeoHealthReport {
     checks.push(check_header(&client, &base, "Cloudflare proxy active", "cf-ray").await);
 
     // 8. Key pages return 200
-    let key_pages = ["/engine", "/methodology", "/vs/", "/guides/quick-install", "/blog/"];
+    let key_pages = ["/engine", "/methodology", "/vs/", "/docs/quickstart", "/blog/"];
     for page in &key_pages {
         checks.push(check_url_status(&client, &format!("{base}{page}"), &format!("{page} returns 200")).await);
     }
