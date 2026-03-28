@@ -1,7 +1,7 @@
 # BUILD_PLAN_002: Mixed Model Routing
 
 **Created:** 2026-03-20
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Goal:** Implement intelligent model routing across the Crux ecosystem — escalation on failure, task-complexity routing, mode→model mapping, and cost-aware selection.
 
 **Constraint:** Changes touch three repos (Crux, CruxCLI, CruxDev). Each must pass its own test suite.

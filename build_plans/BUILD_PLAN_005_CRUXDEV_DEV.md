@@ -1,7 +1,7 @@
 # BUILD_PLAN_005: cruxdev.dev — CruxDev Convergence Framework Website
 
 **Created:** 2026-03-22
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Goal:** Build the documentation and methodology site for CruxDev — the autonomous convergence framework.
 **Methodology:** Follow `docs/WEBSITE_PLANNING.md`. SEO details in `docs/SEO_AND_GEO_REFERENCE.md`.
 

@@ -60,7 +60,7 @@
 
 **Purpose:** The `**Status:**` line in build plan markdown must reflect actual engine state.
 
-- [ ] 4.1 When convergence starts, update plan file `**Status:** NOT STARTED` → `**Status:** CONVERGED`
+- [ ] 4.1 When convergence starts, update plan file `**Status:** CONVERGED` → `**Status:** CONVERGED`
 - [ ] 4.2 When convergence completes, update → `**Status:** CONVERGED`
 - [ ] 4.3 When escalated, update → `**Status:** ESCALATED`
 - [ ] 4.4 Use regex replacement — don't rewrite the whole file

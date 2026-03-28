@@ -1,7 +1,7 @@
 # BUILD_PLAN_006: CruxDev Status Command
 
 **Created:** 2026-03-22
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Goal:** Build a `cruxdev_status` MCP tool and `/cruxdev-status` slash command that verifies everything is wired and working correctly — parallel to Crux's `crux status` command.
 
 **Rule:** TDD. Tests before code. 100% coverage.
