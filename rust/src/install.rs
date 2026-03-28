@@ -42,14 +42,22 @@ pub fn install(project_dir: &str) -> serde_json::Value {
     // Install pre-commit hook
     install_secret_scanner(project_dir);
 
+    // Copy skills and commands for slash command support
+    let skills_installed = install_skills_and_commands(project_dir);
+
+    let mut items = vec![
+        format!("Created .cruxdev/ in {project_dir}"),
+        "Added cruxdev to .mcp.json".into(),
+        "Updated .gitignore with security patterns".into(),
+        "Installed pre-commit secret scanner".into(),
+    ];
+    if skills_installed {
+        items.push("Installed .claude/skills/ and .claude/commands/ for slash commands".into());
+    }
+
     json!({
         "status": "installed",
-        "items": [
-            format!("Created .cruxdev/ in {project_dir}"),
-            "Added cruxdev to .mcp.json",
-            "Updated .gitignore with security patterns",
-            "Installed pre-commit secret scanner",
-        ]
+        "items": items
     })
 }
 
@@ -107,6 +115,86 @@ fi
         return true;
     }
     false
+}
+
+/// Copy .claude/skills/ and .claude/commands/ from the CruxDev source directory
+/// into the target project, giving it slash command support.
+fn install_skills_and_commands(project_dir: &str) -> bool {
+    // Find the CruxDev source directory (parent of the binary's rust/ dir, or known path)
+    let cruxdev_src = find_cruxdev_source();
+    let Some(src_root) = cruxdev_src else {
+        return false;
+    };
+
+    let src_skills = src_root.join(".claude/skills");
+    let src_commands = src_root.join(".claude/commands");
+    let dst_root = Path::new(project_dir);
+
+    if !src_skills.is_dir() && !src_commands.is_dir() {
+        return false;
+    }
+
+    let mut installed = false;
+
+    // Copy skills
+    if src_skills.is_dir() {
+        let dst_skills = dst_root.join(".claude/skills");
+        if copy_dir_recursive(&src_skills, &dst_skills).is_ok() {
+            installed = true;
+        }
+    }
+
+    // Copy commands
+    if src_commands.is_dir() {
+        let dst_commands = dst_root.join(".claude/commands");
+        if copy_dir_recursive(&src_commands, &dst_commands).is_ok() {
+            installed = true;
+        }
+    }
+
+    installed
+}
+
+/// Find the CruxDev source directory.
+fn find_cruxdev_source() -> Option<std::path::PathBuf> {
+    // Try: binary is at cruxdev/rust/target/release/cruxdev → source is cruxdev/
+    if let Ok(exe) = std::env::current_exe() {
+        // Walk up from the exe to find a directory with .claude/skills/
+        let mut path = exe.as_path();
+        for _ in 0..6 {
+            if let Some(parent) = path.parent() {
+                if parent.join(".claude/skills").is_dir() {
+                    return Some(parent.to_path_buf());
+                }
+                path = parent;
+            }
+        }
+    }
+
+    // Fallback: well-known path
+    let home = std::env::var("HOME").unwrap_or_default();
+    let known = Path::new(&home).join("personal/cruxdev");
+    if known.join(".claude/skills").is_dir() {
+        return Some(known);
+    }
+
+    None
+}
+
+/// Recursively copy a directory.
+fn copy_dir_recursive(src: &Path, dst: &Path) -> std::io::Result<()> {
+    fs::create_dir_all(dst)?;
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let src_path = entry.path();
+        let dst_path = dst.join(entry.file_name());
+        if src_path.is_dir() {
+            copy_dir_recursive(&src_path, &dst_path)?;
+        } else {
+            fs::copy(&src_path, &dst_path)?;
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]
