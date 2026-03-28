@@ -67,6 +67,19 @@ cruxdev/
 - **3 failed attempts → auto-rollback** to last known good state
 - **15-min timeout per task** to prevent infinite loops
 
+## Autonomous Mode — CONTINUOUS EXECUTION
+
+**NEVER STOP WORKING unless the user tells you to stop or you hit a genuine blocker requiring human input.**
+
+After every action you complete:
+1. If a convergence is in progress → submit the next result
+2. If a convergence just completed → commit, push, write blog post, deploy
+3. If nothing is in progress → call `prioritize_work` and start the top item
+4. If background agents completed → process their results immediately
+5. If blocked on another project → file a GitHub issue, move to next item
+
+**Do not pause. Do not summarize and wait. Do not ask "what's next?" — the priority engine tells you what's next. Grab it and go.**
+
 ## Session Protocol
 
 1. Read this file (you're doing it now)

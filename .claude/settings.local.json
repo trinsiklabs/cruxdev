@@ -126,7 +126,10 @@
       "Bash(curl -s -X POST \"https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache\" -H \"Authorization: Bearer $CLOUDFLARE_API_TOKEN\" -H \"Content-Type: application/json\" --data '{\"\"\"\"purge_everything\"\"\"\":true}')",
       "Bash(curl -s https://www.cruxdev.dev/blog/20260328-post-deployment-verification/)",
       "mcp__cruxdev__check_seo_health",
-      "Skill(update-config)"
+      "Skill(update-config)",
+      "mcp__cruxdev__list_content_drafts",
+      "mcp__cruxdev__start_convergence",
+      "mcp__cruxdev__convergence_submit_result"
     ]
   },
   "hooks": {
@@ -135,7 +138,27 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "AUTONOMOUS MODE ACTIVE. Do NOT stop. Call prioritize_work to get the next task. If background agents completed, process their results: mark build plan converged, write blog post, post to Typefully, deploy website, commit and push to git. If an item is BLOCKED on another project, file a GitHub issue on that project immediately (gh issue create --repo trinsiklabs/<project>), then move to the next item. NEVER stop because something is blocked — file the issue and continue. Then start the next priority item. Only stop if: (1) the priority queue is truly empty AND you have synced the stream, (2) you hit a blocker requiring human input that cannot be resolved by filing an issue. Resume working NOW."
+            "prompt": "AUTONOMOUS MODE ACTIVE. Do NOT stop. Call prioritize_work to get the next task. If background agents completed, process their results immediately. If a convergence is in progress, submit the next result. If blocked on another project, file a GitHub issue and move to the next item. NEVER stop — grab the next thing and go. The process: plan → check patterns → converge → build → commit → push → deploy → blog → next. You are the closest thing to CruxBot before CruxBot is running. Stay continuous."
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "CONTEXT WAS COMPACTED. Critical rules that may have been lost: (1) NEVER go off half-cocked — plan first, check patterns, then build. (2) NEVER post to X directly — use the queue (30-min hard minimum). (3) NEVER hardcode numbers — use metrics.json. (4) AUTONOMOUS MODE — do not stop, grab next priority. (5) BIP everything — every convergence gets a blog post + X post through the engine. (6) GTV everything — verify claims before shipping. Read CLAUDE.md if uncertain about any rule."
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "A subagent just completed. Process its results immediately: read the output, commit any files it created, and continue with the next priority item. Do not pause or summarize — act on the results and keep moving."
           }
         ]
       }
