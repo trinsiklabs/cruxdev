@@ -1,6 +1,6 @@
 # BUILD_PLAN_058: Regression Detection Between Passes
 
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Priority:** Should Close
 **Source:** IEEE-ISTAS 2025 (arxiv 2506.11022) — 37.6% security increase after 5 LLM iterations
 
