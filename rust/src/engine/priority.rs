@@ -199,7 +199,9 @@ fn scan_competitive_gaps(project_dir: &str) -> Vec<WorkItem> {
         if status_lower.contains("done") || status_lower.contains("converged")
             || status_lower.contains("closed") || status_lower.contains("live")
             || status_lower.contains("patterns doc")
-            || status_lower.contains("n/a") || classification.contains("intentional") {
+            || status_lower.contains("mcp tool") || status_lower.contains("roadmap")
+            || status_lower.contains("n/a") || classification.contains("intentional")
+            || classification.contains("future") || classification.contains("nice to have") {
             continue;
         }
 
