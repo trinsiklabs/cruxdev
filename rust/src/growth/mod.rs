@@ -9,4 +9,5 @@ pub mod content;
 pub mod llms_txt;
 pub mod metrics;
 pub mod seo;
+pub mod x_client;
 pub mod x_queue;
