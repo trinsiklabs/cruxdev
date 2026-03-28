@@ -1024,10 +1024,12 @@ impl CruxDevServer {
             result["content_drafts"] = drafts;
         }
         if next.task_type == "done" {
-            result["self_adopt_recommended"] = serde_json::json!(true);
-            result["self_adopt_instructions"] = serde_json::json!(
-                "Run self-adoption: classify the project, check all patterns docs are integrated, verify dimensions are wired, deploy website if changed."
-            );
+            result["post_convergence_actions"] = serde_json::json!({
+                "git_commit": "REQUIRED — commit all changes from this build plan with descriptive message, then push to remote.",
+                "self_adopt": "REQUIRED — classify project, check patterns integration, verify dimensions wired, deploy website if changed.",
+                "blog_post": "REQUIRED — verify blog post was generated and deployed. If not, generate manually.",
+                "priority_check": "RECOMMENDED — run prioritize_work to pick the next task."
+            });
         }
         result.to_string()
     }
