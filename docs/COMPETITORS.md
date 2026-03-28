@@ -302,14 +302,14 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 |-----|-----------|---------------|--------|
 | KV-cache-aware context engineering | Manus | Must close | **CLOSED** — BP049 converged, KV_CACHE_PATTERNS.md |
 | Durable execution / checkpointing | DeepAgents | Must close | **CLOSED** — BP050 converged, checkpoint after every round |
-| Visual verification (screenshots) | Cursor | Should close (phased) | BP047 written, not started |
-| Multi-agent parallel execution | Claude Code, Codex | Should close | Not started |
-| Hook system (lifecycle events) | Claude Code | Should close | Not started |
-| Kernel-level sandboxing | Codex | Nice to have | Not started (Rust binary could use Seatbelt/Landlock) |
-| Skills auto-activate by context | Superpowers | Should close | Not started |
+| Visual verification (screenshots) | Cursor | Should close (phased) | Patterns doc written (BP051) |
+| Multi-agent parallel execution | Claude Code, Codex | Should close | Patterns doc written (BP052) |
+| Hook system (lifecycle events) | Claude Code | Should close | Patterns doc written (BP053) |
+| Kernel-level sandboxing | Codex | Nice to have | Patterns doc written (BP054) |
+| Skills auto-activate by context | Superpowers | Should close | Patterns doc written (BP055) |
 | Proven unattended evolution run | yoyo-evolve | Should close | **CLOSED** — BP056 converged, cron every 4 hours |
-| Cross-model validation (audit with different LLM) | COCO paper | Should close | Dispatch layer supports it, not wired |
-| Regression detection between passes | IEEE paper | Should close | Not started |
+| Cross-model validation (audit with different LLM) | COCO paper | Should close | Patterns doc written (BP057) |
+| Regression detection between passes | IEEE paper | Should close | Patterns doc written (BP058) |
 | Post-convergence content pipeline | All (none have it) | Differentiator | **LIVE** — BP048, auto blog + X on convergence |
 | Audit trail UI/observability | Developer trust gap | Nice to have | State files exist, no UI |
 | 82K+ stars community | Claude Code | Intentional (build quality, community follows) | N/A |
