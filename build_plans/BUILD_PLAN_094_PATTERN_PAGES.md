@@ -1,6 +1,6 @@
 # BUILD_PLAN_094: Pattern Docs as Public Pages — SEO/GEO Content from Existing Research
 
-**Status:** IN PROGRESS (9 pattern pages deployed at /patterns/)
+**Status:** CONVERGED (58 auto-generated pattern pages via [slug].astro + marked.parse())
 **Priority:** High (zero-effort content — docs already exist)
 
 ## Context
