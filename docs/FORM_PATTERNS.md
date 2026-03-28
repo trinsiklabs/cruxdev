@@ -215,6 +215,311 @@ For convergence engine integration — audit forms against these 9 dimensions:
 
 ---
 
+## 15. Form Layout
+
+**Single-column is the only safe default.** Multi-column forms increase completion time by 15.4 seconds on average (CXL) and cause field-skipping errors (Baymard). Users process a single visual flow; multi-column layouts force lateral scanning that breaks reading order.
+
+**Rules:**
+
+| Principle | Guidance |
+|-----------|----------|
+| Column count | Single column. No exceptions for aesthetic reasons. |
+| Field alignment | Labels and inputs left-aligned to a single vertical edge |
+| Field width | Match the expected input length — width is an affordance (see Section 18) |
+| Vertical spacing | Consistent 16-24px between field groups; 8-12px between label and input |
+| Mobile stacking | All fields stack vertically; no side-by-side on viewports < 768px |
+| Logical grouping exceptions | City / State / Zip on one row; First / Last name on one row — only when all are short, related, and required |
+
+**Field alignment detail:** Left-align everything to a single vertical axis. Center-aligned forms look "designed" but increase cognitive load — the eye has to re-find the start of each row. Right-aligned labels (beside inputs) create the worst completion times of any layout (Wroblewski).
+
+---
+
+## 16. Label Positioning
+
+**Top-aligned labels produce the fastest completion times.** This is the single most-replicated finding in form usability research:
+
+- **Penzo (UXmatters, 2006):** Eye-tracking study found top-aligned labels require ~50% fewer visual fixations than left-aligned labels.
+- **Wroblewski (Web Form Design, 2008):** Confirmed top-aligned labels yield the fastest completion times across all label positions tested.
+- **Matteo Penzo replication (2014):** Results held across mobile and desktop.
+
+**The hierarchy (fastest to slowest):**
+
+1. **Top-aligned** — label directly above input, left-aligned text
+2. **Right-aligned (beside input)** — compact but harder to scan
+3. **Left-aligned (beside input)** — worst: large gutter between label and field causes misassociation
+
+**Rules:**
+- Labels ABOVE inputs, left-aligned text — this is the default, always
+- Never use floating/animated labels as the primary label strategy. Floating labels shrink below WCAG minimum text size (12px), trigger motion sensitivity, and disappear the hint at the moment the user needs it most
+- Never rely on placeholder text as a label — it vanishes on focus and fails screen readers (WCAG 1.3.1, 3.3.2)
+- Maintain clear visual hierarchy: label (smaller, muted) above input (larger, bordered)
+
+---
+
+## 17. Required vs. Optional Field Indicators
+
+**The core principle: minimize noise, maximize clarity.**
+
+The correct strategy depends on the ratio of required to optional fields:
+
+| Form composition | Strategy | Rationale |
+|-----------------|----------|-----------|
+| Most fields required (>75%) | Mark only optional fields with "(optional)" text after the label | Reduces visual clutter; users infer unmarked = required |
+| Most fields optional (>75%) | Mark only required fields with asterisk (*) after the label | Same principle, inverted |
+| Mixed or ambiguous | Mark BOTH required (*) and optional "(optional)" | Baymard research: 32% of users failed to complete required fields when only optional was marked |
+
+**Asterisk rules:**
+- Place the asterisk (*) immediately after the label text, not before
+- Use `aria-required="true"` or the `required` attribute on the input for programmatic access — the visual asterisk alone is insufficient for screen readers
+- Include a legend at the top of the form: "Fields marked with * are required"
+- Red asterisks are conventional but ensure sufficient contrast (4.5:1 minimum)
+
+**What NOT to do:**
+- Do not mark every field with an asterisk when all are required — it creates visual noise with zero information gain
+- Do not use "(Required)" text on every field — same problem
+- Do not rely solely on color to indicate required status (WCAG 1.4.1)
+
+**Baymard checkout finding:** Only 14% of e-commerce sites mark both required and optional fields explicitly. Sites that do see measurably fewer validation errors at checkout.
+
+---
+
+## 18. Input Sizing
+
+**Field width is an affordance.** The width of an input communicates the expected length of the content. A zip code field the width of an email field creates ambiguity. A full-width field for a 2-digit number suggests something is wrong. Users interpret field size as a constraint — respect that.
+
+**Recommended sizing:**
+
+| Field type | Width | Rationale |
+|-----------|-------|-----------|
+| Email | Full width (100%) | Addresses vary wildly in length |
+| Full name | Full width (100%) | Names can be long |
+| First name / Last name | ~50% each (side by side) | Short, paired, related |
+| Phone | ~200px / ~50% | 10-15 characters typical |
+| Zip/Postal code | ~100-120px / ~25% | 5-10 characters |
+| State/Province | ~200px or dropdown | Fixed set of values |
+| Street address | Full width (100%) | Addresses are long |
+| City | ~60-70% width | Medium-length content |
+| Credit card number | ~250px / ~60% | 16-19 characters |
+| CVV/CVC | ~80px | 3-4 characters |
+| Age / Quantity | ~80-100px | 1-3 digits |
+| URL | Full width (100%) | URLs can be very long |
+| Description / Notes | Full width textarea | Multi-line content (see Section 19) |
+
+**Implementation notes:**
+- Use `max-width` to prevent fields from stretching beyond readable width on ultrawide screens
+- On mobile (< 768px), all fields go full-width — narrow fields are unusable on touch keyboards
+- The CSS `field-sizing: content` property (Chromium 123+) auto-sizes fields to content, but lacks Safari/Firefox support as of 2026 — use with fallback
+- For fixed-format fields (zip, phone, CVV), set `maxlength` and `size` attributes to match
+
+---
+
+## 19. Textarea Patterns
+
+**Use a textarea whenever the expected input is more than a single line.** The `<input type="text">` element is for single-line data — names, emails, phone numbers. The `<textarea>` element is for multi-line content.
+
+**When to use textarea (not input):**
+
+- Descriptions, details, explanations
+- Notes, comments, feedback
+- Messages (contact forms, support tickets)
+- Bio, about, summary fields
+- Addresses (when not structured as separate fields)
+- Any "tell us more" or "additional information" prompt
+- Any field where copy-paste of multi-line content is expected
+
+**Textarea rules:**
+
+| Property | Recommendation |
+|----------|---------------|
+| Minimum height | 120px (~4-5 visible lines) — gives users space to think |
+| Resize behavior | `resize: vertical` — prevent horizontal layout breakage while allowing expansion |
+| Auto-resize | Grow with content using JS (`el.style.height = el.scrollHeight + 'px'`) or CSS `field-sizing: content` (Chromium only) |
+| Max height | Cap at ~400px, then scroll — prevent page-length textareas |
+| Character count | Show when a limit exists. Display remaining characters, update live. GOV.UK pattern: show count below the textarea, announce to screen readers via `aria-live="polite"` |
+| Character limit UX | Allow typing past the limit, show warning — do NOT hard-block input, which breaks paste workflows |
+| Placeholder | Brief example of expected content: "Describe the issue you're experiencing..." |
+| Whitespace | `white-space: pre-wrap` to preserve user formatting |
+
+**Anti-pattern:** Using `<input type="text">` for a "Message" or "Description" field. This forces users to compose multi-line content in a single-line box, hiding most of what they've typed. Always use `<textarea>`.
+
+---
+
+## 20. Field Grouping
+
+**Group related fields with `<fieldset>` and `<legend>`.** This is both a usability pattern and an accessibility requirement (WCAG 1.3.1). Screen readers announce the legend before each field in the group, giving users context.
+
+**When to group:**
+
+| Field group | Example fields |
+|------------|----------------|
+| Personal information | First name, Last name, Email, Phone |
+| Mailing address | Street, Apt/Suite, City, State, Zip, Country |
+| Billing address | Same structure, separate fieldset |
+| Payment details | Card number, Expiry, CVV, Cardholder name |
+| Date of birth | Month, Day, Year |
+| Account credentials | Username/Email, Password, Confirm password |
+| Preferences | Checkboxes or radios sharing a common question |
+
+**Rules:**
+- The `<legend>` must be the first child of `<fieldset>` — this is an HTML requirement, not a suggestion
+- The legend text should be the group's heading: "Shipping Address", "Payment Information", "Your Details"
+- Visual separation between groups: 24-32px vertical gap or a subtle horizontal rule
+- Consistent internal padding within groups: 16px
+- On multi-step forms, each step typically maps to one fieldset group
+- Nest fieldsets only when semantically necessary (rare) — deeply nested fieldsets confuse screen readers
+
+**Visual design:**
+- Default browser fieldset styling (beveled border) is ugly — reset with CSS: `border: none; padding: 0; margin: 0;`
+- Use spacing, subtle background color, or light borders to visually distinguish groups
+- The legend can be styled as a heading (e.g., `font-weight: 600; font-size: 1.125rem`)
+
+---
+
+## 21. Error Display (Extended)
+
+This section extends Section 5 with implementation-specific patterns.
+
+**Error positioning hierarchy:**
+
+1. **Error summary at top of form** — on submit, display a linked list of all errors at the top. Set `tabindex="-1"` and move keyboard focus to it. Each error links to its field via anchor.
+2. **Inline error below the field** — immediately beneath the input, above the next label. Never above the input (it shifts the field the user is trying to fix).
+3. **Field-level visual cues** — red/error-color border on the input, error icon inside or beside the field.
+
+**`aria-describedby` linking (mandatory):**
+```html
+<label for="email">Email address</label>
+<input type="email" id="email" aria-describedby="email-error" aria-invalid="true">
+<p id="email-error" class="error-message">Enter a valid email address, like name@example.com</p>
+```
+
+**Focus management on submit:**
+1. Run client-side validation
+2. If errors exist, generate error summary, prepend to form
+3. Move focus to error summary (`summary.focus()`)
+4. User clicks error link, focus moves to the errored field
+5. Inline error is announced by screen reader via `aria-describedby`
+
+**Error message tone:**
+- Specific: "Enter your email address" not "This field is required"
+- Constructive: "Enter a date after today" not "Invalid date"
+- Human: "We couldn't find that zip code — check for typos" not "Validation error: postal_code"
+- Never blame the user: "Enter a valid phone number" not "You entered an invalid phone number"
+
+**Page title on error:** Prepend "Error: " to `<title>` so screen readers announce it on page load (GOV.UK pattern).
+
+---
+
+## 22. Submit Button Patterns
+
+**The submit button is the form's call to action. Its text should describe the outcome, not the mechanism.**
+
+**Outcome-focused text examples:**
+
+| Bad (mechanism) | Good (outcome) |
+|----------------|----------------|
+| Submit | Reserve My Visit |
+| Send | Send Message |
+| Submit Form | Create Account |
+| Submit | Download Free Guide |
+| Process | Complete Purchase |
+| Save | Save Changes |
+| Go | Search Flights |
+
+**Rules:**
+
+| Property | Guidance |
+|----------|----------|
+| Text | 1-4 words, active voice, describes what happens next |
+| Width (desktop) | Match content width with comfortable padding (min 200px) |
+| Width (mobile) | Full width (100%) — easy tap target, no precision required |
+| Position | Directly after the last form field — never floating, never in a fixed bar (unless checkout) |
+| Alignment | Left-aligned on desktop (consistent with field alignment), full-width on mobile |
+| Loading state | On click: disable button, replace text with spinner + "Processing..." or similar. Prevent double-submission |
+| Disabled state | Only disable AFTER click (during processing). Never pre-disable — users can't discover why it won't work |
+| Visual weight | Highest visual prominence in the form. Primary color, solid fill, not outline |
+| Secondary actions | "Cancel", "Back", "Clear" — visually subordinate (text link or ghost button, never same prominence as primary CTA) |
+| Reset button | Do not include. Ever. Accidental data loss risk vastly outweighs the edge case (NNg) |
+
+**Loading state implementation:**
+```
+[Reserve My Visit] → click → [⟳ Reserving...] (disabled) → success → redirect/confirmation
+```
+- Disable the button to prevent double-submission
+- Show a spinner or progress indicator
+- Keep the button visible (don't hide it)
+- If the request fails, re-enable the button and show an error message
+
+---
+
+## 23. Progressive Disclosure
+
+**Show fields only when they become relevant.** Progressive disclosure reduces cognitive load by hiding complexity until the user's context demands it.
+
+**Common patterns:**
+
+| Trigger | Revealed fields |
+|---------|----------------|
+| "Billing address is different from shipping" checkbox | Billing address fieldset |
+| "Other" selected in a dropdown/radio | Free-text input for custom value |
+| "Yes" to "Do you have a referral code?" | Referral code input |
+| Business account selected (vs. personal) | Company name, VAT number, department |
+| "Add a gift message" link | Textarea for message |
+| Country selection | Country-specific fields (state/province, postal code format) |
+
+**Rules:**
+- Revealed fields must animate in smoothly (opacity + height transition, ~200ms) — abrupt layout shifts are disorienting
+- When fields are hidden, their values must be cleared and excluded from submission — do not submit invisible field data
+- Hidden fields must not be validated — only validate what the user can see
+- Use `aria-expanded` on the trigger and `aria-controls` pointing to the revealed section
+- Announce changes to screen readers via `aria-live="polite"` on the container
+- On page load, only show fields relevant to default selections
+- Never use progressive disclosure to hide required fields behind an interaction that isn't obviously necessary
+
+**Anti-patterns:**
+- Hiding essential fields behind "Advanced" toggles that most users need
+- Requiring a specific sequence of interactions to reveal a required field
+- Progressive disclosure that causes significant layout shift (push content below the fold)
+
+---
+
+## 24. Input Types and Mobile Keyboard Optimization
+
+**The correct `type`, `inputmode`, and `autocomplete` attributes form a team.** Together, they trigger the right virtual keyboard, enable browser autofill, and reduce typing effort by 30-50% on mobile (Baymard).
+
+**Input type reference:**
+
+| Field | `type` | `inputmode` | `autocomplete` | Keyboard shown |
+|-------|--------|-------------|-----------------|----------------|
+| Email | `email` | — | `email` | @ and .com keys |
+| Phone | `tel` | — | `tel` | Numeric dialpad |
+| URL | `url` | — | `url` | / and .com keys |
+| Credit card | `text` | `numeric` | `cc-number` | Number pad |
+| CVV | `text` | `numeric` | `cc-csc` | Number pad |
+| Zip code | `text` | `numeric` | `postal-code` | Number pad |
+| Quantity / Age | `number` | — | — | Number pad with +/- |
+| One-time code | `text` | `numeric` | `one-time-code` | Number pad + auto-fill from SMS |
+| Search | `search` | — | — | Search-optimized with "Go" key |
+| Password | `password` | — | `current-password` or `new-password` | Standard with show/hide toggle |
+| Full name | `text` | — | `name` | Standard with auto-capitalize |
+| Street address | `text` | — | `street-address` | Standard |
+| City | `text` | — | `address-level2` | Standard |
+| State | `text` | — | `address-level1` | Standard (or use `<select>`) |
+| Country | `text` | — | `country-name` | Standard (or use `<select>`) |
+
+**Why `inputmode` matters separately from `type`:**
+- `type="number"` adds increment spinners and rejects non-numeric input — wrong for credit cards, zip codes, phone numbers
+- `inputmode="numeric"` shows the number pad WITHOUT the `type="number"` side effects
+- Use `type="text"` + `inputmode="numeric"` for numeric-looking data that isn't a mathematical number
+
+**`autocomplete` rules:**
+- Always set `autocomplete` on name, email, phone, and address fields — browser autofill reduces mobile completion time dramatically
+- Use `autocomplete="new-password"` on registration forms so password managers offer to generate
+- Use `autocomplete="current-password"` on login forms so password managers offer to fill
+- Use `autocomplete="one-time-code"` for SMS/email verification codes — iOS and Android will auto-suggest the code
+- Never set `autocomplete="off"` on login or checkout forms — it breaks password managers and annoys users
+
+---
+
 ## References
 
 ### Tier 1 (Primary/Authoritative)
@@ -235,7 +540,12 @@ For convergence engine integration — audit forms against these 9 dimensions:
 - Smart Interface Design Patterns (Friedman) — inline validation studies
 
 ### Tier 3 (Practitioner)
-- Smashing Magazine — inline validation, multi-step forms
+- Smashing Magazine — inline validation, multi-step forms, mobile form design
 - Venture Harbour — multi-step form studies
 - HubSpot — field count conversion data
-- Wroblewski — Web Form Design (Rosenfeld Media)
+- Wroblewski — Web Form Design (Rosenfeld Media, 2008)
+- Andrew Coyle — "Design Better Input Fields" (field width as affordance)
+- CSS-Tricks — auto-growing inputs and textareas, `field-sizing` property
+- MDN — inputmode global attribute, textarea element, autocomplete attribute
+- Baymard Institute Touch Keyboard Types Cheat Sheet — baymard.com/labs/touch-keyboard-types
+- Jakob Nielsen — "Required Fields in Forms: Best Design Practices" (Substack, 2024)
