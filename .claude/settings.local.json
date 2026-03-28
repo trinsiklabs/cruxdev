@@ -124,7 +124,21 @@
       "Bash(rsync -avz --delete -e \"ssh -i ~/.ssh/cruxdev_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new\" dist/ cruxdev.dev@vh1.trinsik.io:~/public_html/)",
       "Bash(source ~/.zshenv)",
       "Bash(curl -s -X POST \"https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache\" -H \"Authorization: Bearer $CLOUDFLARE_API_TOKEN\" -H \"Content-Type: application/json\" --data '{\"\"\"\"purge_everything\"\"\"\":true}')",
-      "Bash(curl -s https://www.cruxdev.dev/blog/20260328-post-deployment-verification/)"
+      "Bash(curl -s https://www.cruxdev.dev/blog/20260328-post-deployment-verification/)",
+      "mcp__cruxdev__check_seo_health",
+      "Skill(update-config)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "AUTONOMOUS MODE ACTIVE. Do NOT stop. Call prioritize_work to get the next task. If background agents completed, process their results: mark build plan converged, write blog post, post to Typefully, deploy website, commit and push to git. Then start the next priority item. Only stop if: (1) the priority queue is empty, (2) you hit a blocker requiring human input, or (3) you have been running for over 50 tool calls since the last user message. Resume working NOW."
+          }
+        ]
+      }
     ]
   }
 }
