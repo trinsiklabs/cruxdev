@@ -465,14 +465,14 @@ Use `text-gold`, `bg-charcoal`, etc. in custom components. Use DaisyUI's `btn-pr
 
 ### Custom CSS for Interactions
 
-DaisyUI handles component styling, but you'll need custom CSS for interaction patterns that Tailwind utilities can't express:
+DaisyUI handles component styling, but you'll need custom CSS for interaction patterns that Tailwind utilities can't express. **Use CSS custom properties or DaisyUI's oklch variables — never hardcode hex colors that won't adapt to dark mode.**
 
 ```css
-/* Sidebar active link (gold left border) */
+/* Sidebar active link — uses @theme custom properties */
 .sidebar-link.active {
-  border-left: 3px solid #C8A84E;
-  background-color: rgba(200, 168, 78, 0.08);
-  color: #C8A84E;
+  border-left: 3px solid var(--color-gold, oklch(70% 0.15 80));
+  background-color: oklch(from var(--color-gold, oklch(70% 0.15 80)) l c h / 0.08);
+  color: var(--color-gold, oklch(70% 0.15 80));
 }
 
 /* Stat card hover lift */
@@ -481,19 +481,94 @@ DaisyUI handles component styling, but you'll need custom CSS for interaction pa
 }
 .stat-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 12px 24px oklch(0% 0 0 / 0.15);
 }
 
-/* Data table with dark header */
+/* Data table with themed header */
 .data-table thead th {
   position: sticky;
   top: 0;
-  background-color: #2B2B2B;
-  color: white;
+  background-color: oklch(from var(--color-base-content) l c h / 1);
+  color: var(--color-base-100);
 }
 .data-table tbody tr:hover {
-  background-color: rgba(200, 168, 78, 0.06);
+  background-color: oklch(from var(--color-gold, oklch(70% 0.15 80)) l c h / 0.06);
 }
+```
+
+### Dark Mode: Semantic Color Tokens (CRITICAL)
+
+**Never use hardcoded Tailwind color utilities for text or backgrounds in LiveView templates.** DaisyUI activates dark mode via `prefersdark: true` in the theme config. When a user's OS is in dark mode, the page background becomes dark — but hardcoded classes like `text-gray-900` or `bg-gray-50` don't adapt, producing invisible or illegible text.
+
+**The rule:** Use DaisyUI semantic color classes for everything that must work in both themes. Use Tailwind utilities only for layout, spacing, sizing, and responsive design.
+
+| Purpose | WRONG (hardcoded) | RIGHT (semantic) |
+|---------|-------------------|-----------------|
+| Primary text | `text-gray-900` | `text-base-content` |
+| Secondary text | `text-gray-700` | `text-base-content/80` |
+| Tertiary text | `text-gray-600` | `text-base-content/70` |
+| Muted text | `text-gray-500` | `text-base-content/60` |
+| Disabled text | `text-gray-400` | `text-base-content/50` |
+| Page background | `bg-white` | `bg-base-100` |
+| Surface/card bg | `bg-gray-50`, `bg-gray-100` | `bg-base-200` |
+| Borders | `border-gray-200`, `border-gray-300` | `border-base-300` |
+| Brand/accent text | `text-red-700` | `text-primary` |
+| Brand background | `bg-red-700` | `bg-primary` |
+| Brand tinted bg | `bg-red-50` | `bg-primary/10` |
+| Brand tinted border | `border-red-100` | `border-primary/20` |
+| Link text | `text-blue-600` | `text-info` |
+| Success | `text-green-600`, `bg-green-100` | `text-success`, `bg-success/15` |
+| Error | `text-red-600`, `bg-red-50` | `text-error`, `bg-error/10` |
+| Warning | `text-yellow-600`, `bg-yellow-50` | `text-warning`, `bg-warning/10` |
+| Hover states | `hover:bg-gray-50` | `hover:bg-base-200` |
+| White on brand bg | `text-white` | `text-primary-content` or keep `text-white` |
+
+**Opacity modifiers** (`/80`, `/70`, `/60`, etc.) work with DaisyUI semantic colors and are the correct way to create lighter variants: `text-base-content/70` for secondary text, `bg-primary/10` for a tinted background.
+
+**Exceptions where hardcoded colors are acceptable:**
+- Static HTML not rendered through LiveView (embed forms in iframes, error pages without the theme system)
+- Decorative color dots used as legend indicators (e.g., `bg-green-500` for a tiny status dot)
+- Skip-nav links (`sr-only`) only visible on keyboard focus
+
+**How dark mode activates:**
+
+```css
+@plugin "../vendor/daisyui-theme" {
+  name: "dark";
+  prefersdark: true;          /* Activates when OS prefers dark */
+  color-scheme: "dark";
+  --color-base-100: oklch(30.33% 0.016 252.42);   /* Dark background */
+  --color-base-content: oklch(97.8% 0.029 256.8);  /* Light text */
+  --color-primary: oklch(58% 0.233 277.117);
+}
+
+@plugin "../vendor/daisyui-theme" {
+  name: "light";
+  default: true;
+  color-scheme: "light";
+  --color-base-100: oklch(98% 0 0);                /* Light background */
+  --color-base-content: oklch(21% 0.006 285.885);  /* Dark text */
+  --color-primary: oklch(70% 0.213 47.604);
+}
+```
+
+When `prefersdark: true` is set, any user with dark OS settings gets the dark theme automatically. **Every visible element must render correctly in both themes.**
+
+**Audit: Dark Mode Compliance**
+
+Search for these patterns in `.ex` and `.heex` files — any match in a LiveView template is a dark mode failure:
+
+```
+text-gray-[0-9]    → should be text-base-content or text-base-content/NN
+bg-gray-50          → should be bg-base-200
+bg-white            → should be bg-base-100
+text-red-*          → should be text-primary or text-error
+bg-red-*            → should be bg-primary/NN or bg-error/NN
+text-blue-*         → should be text-info
+text-green-*        → should be text-success
+border-gray-*       → should be border-base-300
+hover:bg-gray-*     → should be hover:bg-base-200
+hover:text-gray-*   → should be hover:text-base-content/NN
 ```
 
 ### Key Lesson: DaisyUI Components Don't Fire LiveView Events
@@ -785,14 +860,14 @@ The standard authenticated layout uses a fixed top nav and fixed left sidebar:
 
 ```heex
 <%!-- Top nav (fixed, h-16, z-40) --%>
-<nav class="fixed top-0 left-0 right-0 h-16 bg-white border-b shadow-sm z-40">
+<nav class="fixed top-0 left-0 right-0 h-16 bg-base-100 border-b border-base-300 shadow-sm z-40">
   <!-- Logo, nav items, user menu -->
 </nav>
 
 <%!-- Content area with sidebar --%>
 <div class="pt-16 flex min-h-screen">
   <%!-- Sidebar (fixed, w-64, below nav) --%>
-  <aside class="fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] bg-white border-r z-20
+  <aside class="fixed top-16 left-0 w-64 h-[calc(100vh-4rem)] bg-base-100 border-r border-base-300 z-20
     transform -translate-x-full lg:translate-x-0 transition-transform duration-300">
     <!-- Sidebar content -->
   </aside>
@@ -816,10 +891,10 @@ For navigation dropdowns in LiveView, avoid `phx-click` (server round-trip for h
 ```heex
 <div class="relative group">
   <a href="/portal" class="px-3 py-2 text-sm">Portal</a>
-  <div class="absolute top-full left-0 w-56 bg-white border rounded-lg shadow-xl
+  <div class="absolute top-full left-0 w-56 bg-base-100 border border-base-300 rounded-lg shadow-xl
     hidden group-hover:block z-50">
-    <a href="/portal/dashboard" class="block px-4 py-2 text-sm hover:bg-gray-50">Dashboard</a>
-    <a href="/portal/financials" class="block px-4 py-2 text-sm hover:bg-gray-50">Financials</a>
+    <a href="/portal/dashboard" class="block px-4 py-2 text-sm hover:bg-base-200">Dashboard</a>
+    <a href="/portal/financials" class="block px-4 py-2 text-sm hover:bg-base-200">Financials</a>
   </div>
 </div>
 ```
@@ -885,6 +960,11 @@ def static_paths, do: ~w(assets fonts images favicon.ico robots.txt sitemap.xml 
 | `Ash.load!` without `authorize?: false` in LiveViews | Always pass `authorize?: false` in LiveView loads |
 | Hardcoding test data in inline scripts for UAT | Use `fly ssh console` + `rpc` to run code in the running app |
 | Forgetting `require Ash.Query` in LiveViews | Add `require Ash.Query` at the top of any module using `Ash.Query.filter` |
+| Hardcoded Tailwind colors (`text-gray-*`, `bg-white`, `bg-gray-50`) in LiveView templates | Use DaisyUI semantic tokens (`text-base-content`, `bg-base-100`, `bg-base-200`). Hardcoded colors break dark mode — see Section 5 "Dark Mode: Semantic Color Tokens" |
+| Hardcoded hex colors (`#2B2B2B`, `rgba(...)`) in custom CSS | Use CSS custom properties or DaisyUI oklch variables that adapt to theme |
+| Forms without `novalidate` attribute | Always add `novalidate` — HTML5 native validation is unreliable across assistive technologies |
+| Forms without `autocomplete` attributes | Always add `autocomplete="name"`, `autocomplete="email"`, `autocomplete="tel"`, etc. |
+| "Submit" button text | Use outcome-focused CTA: "Reserve My Free Visit", "Log In", "Create Account" |
 
 ---
 
