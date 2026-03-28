@@ -14,7 +14,7 @@ use super::state::*;
 pub const PLAN_DIMENSIONS: &[&str] = &["completeness", "feasibility", "risk_assessment", "dependency_ordering", "testability"];
 pub const CODE_DIMENSIONS: &[&str] = &["correctness", "completeness", "edge_cases", "error_handling", "security", "performance", "maintainability", "test_coverage", "duplication"];
 pub const DOC_DIMENSIONS: &[&str] = &["accuracy", "completeness", "consistency", "clarity", "currency"];
-pub const FORM_DIMENSIONS: &[&str] = &["layout", "labels", "validation", "errors", "accessibility", "mobile", "cta", "trust", "performance"];
+pub const FORM_DIMENSIONS: &[&str] = &["layout", "labels", "label_positioning", "required_indicators", "input_sizing", "textarea_usage", "field_grouping", "validation", "errors", "error_display", "accessibility", "mobile", "cta", "trust", "performance", "progressive_disclosure", "input_types"];
 pub const METRICS_DIMENSIONS: &[&str] = &["coverage", "collection", "actionability", "thresholds", "freshness", "anti_gaming", "accessibility"];
 pub const DASHBOARD_DIMENSIONS: &[&str] = &["hierarchy", "density", "visualization", "color", "real_time", "mobile", "accessibility", "performance", "actionability"];
 pub const WEBSITE_ESSENTIAL_PAGES: &[&str] = &["homepage", "quick_install", "quick_start", "documentation", "comparison_pages", "llms_txt", "robots_sitemap"];
