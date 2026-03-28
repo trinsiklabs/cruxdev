@@ -54,9 +54,9 @@ enum Commands {
         /// GitHub repo (e.g., "trinsiklabs/cruxdev")
         #[arg(long, default_value = "")]
         repo: String,
-        /// Dry run — log actions without executing (default: true)
-        #[arg(long, default_value_t = true)]
-        dry_run: bool,
+        /// Actually execute actions (default: dry run). Pass --live to execute for real.
+        #[arg(long)]
+        live: bool,
         /// Run continuously until no new signals found
         #[arg(long)]
         continuous: bool,
@@ -104,8 +104,8 @@ impl Cli {
                     }
                 }
             }
-            Some(Commands::Evolve { project_dir, repo, dry_run, continuous }) => {
-                run_evolve(&project_dir, &repo, dry_run, continuous);
+            Some(Commands::Evolve { project_dir, repo, live, continuous }) => {
+                run_evolve(&project_dir, &repo, !live, continuous);
             }
             None => {
                 println!("CruxDev convergence engine. Use --help for commands.");

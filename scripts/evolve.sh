@@ -22,7 +22,7 @@ echo "[$(date)] Evolution cycle starting." >> "${LOG_FILE}"
 export PATH="$HOME/.cargo/bin:$PATH"
 "${PROJECT_DIR}/rust/target/release/cruxdev" evolve "${PROJECT_DIR}" \
     --repo trinsiklabs/cruxdev \
-    --dry-run false \
+    --live \
     --continuous >> "${LOG_FILE}" 2>&1
 
 # For full self-improvement (code changes, convergence), launch Claude Code
