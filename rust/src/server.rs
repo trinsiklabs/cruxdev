@@ -83,6 +83,12 @@ pub struct PrioritizeWorkParam {
 }
 
 #[derive(Deserialize, JsonSchema)]
+pub struct InventoryRoutesParam {
+    /// Project directory to scan for pages/routes
+    pub project_dir: Option<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
 pub struct GtvScanContentParam {
     /// Path to the file to scan for claims
     pub file_path: String,
@@ -3008,6 +3014,32 @@ impl CruxDevServer {
             "total_failed": total_failed,
             "passed": total_failed == 0,
             "failed_files": all_results,
+        }).to_string()
+    }
+
+    // 65. inventory_routes
+    #[tool(description = "Inventory all pages/routes in a project. Scans Astro (src/pages/), Phoenix (router.ex), Next.js (app/) for pages. Classifies each as Form, Dashboard, Blog, Auth, Static, etc. Returns applicable audit dimensions per page. Use for page-level convergence.")]
+    async fn inventory_routes(&self, params: Parameters<InventoryRoutesParam>) -> String {
+        let p = &params.0;
+        let proj_dir = p.project_dir.as_deref().map(std::path::PathBuf::from)
+            .unwrap_or_else(|| self.project_dir.clone());
+
+        let pages = crate::engine::page_audit::inventory_routes(proj_dir.to_str().unwrap_or("."));
+        let tasks = crate::engine::page_audit::generate_audit_tasks(&pages);
+
+        serde_json::json!({
+            "total_pages": pages.len(),
+            "pages": pages,
+            "audit_tasks": tasks.len(),
+            "by_type": {
+                "form": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Form).count(),
+                "dashboard": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Dashboard).count(),
+                "blog": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Blog).count(),
+                "auth": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Auth).count(),
+                "static": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Static).count(),
+                "api": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Api).count(),
+                "index": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Index).count(),
+            }
         }).to_string()
     }
 }

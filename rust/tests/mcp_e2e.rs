@@ -17,7 +17,7 @@ async fn test_mcp_handshake_and_tool_listing() {
         .await
         .expect("timeout listing tools");
 
-    assert_eq!(tools.len(), 63, "expected 63 tools, got {}", tools.len());
+    assert_eq!(tools.len(), 64, "expected 64 tools, got {}", tools.len());
 
     let names: Vec<&str> = tools.iter().map(|t| t.name.as_ref()).collect();
 

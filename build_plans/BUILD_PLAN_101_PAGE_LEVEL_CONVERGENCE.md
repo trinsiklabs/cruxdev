@@ -1,6 +1,6 @@
 # BUILD_PLAN_101: Page-Level Convergence — Audit Every Page, Not Just the Project
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
 **Priority:** Critical (adoption fails without this)
 **Triggered by:** Adopted project passed 9/9 form dimensions at project level, but individual pages had fields floating left, "(Optional)" everywhere, tiny textareas. Not caught until human explicitly challenged.
 
@@ -19,6 +19,27 @@ What SHOULD happen:
 ## Why This Keeps Happening
 
 The LLM rubber-stamps project-level audits because it can't see every page at once. It reads the codebase, sees form components exist, sees they use the right patterns, and says "PASS." It never actually visits `/visit/westlake-select` and checks if THAT specific page's fields are floating left.
+
+## Files
+
+- `rust/src/engine/page_audit.rs` — route inventory, page classification, per-page audit task generation
+- `rust/src/server.rs` — new MCP tool: `inventory_routes`
+
+## Tests
+
+- [ ] test_inventory_astro_pages
+- [ ] test_inventory_phoenix_routes
+- [ ] test_classify_page_type_form
+- [ ] test_classify_page_type_dashboard
+- [ ] test_per_page_audit_task_generation
+- [ ] test_all_pages_must_pass_gate
+
+## Verification
+
+```bash
+cd rust && cargo test page_audit -- --nocapture
+cd rust && cargo clippy -- -D warnings
+```
 
 ## Phase 1: Page/Route Inventory
 
