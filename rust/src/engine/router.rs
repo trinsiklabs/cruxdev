@@ -30,6 +30,7 @@ pub const POST_DEPLOYMENT_DIMENSIONS: &[&str] = &["health_endpoint", "smoke_test
 pub const E2E_TEST_DIMENSIONS: &[&str] = &["critical_paths", "user_journeys", "cross_browser", "error_scenarios", "performance", "accessibility"];
 pub const MOBILE_WEB_DIMENSIONS: &[&str] = &["touch_targets", "responsive_layout", "mobile_nav", "mobile_performance", "pwa_readiness", "mobile_accessibility"];
 pub const UAT_TEST_DIMENSIONS: &[&str] = &["role_coverage", "acceptance_criteria", "edge_cases", "data_integrity", "workflow_completeness"];
+pub const BDD_DIMENSIONS: &[&str] = &["feature_coverage", "scenario_quality", "step_reuse", "living_doc_freshness", "gherkin_code_traceability"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -565,6 +566,14 @@ pub fn get_next_task(
             let has_uat = std::path::Path::new(&proj_dir).join("docs/UAT_TEST_PATTERNS.md").exists();
             if has_uat {
                 for dim in UAT_TEST_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // BDD dimensions — conditional on project using Gherkin/Cucumber
+            let has_bdd = std::path::Path::new(&proj_dir).join("features").is_dir()
+                || walkdir::WalkDir::new(&proj_dir).max_depth(3).into_iter()
+                    .filter_map(|e| e.ok())
+                    .any(|e| e.path().extension().is_some_and(|ext| ext == "feature"));
+            if has_bdd {
+                for dim in BDD_DIMENSIONS { dims.push((*dim).into()); }
             }
             Task {
                 task_type: "test".into(),
