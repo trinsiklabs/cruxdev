@@ -135,7 +135,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "AUTONOMOUS MODE ACTIVE. Do NOT stop. Call prioritize_work to get the next task. If background agents completed, process their results: mark build plan converged, write blog post, post to Typefully, deploy website, commit and push to git. Then start the next priority item. Only stop if: (1) the priority queue is empty, (2) you hit a blocker requiring human input, or (3) you have been running for over 50 tool calls since the last user message. Resume working NOW."
+            "prompt": "AUTONOMOUS MODE ACTIVE. Do NOT stop. Call prioritize_work to get the next task. If background agents completed, process their results: mark build plan converged, write blog post, post to Typefully, deploy website, commit and push to git. If an item is BLOCKED on another project, file a GitHub issue on that project immediately (gh issue create --repo trinsiklabs/<project>), then move to the next item. NEVER stop because something is blocked — file the issue and continue. Then start the next priority item. Only stop if: (1) the priority queue is truly empty AND you have synced the stream, (2) you hit a blocker requiring human input that cannot be resolved by filing an issue. Resume working NOW."
           }
         ]
       }
