@@ -1,6 +1,6 @@
 # BUILD_PLAN_105: X Posting Engine — Rate-Limited, Queue-Based, Scheduled
 
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Priority:** Critical (prevents spam, enforces brand discipline)
 **Triggered by:** Incident on 2026-03-28 where 56 tweets were posted in rapid succession via ad-hoc scripts, violating the 30-minute max rule. All had to be deleted.
 
@@ -67,7 +67,9 @@ Content Generation → Queue (JSONL) → Scheduler (Rust) → X API (OAuth 1.0a)
 - `delete_tweet(id: &str) -> Result<()>`
 - `get_rate_limit() -> Result<RateLimitInfo>`
 - Response parsing: extract tweet ID, URL
-- Error handling: 401 (auth), 403 (permissions), 429 (rate limit)
+- Error handling: 401 (auth), 403 (permissions), 429 (rate limit with backoff)
+- Parse X API rate limit headers: `x-rate-limit-remaining`, `x-rate-limit-reset`
+- Track remaining API quota — pause posting if approaching limit
 
 ### 2c. Tests
 - [ ] test_oauth_signature_generation
@@ -75,6 +77,7 @@ Content Generation → Queue (JSONL) → Scheduler (Rust) → X API (OAuth 1.0a)
 - [ ] test_error_handling_401
 - [ ] test_error_handling_429
 - [ ] test_rate_limit_parsing
+- [ ] test_x_api_429_backoff
 
 ## Phase 3: Scheduler (Rust)
 

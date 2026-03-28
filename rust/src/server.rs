@@ -2961,10 +2961,9 @@ impl CruxDevServer {
                     let path = entry.path();
                     if path.is_dir() {
                         walk_dir(&path, files);
-                    } else if let Some(ext) = path.extension().and_then(|e| e.to_str()) {
-                        if ext == "md" || ext == "astro" {
-                            files.push(path);
-                        }
+                    } else if let Some(ext) = path.extension().and_then(|e| e.to_str())
+                        && (ext == "md" || ext == "astro") {
+                        files.push(path);
                     }
                 }
             }

@@ -180,7 +180,7 @@ fn verify_feature(claim: &Claim, project_dir: &str) -> VerificationResult {
                 }
             }
         }
-        _ => uncertain(&claim, &format!("grep for '{keyword}' failed")),
+        _ => uncertain(claim, &format!("grep for '{keyword}' failed")),
     }
 }
 
@@ -242,7 +242,7 @@ fn verify_url(claim: &Claim) -> VerificationResult {
             claim: claim.clone(),
             verified: false,
             actual_value: None,
-            message: format!("URL check failed (timeout or network error)"),
+            message: "URL check failed (timeout or network error)".to_string(),
             confidence: Confidence::High,
         },
     }
