@@ -43,10 +43,11 @@ pub struct TypefullyConfig {
     /// Name of the environment variable holding the API key. NOT the key itself.
     #[serde(default = "default_typefully_env")]
     pub api_key_env: String,
+    /// Typefully social set ID (X/Twitter account). Fetched via GET /v2/social-sets.
+    #[serde(default)]
+    pub social_set_id: Option<u64>,
     #[serde(default = "default_max_posts")]
     pub max_posts_per_day: u32,
-    #[serde(default = "default_true")]
-    pub threadify_releases: bool,
     #[serde(default = "default_true")]
     pub enabled: bool,
 }
@@ -55,8 +56,8 @@ impl Default for TypefullyConfig {
     fn default() -> Self {
         Self {
             api_key_env: default_typefully_env(),
+            social_set_id: None,
             max_posts_per_day: 3,
-            threadify_releases: true,
             enabled: true,
         }
     }
@@ -311,7 +312,7 @@ mod tests {
         let t = TypefullyConfig::default();
         assert_eq!(t.api_key_env, "TYPEFULLY_API_KEY");
         assert_eq!(t.max_posts_per_day, 3);
-        assert!(t.threadify_releases);
+        assert!(t.social_set_id.is_none());
         assert!(t.enabled);
     }
 

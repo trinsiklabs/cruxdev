@@ -371,6 +371,31 @@ fn now() -> f64 {
         .as_secs_f64()
 }
 
+/// Check if the emergency stop file exists.
+pub fn is_stopped(project_dir: &str) -> bool {
+    std::path::Path::new(project_dir)
+        .join(".cruxdev/evolution/STOP")
+        .exists()
+}
+
+/// Safety limits for unattended runs.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SafetyLimits {
+    pub max_commits: u32,
+    pub max_posts: u32,
+    pub max_prs: u32,
+}
+
+impl Default for SafetyLimits {
+    fn default() -> Self {
+        Self {
+            max_commits: 5,
+            max_posts: 3,
+            max_prs: 1,
+        }
+    }
+}
+
 /// Run a complete 5-beat evolution cycle.
 pub fn run_cycle(
     state: &mut EvolutionState,
@@ -378,6 +403,22 @@ pub fn run_cycle(
     github_repo: &str,
     dry_run: bool,
 ) -> EvolutionCycle {
+    // Safety: check emergency stop file
+    if is_stopped(project_dir) {
+        return EvolutionCycle {
+            cycle_id: state.cycle_count + 1,
+            started_at: now(),
+            completed_at: Some(now()),
+            beat: "stopped".into(),
+            gathered: Vec::new(),
+            evaluated: Vec::new(),
+            integrated: Vec::new(),
+            posted: Vec::new(),
+            engaged: Vec::new(),
+            error: Some("Emergency STOP file detected. Remove .cruxdev/evolution/STOP to resume.".into()),
+        };
+    }
+
     let cycle_id = state.cycle_count + 1;
     let mut cycle = EvolutionCycle {
         cycle_id,
@@ -650,5 +691,35 @@ mod tests {
         append_to_archive(path.to_str().unwrap(), &cycle).unwrap();
         let lines: Vec<&str> = content.trim().lines().collect();
         assert_eq!(lines.len(), 1); // First append only
+    }
+
+    #[test]
+    fn test_stop_file_halts_cycle() {
+        let dir = tempfile::tempdir().unwrap();
+        let evo_dir = dir.path().join(".cruxdev/evolution");
+        fs::create_dir_all(&evo_dir).unwrap();
+        fs::write(evo_dir.join("STOP"), "emergency stop").unwrap();
+
+        let mut state = EvolutionState::new("test");
+        let cycle = run_cycle(&mut state, dir.path().to_str().unwrap(), "", true);
+        assert_eq!(cycle.beat, "stopped");
+        assert!(cycle.error.is_some());
+        assert!(cycle.error.unwrap().contains("STOP"));
+    }
+
+    #[test]
+    fn test_no_stop_file_runs_normally() {
+        let dir = tempfile::tempdir().unwrap();
+        fs::create_dir_all(dir.path().join(".cruxdev/evolution")).unwrap();
+        assert!(!is_stopped(dir.path().to_str().unwrap()));
+    }
+
+    #[test]
+    fn test_stop_file_detected() {
+        let dir = tempfile::tempdir().unwrap();
+        let evo_dir = dir.path().join(".cruxdev/evolution");
+        fs::create_dir_all(&evo_dir).unwrap();
+        fs::write(evo_dir.join("STOP"), "stop").unwrap();
+        assert!(is_stopped(dir.path().to_str().unwrap()));
     }
 }

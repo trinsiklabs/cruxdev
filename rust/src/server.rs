@@ -12,6 +12,7 @@ use std::sync::{LazyLock, Mutex};
 
 use crate::engine::{convergence, persistence, plan_status, plan_validator, wal, index, router};
 use crate::engine::state::ConvergenceState;
+use crate::growth::content_pipeline::{self, ContentEvent, EventType, ContentMetrics};
 
 // --- Parameter types (Build freshness) ---
 
@@ -27,6 +28,78 @@ pub struct RebuildStaleParam {
     pub project_dir: Option<String>,
     /// Dry run (default: true)
     pub dry_run: Option<bool>,
+}
+
+// --- Parameter types (Content pipeline) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct GenerateContentParam {
+    /// Event type: feature_shipped, gap_closed, issue_resolved, competitor_discovered, etc.
+    pub event_type: String,
+    /// Title for the content
+    pub title: String,
+    /// Short summary
+    pub summary: String,
+    /// Longer details (optional)
+    pub details: Option<String>,
+    /// Project type (default: software-existing)
+    pub project_type: Option<String>,
+    /// Test count (optional metric)
+    pub test_count: Option<usize>,
+    /// Tool count (optional metric)
+    pub tool_count: Option<usize>,
+    /// Findings closed (optional metric)
+    pub findings_closed: Option<usize>,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct ListContentDraftsParam {
+    /// Max drafts to return (default: 20)
+    pub limit: Option<usize>,
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct PublishDraftsParam {
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+    /// Dry run — list what would be published without doing it (default: true)
+    pub dry_run: Option<bool>,
+}
+
+// --- Parameter types (Priority) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct PrioritizeWorkParam {
+    /// Project directory (default: cwd)
+    pub project_dir: Option<String>,
+    /// GitHub repo (e.g., "trinsiklabs/cruxdev")
+    pub github_repo: Option<String>,
+    /// Max items to return (default: 10)
+    pub limit: Option<usize>,
+}
+
+// --- Parameter types (SEO) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct CheckSeoHealthParam {
+    /// Domain to check (e.g., "cruxdev.dev")
+    pub domain: String,
+    /// Project directory for storing results (default: cwd)
+    pub project_dir: Option<String>,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct CheckPageSpeedParam {
+    /// URL to check (e.g., "https://cruxdev.dev")
+    pub url: String,
+    /// Strategy: "mobile" or "desktop" (default: "mobile")
+    pub strategy: Option<String>,
+    /// Project directory for storing results (default: cwd)
+    pub project_dir: Option<String>,
 }
 
 // --- Parameter types (Growth config) ---
@@ -430,6 +503,332 @@ pub struct GenerateGapBuildPlanParam {
 static GUIDED_RESEARCH_SESSIONS: LazyLock<Mutex<HashMap<String, crate::competitors::guided_research::ResearchState>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
+// --- Post-convergence content generation + publishing ---
+
+use crate::growth::typefully;
+
+fn extract_repo_from_plan(plan_file: &str) -> Option<String> {
+    let content = std::fs::read_to_string(plan_file).ok()?;
+    let re = regex::Regex::new(r"github\.com/([^/\s]+/[^/\s]+)").ok()?;
+    re.captures(&content).map(|c| c[1].to_string())
+}
+
+async fn generate_and_publish_convergence_content(
+    state: &ConvergenceState,
+    project_dir: &std::path::Path,
+) -> Option<serde_json::Value> {
+    let plan_name = std::path::Path::new(&state.plan_file)
+        .file_stem()
+        .and_then(|s| s.to_str())
+        .unwrap_or("build plan")
+        .replace('_', " ");
+
+    let total_findings: usize = state.history.iter().map(|r| r.findings.len()).sum();
+    let total_fixed: usize = state.history.iter().map(|r| r.findings_fixed).sum();
+
+    // Extract originating GitHub issue from plan file (look for "Triggered by:" or "GitHub Issue:" lines)
+    let origin_issue = std::fs::read_to_string(&state.plan_file)
+        .ok()
+        .and_then(|content| {
+            let issue_re = regex::Regex::new(r"(?i)(?:triggered by|github issue|origin):\s*(https://github\.com/[^\s)]+/issues/\d+|#\d+)").ok()?;
+            issue_re.captures(&content).map(|c| c[1].to_string())
+        });
+
+    let event = ContentEvent {
+        project_type: "software-existing".into(),
+        event_type: if plan_name.to_lowercase().contains("gap") {
+            EventType::GapClosed
+        } else if plan_name.to_lowercase().contains("fix") || plan_name.to_lowercase().contains("bug") {
+            EventType::BugFix
+        } else {
+            EventType::FeatureShipped
+        },
+        title: format!("Converged: {plan_name}"),
+        summary: format!(
+            "Completed {} rounds across {} phases. {} findings discovered, {} fixed. Two consecutive clean passes achieved.",
+            state.round,
+            state.history.iter().map(|r| format!("{:?}", r.phase)).collect::<std::collections::HashSet<_>>().len(),
+            total_findings,
+            total_fixed,
+        ),
+        details: origin_issue.as_ref().map(|issue| {
+            if issue.starts_with("http") {
+                format!("**Origin:** [{issue}]({issue})")
+            } else {
+                // #N shorthand — resolve against repo from growth.toml or plan file
+                let repo = extract_repo_from_plan(&state.plan_file).unwrap_or_else(|| "trinsiklabs/cruxdev".to_string());
+                let num = issue.trim_start_matches('#');
+                format!("**Origin:** [{}#{}](https://github.com/{}/issues/{})", repo, num, repo, num)
+            }
+        }).unwrap_or_default(),
+        metrics: Some(ContentMetrics {
+            test_count: None,
+            tool_count: None,
+            findings_closed: Some(total_fixed),
+        }),
+    };
+
+    let decision = content_pipeline::classify_event(&event);
+
+    if !decision.generate_blog && !decision.generate_x_post {
+        return None;
+    }
+
+    let blog = content_pipeline::generate_blog_post(&event, &decision);
+    let x_post = content_pipeline::generate_x_post(&event, &decision);
+
+    // Write drafts to posts dir
+    let posts_dir = if !state.project_dir.is_empty() {
+        std::path::PathBuf::from(&state.project_dir).join(".cruxdev/evolution/posts")
+    } else {
+        std::path::PathBuf::from(".cruxdev/evolution/posts")
+    };
+    let _ = std::fs::create_dir_all(&posts_dir);
+
+    let ts = chrono::Local::now().format("%Y%m%d-%H%M%S").to_string();
+    let mut draft_paths = Vec::new();
+
+    if let Some(ref blog_content) = blog {
+        let path = posts_dir.join(format!("{ts}-changelog_entry.md"));
+        let _ = std::fs::write(&path, blog_content);
+        draft_paths.push(path.display().to_string());
+    }
+
+    if let Some(ref x_content) = x_post {
+        let path = posts_dir.join(format!("{ts}-x_post.md"));
+        let _ = std::fs::write(&path, x_content);
+        draft_paths.push(path.display().to_string());
+    }
+
+    // Write blog post to website repo if configured
+    let blog_published = if let Some(ref blog_content) = blog {
+        publish_blog_post(project_dir, &ts, &plan_name, blog_content)
+    } else {
+        false
+    };
+
+    // Auto-post X content to Typefully if API key is available
+    let typefully_result = if let Some(ref x_content) = x_post {
+        auto_post_to_typefully(project_dir, x_content).await
+    } else {
+        serde_json::json!({"skipped": "no x_post generated"})
+    };
+
+    // Archive posted drafts
+    if typefully_result.get("success").and_then(|v| v.as_bool()).unwrap_or(false) || blog_published {
+        let archive_dir = posts_dir.parent().unwrap_or(posts_dir.as_path()).join("archive");
+        let _ = std::fs::create_dir_all(&archive_dir);
+        for path_str in &draft_paths {
+            let src = std::path::Path::new(path_str);
+            if let Some(filename) = src.file_name() {
+                let dest = archive_dir.join(filename);
+                let _ = std::fs::rename(src, dest);
+            }
+        }
+    }
+
+    Some(serde_json::json!({
+        "event_type": format!("{:?}", event.event_type),
+        "blog_generated": blog.is_some(),
+        "x_post_generated": x_post.is_some(),
+        "blog_published": blog_published,
+        "typefully": typefully_result,
+        "draft_paths": draft_paths,
+        "reason": decision.reason,
+    }))
+}
+
+/// Publish a blog post to the website repo.
+fn publish_blog_post(
+    project_dir: &std::path::Path,
+    ts: &str,
+    plan_name: &str,
+    content: &str,
+) -> bool {
+    // Check for growth.toml config
+    let config_path = project_dir.join(".cruxdev/growth.toml");
+    let config_str = match std::fs::read_to_string(&config_path) {
+        Ok(s) => s,
+        Err(_) => return false,
+    };
+    let config: toml::Value = match config_str.parse() {
+        Ok(v) => v,
+        Err(_) => return false,
+    };
+
+    // Get blog_dir from config
+    let blog_dir = config
+        .get("content")
+        .and_then(|c| c.get("blog_dir"))
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+
+    if blog_dir.is_empty() {
+        return false;
+    }
+
+    let blog_path = std::path::Path::new(blog_dir);
+    let _ = std::fs::create_dir_all(blog_path);
+
+    // Create slug from plan name
+    let slug: String = plan_name
+        .to_lowercase()
+        .chars()
+        .map(|c| if c.is_alphanumeric() { c } else { '-' })
+        .collect::<String>()
+        .replace("--", "-")
+        .trim_matches('-')
+        .to_string();
+
+    let date = &ts[..8]; // YYYYMMDD
+    let filename = format!("{date}-{slug}.md");
+
+    // Write with Astro-compatible frontmatter (includes layout for rendering)
+    let frontmatter = format!(
+        "---\nlayout: ../../layouts/BlogPost.astro\ntitle: \"{plan_name}\"\ndate: \"{}-{}-{}\"\nslug: \"{slug}\"\nsummary: \"{}\"\n---\n\n",
+        &date[..4], &date[4..6], &date[6..8],
+        content.lines().find(|l| !l.is_empty() && !l.starts_with('#')).unwrap_or(""),
+    );
+
+    let full_content = format!("{frontmatter}{content}");
+    if std::fs::write(blog_path.join(&filename), &full_content).is_err() {
+        return false;
+    }
+
+    // Trigger deploy if deploy.sh exists in the website repo
+    let website_repo = config
+        .get("content")
+        .and_then(|c| c.get("website_repo"))
+        .and_then(|v| v.as_str())
+        .unwrap_or("");
+    if !website_repo.is_empty() {
+        let deploy_script = std::path::Path::new(website_repo).join("deploy.sh");
+        if deploy_script.exists() {
+            let _ = std::process::Command::new("bash")
+                .arg(&deploy_script)
+                .current_dir(website_repo)
+                .output();
+        }
+    }
+
+    true
+}
+
+/// Auto-post X content to Typefully if configured.
+async fn auto_post_to_typefully(
+    project_dir: &std::path::Path,
+    content: &str,
+) -> serde_json::Value {
+    // Check for API key
+    let api_key = match typefully::api_key_from_env() {
+        Some(k) if !k.is_empty() => k,
+        _ => return serde_json::json!({"skipped": "TYPEFULLY_API_KEY not set"}),
+    };
+
+    // Check growth.toml config
+    let config_path = project_dir.join(".cruxdev/growth.toml");
+    let config_str = match std::fs::read_to_string(&config_path) {
+        Ok(s) => s,
+        Err(_) => return serde_json::json!({"skipped": "no growth.toml"}),
+    };
+    let config: toml::Value = match config_str.parse() {
+        Ok(v) => v,
+        Err(_) => return serde_json::json!({"skipped": "invalid growth.toml"}),
+    };
+
+    let enabled = config
+        .get("typefully")
+        .and_then(|t| t.get("enabled"))
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+
+    if !enabled {
+        return serde_json::json!({"skipped": "typefully not enabled in growth.toml"});
+    }
+
+    let social_set_id = config
+        .get("typefully")
+        .and_then(|t| t.get("social_set_id"))
+        .and_then(|v| v.as_integer())
+        .map(|v| v as u64);
+
+    let result = typefully::post_draft(&api_key, content, social_set_id).await;
+
+    serde_json::json!({
+        "success": result.success,
+        "draft_id": result.draft_id,
+        "error": result.error,
+    })
+}
+
+/// Publish all unpublished drafts (from .cruxdev/evolution/posts/) to Typefully and website.
+async fn publish_pending_drafts(
+    project_dir: &std::path::Path,
+) -> serde_json::Value {
+    let posts_dir = project_dir.join(".cruxdev/evolution/posts");
+    let archive_dir = project_dir.join(".cruxdev/evolution/archive");
+    let _ = std::fs::create_dir_all(&archive_dir);
+
+    let mut published = Vec::new();
+    let mut errors = Vec::new();
+
+    let mut entries: Vec<std::path::PathBuf> = Vec::new();
+    if let Ok(rd) = std::fs::read_dir(&posts_dir) {
+        for entry in rd.flatten() {
+            let path = entry.path();
+            if path.extension().map(|e| e == "md").unwrap_or(false) {
+                entries.push(path);
+            }
+        }
+    }
+    entries.sort();
+
+    for path in &entries {
+        let filename = path.file_name().unwrap_or_default().to_string_lossy().to_string();
+        let content = match std::fs::read_to_string(path) {
+            Ok(c) => c,
+            Err(e) => {
+                errors.push(serde_json::json!({"file": filename, "error": format!("{e}")}));
+                continue;
+            }
+        };
+
+        if filename.contains("x_post") {
+            let result = auto_post_to_typefully(project_dir, &content).await;
+            let success = result.get("success").and_then(|v| v.as_bool()).unwrap_or(false);
+            if success {
+                let dest = archive_dir.join(&filename);
+                let _ = std::fs::rename(path, dest);
+                published.push(serde_json::json!({"file": filename, "target": "typefully", "result": result}));
+            } else {
+                errors.push(serde_json::json!({"file": filename, "target": "typefully", "result": result}));
+            }
+        } else if filename.contains("changelog_entry") {
+            // Extract timestamp and plan name for blog publishing
+            let ts = filename.split('-').take(2).collect::<Vec<_>>().join("-");
+            let plan_name = filename
+                .trim_end_matches(".md")
+                .split('-')
+                .skip(2)
+                .collect::<Vec<_>>()
+                .join(" ");
+            let blog_ok = publish_blog_post(project_dir, &ts, &plan_name, &content);
+            if blog_ok {
+                let dest = archive_dir.join(&filename);
+                let _ = std::fs::rename(path, dest);
+                published.push(serde_json::json!({"file": filename, "target": "blog"}));
+            }
+        }
+    }
+
+    serde_json::json!({
+        "published": published.len(),
+        "errors": errors.len(),
+        "details": published,
+        "error_details": errors,
+    })
+}
+
 // --- Server ---
 
 #[derive(Debug, Clone)]
@@ -552,6 +951,7 @@ impl CruxDevServer {
 
         serde_json::json!({
             "convergence_id": id,
+            "protocol_version": crate::engine::state::PROTOCOL_VERSION,
             "status": "started",
             "task": task,
         }).to_string()
@@ -596,11 +996,14 @@ impl CruxDevServer {
 
         let next = router::get_next_task(&mut state, &sp, None, None, None);
 
+        let mut content_drafts: Option<serde_json::Value> = None;
         if next.task_type == "done" {
             plan_status::update_plan_status(&state.plan_file, "CONVERGED");
             if !state.project_dir.is_empty() {
                 index::update_run_status(&state.project_dir, &p.convergence_id, "converged");
             }
+            // Post-convergence content generation + publishing
+            content_drafts = generate_and_publish_convergence_content(&state, &self.project_dir).await;
         } else if next.task_type == "escalated" {
             plan_status::update_plan_status(&state.plan_file, "ESCALATED");
             if !state.project_dir.is_empty() {
@@ -608,7 +1011,7 @@ impl CruxDevServer {
             }
         }
 
-        serde_json::json!({
+        let mut result = serde_json::json!({
             "convergence_id": p.convergence_id,
             "phase": format!("{:?}", state.phase),
             "round": state.round,
@@ -616,7 +1019,17 @@ impl CruxDevServer {
             "status": "result_accepted",
             "continue": !convergence::is_terminal(state.phase),
             "next_task": next,
-        }).to_string()
+        });
+        if let Some(drafts) = content_drafts {
+            result["content_drafts"] = drafts;
+        }
+        if next.task_type == "done" {
+            result["self_adopt_recommended"] = serde_json::json!(true);
+            result["self_adopt_instructions"] = serde_json::json!(
+                "Run self-adoption: classify the project, check all patterns docs are integrated, verify dimensions are wired, deploy website if changed."
+            );
+        }
+        result.to_string()
     }
 
     #[tool(description = "Check convergence status.")]
@@ -625,6 +1038,7 @@ impl CruxDevServer {
         match persistence::load_state(&sp) {
             Ok(state) => serde_json::json!({
                 "convergence_id": params.0.convergence_id,
+                "protocol_version": crate::engine::state::PROTOCOL_VERSION,
                 "phase": format!("{:?}", state.phase),
                 "round": state.round,
                 "consecutive_clean": state.consecutive_clean,
@@ -1367,6 +1781,8 @@ impl CruxDevServer {
             "files_written": files_written,
             "gap_analysis": result.gap_analysis,
             "discovery_queries": result.discovery_queries,
+            "competitors_doc_length": result.competitors_doc.len(),
+            "comparison_pages_count": result.comparison_pages.len(),
             "competitors_doc_preview": &result.competitors_doc[..result.competitors_doc.len().min(2000)],
         }).to_string()
     }
@@ -1910,7 +2326,7 @@ impl CruxDevServer {
         if !dry_run && config.typefully.enabled {
             if let Some(api_key) = crate::growth::config::resolve_api_key(&config.typefully.api_key_env) {
                 let result = crate::growth::typefully::post_draft(
-                    &api_key, &x_post, config.typefully.threadify_releases,
+                    &api_key, &x_post, config.typefully.social_set_id,
                 ).await;
                 actions.push(serde_json::json!({"action": "typefully_post", "success": result.success, "error": result.error}));
             } else {
@@ -2047,7 +2463,7 @@ impl CruxDevServer {
             None => return serde_json::json!({"error": "TYPEFULLY_API_KEY not set"}).to_string(),
         };
 
-        let result = crate::growth::typefully::post_draft(&api_key, &p.content, threadify).await;
+        let result = crate::growth::typefully::post_draft(&api_key, &p.content, None).await;
         serde_json::json!(result).to_string()
     }
 
@@ -2107,6 +2523,249 @@ impl CruxDevServer {
             "rebuilt": results.len(),
             "all_succeeded": all_ok,
             "results": results,
+        }).to_string()
+    }
+
+    // 53. generate_content
+    #[tool(description = "Generate blog post and X post drafts from a content event. Writes drafts to .cruxdev/evolution/posts/.")]
+    async fn generate_content(&self, params: Parameters<GenerateContentParam>) -> String {
+        let p = &params.0;
+        let event_type = match p.event_type.as_str() {
+            "feature_shipped" => EventType::FeatureShipped,
+            "competitor_discovered" => EventType::CompetitorDiscovered,
+            "gap_closed" => EventType::GapClosed,
+            "issue_resolved" => EventType::IssueResolved,
+            "integration_added" => EventType::IntegrationAdded,
+            "methodology_doc" => EventType::MethodologyDoc,
+            "chapter_completed" => EventType::ChapterCompleted,
+            "book_published" => EventType::BookPublished,
+            "episode_published" => EventType::EpisodePublished,
+            "issue_published" => EventType::IssuePublished,
+            "video_published" => EventType::VideoPublished,
+            "product_launch" => EventType::ProductLaunch,
+            "release_published" => EventType::ReleasePublished,
+            "milestone_reached" => EventType::MilestoneReached,
+            "bug_fix" => EventType::BugFix,
+            "refactor" => EventType::Refactor,
+            _ => return serde_json::json!({"error": format!("Unknown event_type: {}", p.event_type)}).to_string(),
+        };
+
+        let event = ContentEvent {
+            project_type: p.project_type.clone().unwrap_or_else(|| "software-existing".into()),
+            event_type,
+            title: p.title.clone(),
+            summary: p.summary.clone(),
+            details: p.details.clone().unwrap_or_default(),
+            metrics: if p.test_count.is_some() || p.tool_count.is_some() || p.findings_closed.is_some() {
+                Some(ContentMetrics {
+                    test_count: p.test_count,
+                    tool_count: p.tool_count,
+                    findings_closed: p.findings_closed,
+                })
+            } else {
+                None
+            },
+        };
+
+        let decision = content_pipeline::classify_event(&event);
+        let blog = content_pipeline::generate_blog_post(&event, &decision);
+        let x_post = content_pipeline::generate_x_post(&event, &decision);
+
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.clone()
+        } else {
+            std::path::PathBuf::from(proj)
+        };
+        let posts_dir = proj_dir.join(".cruxdev/evolution/posts");
+        let _ = std::fs::create_dir_all(&posts_dir);
+
+        let ts = chrono::Local::now().format("%Y%m%d-%H%M%S").to_string();
+        let mut draft_paths = Vec::new();
+
+        if let Some(ref content) = blog {
+            let path = posts_dir.join(format!("{ts}-changelog_entry.md"));
+            let _ = std::fs::write(&path, content);
+            draft_paths.push(path.display().to_string());
+        }
+
+        if let Some(ref content) = x_post {
+            let path = posts_dir.join(format!("{ts}-x_post.md"));
+            let _ = std::fs::write(&path, content);
+            draft_paths.push(path.display().to_string());
+        }
+
+        serde_json::json!({
+            "event_type": p.event_type,
+            "blog_generated": blog.is_some(),
+            "x_post_generated": x_post.is_some(),
+            "blog_template": decision.blog_template,
+            "x_template": decision.x_template,
+            "reason": decision.reason,
+            "draft_paths": draft_paths,
+            "blog_preview": blog.as_deref().map(|b| b.chars().take(500).collect::<String>()),
+            "x_post_preview": x_post,
+        }).to_string()
+    }
+
+    // 54. list_content_drafts
+    #[tool(description = "List recent content drafts from .cruxdev/evolution/posts/.")]
+    async fn list_content_drafts(&self, params: Parameters<ListContentDraftsParam>) -> String {
+        let p = &params.0;
+        let limit = p.limit.unwrap_or(20);
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.clone()
+        } else {
+            std::path::PathBuf::from(proj)
+        };
+        let posts_dir = proj_dir.join(".cruxdev/evolution/posts");
+
+        let mut entries: Vec<(String, String)> = Vec::new();
+        if let Ok(rd) = std::fs::read_dir(&posts_dir) {
+            for entry in rd.flatten() {
+                let name = entry.file_name().to_string_lossy().to_string();
+                if name.ends_with(".md") {
+                    let content = std::fs::read_to_string(entry.path()).unwrap_or_default();
+                    let preview: String = content.chars().take(200).collect();
+                    entries.push((name, preview));
+                }
+            }
+        }
+
+        entries.sort_by(|a, b| b.0.cmp(&a.0));
+        entries.truncate(limit);
+
+        serde_json::json!({
+            "drafts": entries.iter().map(|(name, preview)| serde_json::json!({
+                "filename": name,
+                "preview": preview,
+            })).collect::<Vec<_>>(),
+            "total": entries.len(),
+        }).to_string()
+    }
+
+    // 55. publish_drafts
+    #[tool(description = "Publish all pending content drafts to Typefully (X posts) and website blog (changelog entries). Dry-run by default. Moves published drafts to archive.")]
+    async fn publish_drafts(&self, params: Parameters<PublishDraftsParam>) -> String {
+        let p = &params.0;
+        let dry_run = p.dry_run.unwrap_or(true);
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.clone()
+        } else {
+            std::path::PathBuf::from(proj)
+        };
+
+        if dry_run {
+            // List what would be published
+            let posts_dir = proj_dir.join(".cruxdev/evolution/posts");
+            let mut x_posts = Vec::new();
+            let mut blog_posts = Vec::new();
+            if let Ok(rd) = std::fs::read_dir(&posts_dir) {
+                for entry in rd.flatten() {
+                    let name = entry.file_name().to_string_lossy().to_string();
+                    if name.ends_with(".md") {
+                        if name.contains("x_post") {
+                            x_posts.push(name);
+                        } else if name.contains("changelog_entry") {
+                            blog_posts.push(name);
+                        }
+                    }
+                }
+            }
+            return serde_json::json!({
+                "dry_run": true,
+                "pending_x_posts": x_posts.len(),
+                "pending_blog_posts": blog_posts.len(),
+                "x_posts": x_posts,
+                "blog_posts": blog_posts,
+                "typefully_api_key_set": typefully::api_key_from_env().is_some(),
+            }).to_string();
+        }
+
+        let result = publish_pending_drafts(&proj_dir).await;
+        result.to_string()
+    }
+
+    // 56. check_seo_health
+    #[tool(description = "Run SEO health checks against a domain. Checks robots.txt, sitemap, llms.txt, security headers, HTTPS redirect, key pages, and meta tags. No API key needed.")]
+    async fn check_seo_health(&self, params: Parameters<CheckSeoHealthParam>) -> String {
+        let p = &params.0;
+        let report = crate::growth::seo::check_seo_health(&p.domain).await;
+
+        // Store results
+        let proj_dir = p.project_dir.as_deref().map(std::path::PathBuf::from)
+            .unwrap_or_else(|| self.project_dir.clone());
+        let path = proj_dir.join(".cruxdev/growth/seo_health.jsonl");
+        let _ = crate::growth::seo::append_report(&path, &report);
+
+        serde_json::to_string_pretty(&report).unwrap_or_else(|e| format!("{{\"error\": \"{e}\"}}" ))
+    }
+
+    // 57. check_pagespeed
+    #[tool(description = "Check Google PageSpeed Insights for a URL. Returns performance, accessibility, best practices, and SEO scores plus Core Web Vitals. Free API, no key needed. Detects regressions against previous run.")]
+    async fn check_pagespeed(&self, params: Parameters<CheckPageSpeedParam>) -> String {
+        let p = &params.0;
+        let strategy = p.strategy.as_deref().unwrap_or("mobile");
+
+        let report = match crate::growth::seo::check_pagespeed(&p.url, strategy).await {
+            Some(r) => r,
+            None => return serde_json::json!({"error": "PageSpeed API returned no data. Check URL."}).to_string(),
+        };
+
+        let proj_dir = p.project_dir.as_deref().map(std::path::PathBuf::from)
+            .unwrap_or_else(|| self.project_dir.clone());
+        let path = proj_dir.join(".cruxdev/growth/pagespeed.jsonl");
+
+        // Check for regression against last run
+        let previous: Vec<crate::growth::seo::PageSpeedReport> =
+            crate::growth::seo::load_recent_reports(&path, 1);
+        let regressions = if let Some(prev) = previous.last() {
+            crate::growth::seo::detect_regression(&report, prev, 5.0)
+        } else {
+            vec![]
+        };
+
+        // Store current report
+        let _ = crate::growth::seo::append_report(&path, &report);
+
+        let mut result = serde_json::to_value(&report).unwrap_or_default();
+        if !regressions.is_empty() {
+            result["regressions"] = serde_json::json!(regressions);
+            result["regression_detected"] = serde_json::json!(true);
+        }
+        serde_json::to_string_pretty(&result).unwrap_or_else(|e| format!("{{\"error\": \"{e}\"}}" ))
+    }
+
+    // 58. prioritize_work
+    #[tool(description = "Scan all work sources (build plans, GitHub issues, competitive gaps, self-adoption findings, content backlog) and return a prioritized list. Use this to decide what to work on next in autonomous mode.")]
+    async fn prioritize_work(&self, params: Parameters<PrioritizeWorkParam>) -> String {
+        let p = &params.0;
+        let proj = p.project_dir.as_deref().unwrap_or(".");
+        let proj_dir = if proj == "." {
+            self.project_dir.to_string_lossy().to_string()
+        } else {
+            proj.to_string()
+        };
+        let repo = p.github_repo.as_deref().unwrap_or("");
+        let limit = p.limit.unwrap_or(10);
+
+        let items = crate::engine::priority::scan_work_sources(&proj_dir, repo);
+        let total = items.len();
+        let top: Vec<_> = items.into_iter().take(limit).collect();
+        let next = top.first().map(|i| serde_json::json!({
+            "title": i.title,
+            "action": i.action,
+            "score": i.score,
+            "source": i.source,
+        }));
+
+        serde_json::json!({
+            "total_items": total,
+            "showing": top.len(),
+            "next": next,
+            "items": top,
         }).to_string()
     }
 }

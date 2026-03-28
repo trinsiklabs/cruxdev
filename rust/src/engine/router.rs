@@ -23,6 +23,9 @@ pub const SKILL_DIMENSIONS: &[&str] = &["design", "description", "mcp_sync", "te
 pub const CONTENT_DIMENSIONS: &[&str] = &["accuracy", "completeness", "clarity", "consistency", "engagement", "structure", "voice", "citations"];
 pub const BUSINESS_DIMENSIONS: &[&str] = &["viability", "market_fit", "financial_soundness", "legal_compliance", "competitive_position", "scalability"];
 pub const MEDIA_DIMENSIONS: &[&str] = &["content_quality", "production_quality", "audience_fit", "seo", "accessibility", "consistency"];
+pub const UI_COMPONENT_DIMENSIONS: &[&str] = &["variant_consistency", "token_usage", "composition_quality", "duplication_detection", "api_surface", "accessibility", "maintenance_cost"];
+pub const COLOR_CONTRAST_DIMENSIONS: &[&str] = &["wcag_aa_compliance", "color_system_consistency", "dark_mode_parity", "semantic_tokens", "focus_visibility"];
+pub const LOGO_DIMENSIONS: &[&str] = &["viewbox_optimization", "favicon_set", "dark_light_variants", "size_legibility"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -133,11 +136,139 @@ fn detect_website(plan_file: &str) -> (bool, Vec<String>, String) {
 }
 
 /// Detect if project is a webapp (not just static site).
+fn detect_ui_components(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    // Check for common UI component patterns across frameworks
+    let component_markers = [
+        // React/Next.js/Vue/Svelte component dirs
+        "src/components", "components", "app/components",
+        // Phoenix/LiveView
+        "lib/web/components", "lib/web/live",
+        // Flutter
+        "lib/widgets",
+        // Blazor
+        "Components", "Pages",
+        // Component library configs
+        "components.json", // shadcn
+    ];
+    let component_files = [
+        // Tailwind + component library indicators
+        "tailwind.config.js", "tailwind.config.ts", "tailwind.config.mjs",
+        // Framework component files
+        "package.json", // check for React/Vue/Svelte deps
+        "mix.exs", // Phoenix
+        "pubspec.yaml", // Flutter
+    ];
+    let has_component_dir = component_markers.iter().any(|m| root.join(m).is_dir());
+    let has_component_config = component_files.iter().any(|m| root.join(m).exists());
+    has_component_dir && has_component_config
+}
+
 fn detect_webapp(plan_file: &str) -> bool {
     let root = find_project_root(plan_file);
     let markers = ["app", "api", "Dockerfile", "docker-compose.yml",
                    "docs/E2E_TEST_PATTERNS.md", "docs/UAT_TEST_PATTERNS.md"];
     markers.iter().any(|m| root.join(m).exists())
+}
+
+/// Resolve project dir from state, falling back to plan_file parent.
+fn resolve_proj_dir(state: &ConvergenceState) -> String {
+    if !state.project_dir.is_empty() {
+        state.project_dir.clone()
+    } else {
+        std::path::Path::new(&state.plan_file)
+            .parent()
+            .unwrap_or(std::path::Path::new("."))
+            .to_string_lossy()
+            .to_string()
+    }
+}
+
+/// Detect if project has metrics/observability (dashboards, metrics collection).
+fn detect_metrics(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let markers = [
+        "docs/METRICS_PATTERNS.md", "docs/METRICS.md",
+        "grafana", "prometheus", "datadog",
+        ".cruxdev/growth/metrics.jsonl",
+    ];
+    markers.iter().any(|m| root.join(m).exists())
+}
+
+/// Detect if project has dashboards.
+fn detect_dashboards(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let markers = [
+        "docs/DASHBOARD_PATTERNS.md", "dashboard", "dashboards",
+        "src/pages/dashboard", "app/dashboard",
+    ];
+    markers.iter().any(|m| root.join(m).exists())
+}
+
+/// Detect if project is an MCP server.
+fn detect_mcp_server(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let has_mcp_config = root.join(".mcp.json").exists();
+    let has_server = ["src/server.rs", "src/mcp_server.py", "src/server.ts", "server.py"]
+        .iter()
+        .any(|m| root.join(m).exists());
+    has_mcp_config && has_server
+}
+
+/// Detect if project has skills (.claude/skills/ or .claude/commands/).
+fn detect_skills(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    root.join(".claude/skills").is_dir() || root.join(".claude/commands").is_dir()
+}
+
+/// Detect if project produces content (blog, newsletter, posts).
+fn detect_content_project(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let markers = [
+        "blog", "src/pages/blog", "content", "posts",
+        "newsletters", "issues",
+        "docs/BLOG_POST_PATTERNS.md", "docs/X_POST_PATTERNS.md",
+        ".cruxdev/evolution/posts",
+    ];
+    markers.iter().any(|m| root.join(m).is_dir() || root.join(m).exists())
+}
+
+/// Detect if project is a business (not purely software).
+fn detect_business_project(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let markers = [
+        "docs/BUSINESS_PLAN.md", "docs/BUDGET.md", "docs/OPERATIONS.md",
+        "docs/PRICING.md", "docs/REVENUE.md",
+        "proposals", "clients", "deliverables",
+    ];
+    markers.iter().filter(|m| root.join(m).exists() || root.join(m).is_dir()).count() >= 2
+}
+
+/// Detect if project is a media/content creation project.
+fn detect_media_project(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let markers = [
+        "episodes", "videos", "chapters", "manuscript",
+        "SHOW_FORMAT.md", "docs/SHOW_FORMAT.md",
+        "CHANNEL_STRATEGY.md", "docs/CHANNEL_STRATEGY.md",
+        "BOOK_OUTLINE.md", "docs/BOOK_OUTLINE.md",
+    ];
+    markers.iter().any(|m| root.join(m).exists() || root.join(m).is_dir())
+}
+
+/// Detect if project has a website with visual elements needing color/contrast audit.
+fn detect_website_visual(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    // Has CSS/styles + website indicators
+    let has_styles = ["styles", "src/styles", "css", "tailwind.config.js", "tailwind.config.ts", "tailwind.config.mjs"]
+        .iter()
+        .any(|m| root.join(m).exists() || root.join(m).is_dir());
+    let has_website = root.join("docs/DEPLOYMENT.md").exists()
+        || root.join("docs/WEBSITE.md").exists()
+        || root.join("astro.config.mjs").exists()
+        || root.join("next.config.js").exists()
+        || root.join("next.config.ts").exists();
+    has_styles && has_website
 }
 
 /// Main dispatch: determine the next task based on engine state.
@@ -269,11 +400,29 @@ pub fn get_next_task(
             }
             let files = source_files.map(|f| f.to_vec())
                 .unwrap_or_else(|| vec![state.plan_file.clone()]);
+            let mut dims: Vec<String> = CODE_DIMENSIONS.iter().map(|s| s.to_string()).collect();
+            let proj_dir = resolve_proj_dir(state);
+            // UI component DRY dimensions
+            if detect_ui_components(&proj_dir) {
+                for dim in UI_COMPONENT_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // MCP server dimensions
+            if detect_mcp_server(&proj_dir) {
+                for dim in MCP_SERVER_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // Metrics/observability dimensions
+            if detect_metrics(&proj_dir) {
+                for dim in METRICS_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // Business dimensions
+            if detect_business_project(&proj_dir) {
+                for dim in BUSINESS_DIMENSIONS { dims.push((*dim).into()); }
+            }
             Task {
                 task_type: "audit".into(),
                 description: format!("Audit code (round {}).", state.round),
                 files,
-                dimensions: CODE_DIMENSIONS.iter().map(|s| s.to_string()).collect(),
+                dimensions: dims,
                 finding: None,
                 test_command: test_command.map(|tc| tc.to_vec()),
                 metadata: None,
@@ -288,11 +437,25 @@ pub fn get_next_task(
             }
             let files = doc_files.map(|f| f.to_vec())
                 .unwrap_or_else(|| auto_discover_docs(&state.plan_file));
+            let mut dims: Vec<String> = DOC_DIMENSIONS.iter().map(|s| s.to_string()).collect();
+            let proj_dir = resolve_proj_dir(state);
+            // Skills dimensions
+            if detect_skills(&proj_dir) {
+                for dim in SKILL_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // Content dimensions (blog, newsletter, posts)
+            if detect_content_project(&proj_dir) {
+                for dim in CONTENT_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // Media dimensions (books, podcasts, YouTube, courses)
+            if detect_media_project(&proj_dir) {
+                for dim in MEDIA_DIMENSIONS { dims.push((*dim).into()); }
+            }
             Task {
                 task_type: "audit".into(),
                 description: format!("Audit documentation (round {}).", state.round),
                 files,
-                dimensions: DOC_DIMENSIONS.iter().map(|s| s.to_string()).collect(),
+                dimensions: dims,
                 finding: None, test_command: None, metadata: None,
                 recommended_tier: Some("fast".into()),
             }
@@ -314,20 +477,19 @@ pub fn get_next_task(
                 dims.push("e2e_testing".into());
                 dims.push("uat_testing".into());
             }
-            // Check for forms — add form audit dimensions if detected
-            let form_dir = if state.project_dir.is_empty() {
-                std::path::Path::new(&state.plan_file)
-                    .parent()
-                    .unwrap_or(std::path::Path::new("."))
-                    .to_string_lossy()
-                    .to_string()
-            } else {
-                state.project_dir.clone()
-            };
-            if super::form_detect::project_has_forms(&form_dir) {
-                for dim in FORM_DIMENSIONS {
-                    dims.push((*dim).into());
-                }
+            let proj_dir = resolve_proj_dir(state);
+            // Form dimensions
+            if super::form_detect::project_has_forms(&proj_dir) {
+                for dim in FORM_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // Dashboard dimensions
+            if detect_dashboards(&proj_dir) {
+                for dim in DASHBOARD_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // Color/contrast dimensions
+            if detect_website_visual(&proj_dir) {
+                for dim in COLOR_CONTRAST_DIMENSIONS { dims.push((*dim).into()); }
+                for dim in LOGO_DIMENSIONS { dims.push((*dim).into()); }
             }
             Task {
                 task_type: "audit".into(),
@@ -570,5 +732,84 @@ mod tests {
         submit_result(&mut state, &sp, &json!({"checklist_item": "1.1", "findings": []}));
         let content = std::fs::read_to_string(&plan).unwrap();
         assert!(content.contains("- [x] 1.1"));
+    }
+
+    /// Architecture test: verify every DIMENSIONS constant is referenced in routing logic.
+    /// This prevents the pattern of defining dimensions but never wiring them into convergence.
+    #[test]
+    fn all_dimension_sets_are_wired_into_routing() {
+        let source = include_str!("router.rs");
+
+        // Every *_DIMENSIONS constant must appear in a `for dim in` or `dims.push` context
+        // (not just its definition line)
+        let dimension_sets = [
+            "PLAN_DIMENSIONS",
+            "CODE_DIMENSIONS",
+            "DOC_DIMENSIONS",
+            "FORM_DIMENSIONS",
+            "METRICS_DIMENSIONS",
+            "DASHBOARD_DIMENSIONS",
+            "MCP_SERVER_DIMENSIONS",
+            "SKILL_DIMENSIONS",
+            "CONTENT_DIMENSIONS",
+            "BUSINESS_DIMENSIONS",
+            "MEDIA_DIMENSIONS",
+            "UI_COMPONENT_DIMENSIONS",
+            "COLOR_CONTRAST_DIMENSIONS",
+            "LOGO_DIMENSIONS",
+        ];
+
+        for dim_set in &dimension_sets {
+            // Count occurrences — must appear at least twice (once for definition, once for usage)
+            let count = source.matches(dim_set).count();
+            assert!(
+                count >= 2,
+                "Dimension set {} is defined but never used in routing logic (found {} references, need >= 2)",
+                dim_set, count
+            );
+        }
+    }
+
+    #[test]
+    fn code_auditing_includes_mcp_dimensions_for_mcp_project() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join("src")).unwrap();
+        std::fs::write(dir.path().join(".mcp.json"), "{}").unwrap();
+        std::fs::write(dir.path().join("src/server.rs"), "fn main() {}").unwrap();
+        let (mut state, _plan, sp) = setup(dir.path(), "# Plan\n- [ ] 1.1 task\n");
+        state.phase = ConvergencePhase::CodeAuditing;
+        state.project_dir = dir.path().to_str().unwrap().to_string();
+        persistence::save_state(&mut state, &sp).unwrap();
+        let task = get_next_task(&mut state, &sp, None, None, None);
+        assert!(task.dimensions.contains(&"tool_design".to_string()), "MCP project should have tool_design dimension");
+        assert!(task.dimensions.contains(&"skill_sync".to_string()), "MCP project should have skill_sync dimension");
+    }
+
+    #[test]
+    fn doc_auditing_includes_content_dimensions_for_content_project() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join("blog")).unwrap();
+        std::fs::create_dir_all(dir.path().join("docs")).unwrap();
+        std::fs::write(dir.path().join("docs/README.md"), "# Docs").unwrap();
+        let (mut state, _plan, sp) = setup(dir.path(), "# Plan\n- [ ] 1.1 task\n");
+        state.phase = ConvergencePhase::DocAuditing;
+        state.project_dir = dir.path().to_str().unwrap().to_string();
+        persistence::save_state(&mut state, &sp).unwrap();
+        let task = get_next_task(&mut state, &sp, None, None, None);
+        assert!(task.dimensions.contains(&"engagement".to_string()), "Content project should have engagement dimension");
+    }
+
+    #[test]
+    fn doc_auditing_includes_skill_dimensions_for_skill_project() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join(".claude/skills")).unwrap();
+        std::fs::create_dir_all(dir.path().join("docs")).unwrap();
+        std::fs::write(dir.path().join("docs/README.md"), "# Docs").unwrap();
+        let (mut state, _plan, sp) = setup(dir.path(), "# Plan\n- [ ] 1.1 task\n");
+        state.phase = ConvergencePhase::DocAuditing;
+        state.project_dir = dir.path().to_str().unwrap().to_string();
+        persistence::save_state(&mut state, &sp).unwrap();
+        let task = get_next_task(&mut state, &sp, None, None, None);
+        assert!(task.dimensions.contains(&"mcp_sync".to_string()), "Skill project should have mcp_sync dimension");
     }
 }

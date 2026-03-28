@@ -63,9 +63,14 @@ pub struct TestRunResult {
     pub duration_seconds: f64,
 }
 
+/// Current convergence protocol version.
+pub const PROTOCOL_VERSION: &str = "1.0";
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ConvergenceState {
     pub plan_file: String,
+    #[serde(default = "default_protocol_version")]
+    pub protocol_version: String,
     #[serde(default = "default_phase")]
     pub phase: ConvergencePhase,
     #[serde(default)]
@@ -94,6 +99,7 @@ pub struct ConvergenceState {
     pub project_dir: String,
 }
 
+fn default_protocol_version() -> String { PROTOCOL_VERSION.to_string() }
 fn default_phase() -> ConvergencePhase { ConvergencePhase::Planning }
 fn default_max_rounds() -> i32 { 5 }
 fn default_threshold() -> i32 { 2 }
@@ -111,6 +117,7 @@ impl ConvergenceState {
         let t = now();
         Self {
             plan_file,
+            protocol_version: PROTOCOL_VERSION.to_string(),
             phase: ConvergencePhase::Planning,
             round: 0,
             max_rounds: 5,

@@ -280,12 +280,18 @@ pub fn write_results(
 ) -> Result<Vec<PathBuf>> {
     let mut written = Vec::new();
 
-    // Write COMPETITORS.md
+    // Write COMPETITORS.md — guard against writing empty content
     let comp_path = Path::new(project_dir).join(docs_dir).join("COMPETITORS.md");
+    if result.competitors_doc.trim().is_empty() {
+        return Err(anyhow::anyhow!("Refusing to write empty COMPETITORS.md — generation returned no content"));
+    }
     if let Some(parent) = comp_path.parent() {
         fs::create_dir_all(parent)?;
     }
-    fs::write(&comp_path, &result.competitors_doc)?;
+    // Atomic write: write to temp file then rename
+    let tmp_path = comp_path.with_extension("md.tmp");
+    fs::write(&tmp_path, &result.competitors_doc)?;
+    fs::rename(&tmp_path, &comp_path)?;
     written.push(comp_path);
 
     // Write comparison pages
@@ -293,8 +299,13 @@ pub fn write_results(
         let vs_path = Path::new(project_dir).join(vs_dir);
         fs::create_dir_all(&vs_path)?;
         for (slug, content) in &result.comparison_pages {
+            if content.trim().is_empty() {
+                continue; // Skip empty pages
+            }
             let page_path = vs_path.join(format!("{slug}.md"));
-            fs::write(&page_path, content)?;
+            let tmp_path = page_path.with_extension("md.tmp");
+            fs::write(&tmp_path, content)?;
+            fs::rename(&tmp_path, &page_path)?;
             written.push(page_path);
         }
     }

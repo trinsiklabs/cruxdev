@@ -158,6 +158,8 @@ fn type_signals() -> Vec<(ProjectType, Vec<&'static str>)> {
                 "docs/BUSINESS_PLAN.md",
                 "docs/BUDGET.md",
                 "docs/OPERATIONS.md",
+                "docs/VISION.md",
+                "coaching/",
             ],
         ),
         (ProjectType::BusinessNew, vec![]),
@@ -181,7 +183,9 @@ fn type_signals() -> Vec<(ProjectType, Vec<&'static str>)> {
             ProjectType::BookSeries,
             vec![
                 "SERIES_BIBLE.md", "docs/SERIES_BIBLE.md",
-                "books/", "series/",
+                "MANUSCRIPT_TRACKING.md", "docs/MANUSCRIPT_TRACKING.md",
+                "SERIES_PLAN.md",
+                "books/", "series/", "series-1/", "series-2/", "series-3/",
             ],
         ),
         (
@@ -210,7 +214,8 @@ fn type_signals() -> Vec<(ProjectType, Vec<&'static str>)> {
             ProjectType::Course,
             vec![
                 "COURSE_OUTLINE.md", "docs/COURSE_OUTLINE.md",
-                "lessons/", "modules/", "curriculum/",
+                "course/COURSE_OUTLINE.md",
+                "lessons/", "modules/", "curriculum/", "course/",
             ],
         ),
         (

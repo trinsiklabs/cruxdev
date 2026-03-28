@@ -5,8 +5,7 @@
 
 use serde::{Deserialize, Serialize};
 
-const TYPEFULLY_API_URL: &str = "https://api.typefully.com/v1/drafts/";
-const TYPEFULLY_API_URL_V2: &str = "https://api.typefully.com/v2/drafts";
+const TYPEFULLY_API_BASE: &str = "https://api.typefully.com/v2";
 
 /// Result of a Typefully post.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -72,56 +71,80 @@ pub fn compose_build_update(
     post
 }
 
-/// Post a draft to Typefully API.
+/// Fetch the social set ID for the authenticated account.
+pub async fn fetch_social_set_id(api_key: &str) -> Option<u64> {
+    let client = reqwest::Client::new();
+    let resp = client
+        .get(format!("{TYPEFULLY_API_BASE}/social-sets"))
+        .bearer_auth(api_key)
+        .send()
+        .await
+        .ok()?;
+    let json: serde_json::Value = resp.json().await.ok()?;
+    json.pointer("/results/0/id").and_then(|v| v.as_u64())
+}
+
+/// Post a draft to Typefully API v2.
+/// Requires social_set_id — pass None to auto-fetch from API.
 pub async fn post_draft(
     api_key: &str,
     content: &str,
-    threadify: bool,
+    social_set_id: Option<u64>,
 ) -> PostResult {
     let client = reqwest::Client::new();
 
+    // Resolve social set ID
+    let set_id = match social_set_id {
+        Some(id) => id,
+        None => match fetch_social_set_id(api_key).await {
+            Some(id) => id,
+            None => return PostResult {
+                success: false,
+                draft_id: String::new(),
+                error: "Could not fetch social_set_id from Typefully API".to_string(),
+            },
+        },
+    };
+
+    // Split content into posts if it's a thread (separated by blank lines)
+    let posts: Vec<serde_json::Value> = content
+        .split("\n\n")
+        .filter(|s| !s.trim().is_empty())
+        .map(|text| serde_json::json!({"text": text.trim()}))
+        .collect();
+
     let body = serde_json::json!({
-        "content": content,
-        "threadify": threadify,
+        "platforms": {
+            "x": {
+                "enabled": true,
+                "posts": posts,
+            }
+        }
     });
 
-    // Try v2 with Bearer auth first (matches crux's working implementation),
-    // fall back to v1 with X-API-KEY header
+    let url = format!("{TYPEFULLY_API_BASE}/social-sets/{set_id}/drafts");
+
     let resp = client
-        .post(TYPEFULLY_API_URL_V2)
+        .post(&url)
         .bearer_auth(api_key)
         .json(&body)
         .send()
         .await;
 
-    // If v2 fails (404), try v1
-    let resp = match &resp {
-        Ok(r) if r.status() == 404 => {
-            client
-                .post(TYPEFULLY_API_URL)
-                .header("X-API-KEY", api_key)
-                .json(&body)
-                .send()
-                .await
-        }
-        _ => resp,
-    };
-
-    match resp
-    {
+    match resp {
         Ok(resp) => {
             let status = resp.status();
             let text = resp.text().await.unwrap_or_default();
             if status.is_success() {
                 let parsed: serde_json::Value =
                     serde_json::from_str(&text).unwrap_or(serde_json::json!({}));
+                let draft_id = parsed.get("id")
+                    .and_then(|v| v.as_u64())
+                    .map(|v| v.to_string())
+                    .unwrap_or_default();
                 PostResult {
                     success: true,
-                    draft_id: parsed
-                        .get("id")
-                        .and_then(|v| v.as_str())
-                        .unwrap_or("")
-                        .to_string(),
+                    draft_id,
                     error: String::new(),
                 }
             } else {
