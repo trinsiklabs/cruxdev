@@ -1,6 +1,6 @@
 # BUILD_PLAN_103: CruxVibe — Mix-and-Match Recipe Platform
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
 **Priority:** Critical (REVENUE — this is the business model)
 
 ## The Vision
@@ -82,6 +82,17 @@ CruxVibe Platform
 └── Creator Dashboard (analytics, revenue, content management)
 ```
 
+## Phase 0: Project Setup
+
+- [ ] 0.1 Phoenix project: `mix phx.new cruxvibe --live --no-dashboard`
+- [ ] 0.2 Add deps: ash, ash_postgres, ash_authentication, ash_phoenix, oban, stripity_stripe
+- [ ] 0.3 Configure Ash domains, Ecto repos, tenant context
+- [ ] 0.4 Multi-tenant setup per MULTI_TENANT_PATTERNS.md (shared DB + tenant_id + RLS)
+- [ ] 0.5 Stripe Connect setup per STRIPE_CONNECT_PATTERNS.md (Express accounts)
+- [ ] 0.6 Integrate BP002 recipe lifecycle (issues, voting, versioning, auto-evolution)
+
+**Reference patterns:** MULTI_TENANT_PATTERNS.md, STRIPE_CONNECT_PATTERNS.md, SUBSCRIPTION_BILLING_PATTERNS.md, DEVELOPMENT_PATTERNS_PETAL.md
+
 ## Phase 1: Core Platform
 
 - [ ] 1.1 Recipe specification format (what a recipe contains, how recipes compose)
@@ -109,7 +120,7 @@ CruxVibe Platform
 - [ ] 2.6 Monitoring + alerting (uptime, errors, performance)
 - [ ] 2.7 Backup + restore
 
-## Phase 3: Reader App
+## Phase 3: Reader App (DEFERRED to v2 — web-only for v1)
 
 - [ ] 3.1 React Native/Expo app (iOS + Android)
 - [ ] 3.2 Add subscription endpoint (point at your CruxVibe-hosted site)
@@ -161,3 +172,11 @@ CruxVibe Platform
 ## The Tagline
 
 **CruxVibe: Keep your money. We handle the rest.**
+
+## Verification
+
+```bash
+mix test --trace
+mix credo --strict
+mix dialyzer
+```
