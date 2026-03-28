@@ -26,7 +26,7 @@ Crux session logging — pull updates from `.claude/` session transcripts or a d
 - [ ] 2.2 Auto-scroll to bottom as new lines arrive
 - [ ] 2.3 ANSI color code rendering (green for success, red for errors, yellow for warnings, blue for tool calls)
 - [ ] 2.4 Timestamps on each line
-- [ ] 2.5 Max buffer: keep last 500 lines in view, older lines still scrollable
+- [ ] 2.5 Show only previous 24 hours of output, infinite scroll upward/backward through that window
 - [ ] 2.6 Responsive: full-width on desktop, stacked on mobile
 
 ## Phase 3: Homepage Integration
