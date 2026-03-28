@@ -1,9 +1,9 @@
 ---
-name: plan
+name: cruxdev-plan
 description: /plan — Create a CruxDev build plan
 ---
 
-# /plan — Create a CruxDev build plan
+# /cruxdev-plan — Create a CruxDev build plan
 
 Create a structured build plan that the convergence engine can execute.
 

@@ -1,4 +1,4 @@
-# /converge — Run the CruxDev convergence engine
+# /cruxdev-converge — Run the CruxDev convergence engine
 
 Execute the full convergence loop on a build plan. The engine owns all termination logic — you execute the tasks it gives you.
 

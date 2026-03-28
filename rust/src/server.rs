@@ -82,6 +82,18 @@ pub struct PrioritizeWorkParam {
     pub limit: Option<usize>,
 }
 
+// --- Parameter types (Deployment verification) ---
+
+#[derive(Deserialize, JsonSchema)]
+pub struct VerifyDeploymentParam {
+    /// URL to verify (e.g., "https://cruxdev.dev" or "https://uat.westlakeselect.net")
+    pub url: String,
+    /// Additional paths to check (default: ["/"])
+    pub check_paths: Option<Vec<String>>,
+    /// Expected HTTP status (default: 200)
+    pub expected_status: Option<u16>,
+}
+
 // --- Parameter types (SEO) ---
 
 #[derive(Deserialize, JsonSchema)]
@@ -2740,7 +2752,81 @@ impl CruxDevServer {
         serde_json::to_string_pretty(&result).unwrap_or_else(|e| format!("{{\"error\": \"{e}\"}}" ))
     }
 
-    // 58. prioritize_work
+    // 58. verify_deployment
+    #[tool(description = "Post-deployment health check. Verifies URL returns expected status, checks SSL, security headers, response time, and additional paths. Run after every deploy.")]
+    async fn verify_deployment(&self, params: Parameters<VerifyDeploymentParam>) -> String {
+        let p = &params.0;
+        let expected = p.expected_status.unwrap_or(200);
+        let paths = p.check_paths.clone().unwrap_or_else(|| vec!["/".into()]);
+
+        let client = reqwest::Client::builder()
+            .timeout(std::time::Duration::from_secs(15))
+            .build()
+            .unwrap_or_default();
+
+        let mut checks = Vec::new();
+        let mut all_pass = true;
+
+        // Check each path
+        for path in &paths {
+            let url = if path.starts_with("http") {
+                path.clone()
+            } else {
+                format!("{}{}", p.url.trim_end_matches('/'), path)
+            };
+
+            let start = std::time::Instant::now();
+            match client.get(&url).send().await {
+                Ok(resp) => {
+                    let status = resp.status().as_u16();
+                    let duration_ms = start.elapsed().as_millis();
+                    let headers = resp.headers().clone();
+
+                    let has_hsts = headers.get("strict-transport-security").is_some();
+                    let has_xfo = headers.get("x-frame-options").is_some();
+                    let is_cloudflare = headers.get("cf-ray").is_some();
+
+                    let pass = status == expected;
+                    if !pass { all_pass = false; }
+
+                    checks.push(serde_json::json!({
+                        "path": path,
+                        "status": status,
+                        "expected": expected,
+                        "pass": pass,
+                        "response_ms": duration_ms,
+                        "hsts": has_hsts,
+                        "x_frame_options": has_xfo,
+                        "cloudflare": is_cloudflare,
+                        "slow": duration_ms > 3000,
+                    }));
+                }
+                Err(e) => {
+                    all_pass = false;
+                    checks.push(serde_json::json!({
+                        "path": path,
+                        "status": 0,
+                        "pass": false,
+                        "error": format!("{e}"),
+                    }));
+                }
+            }
+        }
+
+        // SSL check
+        let ssl_ok = p.url.starts_with("https://");
+
+        serde_json::json!({
+            "url": p.url,
+            "all_pass": all_pass,
+            "ssl": ssl_ok,
+            "checks": checks,
+            "total_checked": checks.len(),
+            "failed": checks.iter().filter(|c| !c.get("pass").and_then(|v| v.as_bool()).unwrap_or(false)).count(),
+        }).to_string()
+    }
+
+    // 59. prioritize_work
     #[tool(description = "Scan all work sources (build plans, GitHub issues, competitive gaps, self-adoption findings, content backlog) and return a prioritized list. Use this to decide what to work on next in autonomous mode.")]
     async fn prioritize_work(&self, params: Parameters<PrioritizeWorkParam>) -> String {
         let p = &params.0;

@@ -1,20 +1,24 @@
 ---
 name: cruxdev-status
-description: /cruxdev-status — Check CruxDev installation health
+description: /status — Check convergence status
 ---
 
-# /cruxdev-status — Check CruxDev installation health
+# /cruxdev-status — Check convergence status
 
-Run all health checks and report what's working and what's not.
+Show the current state of a convergence run.
+
+## Arguments
+
+$ARGUMENTS = convergence_id (optional — if not provided, list all runs)
 
 ## Protocol
 
-Call `cruxdev_status()` and display:
+If convergence_id provided:
+- Call `convergence_status($ARGUMENTS)`
+- Display: phase, round, consecutive clean passes, total findings, total fixed, elapsed time
+- If terminal, say whether it converged or escalated (and why)
 
-1. **Health status** — overall healthy or not
-2. **Checks** — each check with pass/fail and message
-3. **Warnings** — non-critical issues (e.g., Crux not configured)
-4. **Active convergences** — any in-progress convergence runs
-5. **Versions** — Python version, CruxDev root path
-
-If any check fails, suggest how to fix it.
+If no convergence_id:
+- Look for state files in `.cruxdev/convergence_state/`
+- List all runs with their status
+- Highlight any that are still in progress

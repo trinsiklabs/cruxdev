@@ -1,4 +1,9 @@
-# /inbox — Check messages from other CruxDev sessions
+---
+name: cruxdev-inbox
+description: /inbox — Check messages from other CruxDev sessions
+---
+
+# /cruxdev-inbox — Check messages from other CruxDev sessions
 
 Check for issues, improvements, patterns, and breaking changes reported by other projects in the ecosystem.
 

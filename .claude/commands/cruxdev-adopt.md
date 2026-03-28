@@ -1,4 +1,4 @@
-# /adopt — Adopt or re-audit a project
+# /cruxdev-adopt — Adopt or re-audit a project
 
 First run: full Key-compatible adoption. Subsequent runs: audit for gaps and fix them.
 

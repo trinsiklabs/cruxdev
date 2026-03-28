@@ -1,9 +1,4 @@
----
-name: competitor-add
-description: /competitor-add — Manually add a competitor to track
----
-
-# /competitor-add — Manually add a competitor to track
+# /cruxdev-competitor-add — Manually add a competitor to track
 
 Add a competitor that you've identified to the project's competitive analysis.
 

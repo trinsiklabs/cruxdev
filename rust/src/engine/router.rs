@@ -26,6 +26,7 @@ pub const MEDIA_DIMENSIONS: &[&str] = &["content_quality", "production_quality",
 pub const UI_COMPONENT_DIMENSIONS: &[&str] = &["variant_consistency", "token_usage", "composition_quality", "duplication_detection", "api_surface", "accessibility", "maintenance_cost"];
 pub const COLOR_CONTRAST_DIMENSIONS: &[&str] = &["wcag_aa_compliance", "color_system_consistency", "dark_mode_parity", "semantic_tokens", "focus_visibility"];
 pub const LOGO_DIMENSIONS: &[&str] = &["viewbox_optimization", "favicon_set", "dark_light_variants", "size_legibility"];
+pub const POST_DEPLOYMENT_DIMENSIONS: &[&str] = &["health_endpoint", "smoke_tests", "ssl_verification", "asset_integrity", "rollback_plan", "notifications", "migration_check"];
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Task {
@@ -254,6 +255,17 @@ fn detect_media_project(project_dir: &str) -> bool {
         "BOOK_OUTLINE.md", "docs/BOOK_OUTLINE.md",
     ];
     markers.iter().any(|m| root.join(m).exists() || root.join(m).is_dir())
+}
+
+/// Detect if project is deployable (has deployment config).
+fn detect_deployable(project_dir: &str) -> bool {
+    let root = Path::new(project_dir);
+    let markers = [
+        "fly.toml", "Dockerfile", "docker-compose.yml", "docker-compose.yaml",
+        "vercel.json", "netlify.toml", "deploy.sh", "scripts/deploy.sh",
+        "render.yaml", "railway.json", "Procfile",
+    ];
+    markers.iter().any(|m| root.join(m).exists())
 }
 
 /// Detect if project has a website with visual elements needing color/contrast audit.
@@ -485,6 +497,10 @@ pub fn get_next_task(
             // Dashboard dimensions
             if detect_dashboards(&proj_dir) {
                 for dim in DASHBOARD_DIMENSIONS { dims.push((*dim).into()); }
+            }
+            // Post-deployment verification dimensions
+            if detect_deployable(&proj_dir) {
+                for dim in POST_DEPLOYMENT_DIMENSIONS { dims.push((*dim).into()); }
             }
             // Color/contrast dimensions + automated scanning
             if detect_website_visual(&proj_dir) {
