@@ -10,6 +10,7 @@ pub mod git;
 pub mod growth;
 pub mod graph;
 pub mod gtv;
+pub mod metrics;
 pub mod improvement;
 pub mod install;
 pub mod normalize;
