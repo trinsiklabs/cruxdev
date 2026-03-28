@@ -1,6 +1,6 @@
 #!/bin/bash
 # CruxDev Autonomous Evolution — runs every 4 hours via cron
-# Launches a Claude Code session that self-improves until nothing left to do
+# Single cycle per run (NOT continuous — avoids spam loop from own git changes)
 set -e
 
 PROJECT_DIR="/Users/user/personal/cruxdev"
@@ -18,18 +18,11 @@ fi
 
 echo "[$(date)] Evolution cycle starting." >> "${LOG_FILE}"
 
-# Run the evolution cycle (gather/evaluate/post/engage) — no LLM needed
+# Run ONE evolution cycle (not continuous)
 export PATH="$HOME/.cargo/bin:$PATH"
 "${PROJECT_DIR}/rust/target/release/cruxdev" evolve "${PROJECT_DIR}" \
     --repo trinsiklabs/cruxdev \
-    --live \
-    --continuous >> "${LOG_FILE}" 2>&1
-
-# For full self-improvement (code changes, convergence), launch Claude Code
-# Uncomment when ready for fully autonomous mode:
-# claude --print -p "Self-adopt to convergence. Check GitHub issues, fix any bugs, converge any open build plans, generate blog posts, deploy the site. Stop when nothing left to do." \
-#     --allowedTools "Read,Write,Edit,Bash,Glob,Grep" \
-#     2>> "${LOG_FILE}"
+    --live >> "${LOG_FILE}" 2>&1
 
 echo "[$(date)] Evolution cycle complete." >> "${LOG_FILE}"
 
