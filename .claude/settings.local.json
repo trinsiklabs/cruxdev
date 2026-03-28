@@ -112,7 +112,16 @@
       "Bash(timeout 5 /Users/user/personal/cruxdev/rust/target/release/cruxdev mcp start)",
       "Bash(gtimeout 5 /Users/user/personal/cruxdev/rust/target/release/cruxdev mcp start)",
       "Bash(printf '{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"id\"\"\"\":1,\"\"\"\"method\"\"\"\":\"\"\"\"initialize\"\"\"\",\"\"\"\"params\"\"\"\":{\"\"\"\"protocolVersion\"\"\"\":\"\"\"\"2024-11-05\"\"\"\",\"\"\"\"capabilities\"\"\"\":{},\"\"\"\"clientInfo\"\"\"\":{\"\"\"\"name\"\"\"\":\"\"\"\"test\"\"\"\",\"\"\"\"version\"\"\"\":\"\"\"\"0.1\"\"\"\"}}}\\\\n{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"method\"\"\"\":\"\"\"\"notifications/initialized\"\"\"\"}\\\\n{\"\"\"\"jsonrpc\"\"\"\":\"\"\"\"2.0\"\"\"\",\"\"\"\"id\"\"\"\":2,\"\"\"\"method\"\"\"\":\"\"\"\"tools/list\"\"\"\",\"\"\"\"params\"\"\"\":{}}\\\\n')",
-      "Bash(/Users/user/personal/cruxdev/rust/target/release/cruxdev mcp:*)"
+      "Bash(/Users/user/personal/cruxdev/rust/target/release/cruxdev mcp:*)",
+      "Bash(/Users/user/personal/cruxdev/rust/target/debug/cruxdev prioritize:*)",
+      "mcp__cruxdev__prioritize_work",
+      "Write(/Users/user/personal/cruxdev-dev/**)",
+      "Edit(/Users/user/personal/cruxdev-dev/**)",
+      "Bash(*)",
+      "Bash(rsync -avz --delete -e \"ssh -i ~/.ssh/cruxdev_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new\" dist/ cruxdev.dev@vh1.trinsik.io:~/public_html/)",
+      "Bash(source ~/.zshenv)",
+      "Bash(curl -s -X POST \"https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache\" -H \"Authorization: Bearer $CLOUDFLARE_API_TOKEN\" -H \"Content-Type: application/json\" --data '{\"\"\"\"purge_everything\"\"\"\":true}')",
+      "Bash(curl -s https://www.cruxdev.dev/blog/20260328-post-deployment-verification/)"
     ]
   }
 }
