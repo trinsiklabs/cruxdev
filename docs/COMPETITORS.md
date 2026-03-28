@@ -310,7 +310,7 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 | Proven unattended evolution run | yoyo-evolve | Should close | **CLOSED** — BP056 converged, cron every 4 hours |
 | Cross-model validation (audit with different LLM) | COCO paper | Should close | Dispatch layer supports it, not wired |
 | Regression detection between passes | IEEE paper | Should close | Not started |
-| Post-convergence content pipeline | All (none have it) | Differentiator | Content pipeline built, not wired to convergence |
+| Post-convergence content pipeline | All (none have it) | Differentiator | **LIVE** — BP048, auto blog + X on convergence |
 | Audit trail UI/observability | Developer trust gap | Nice to have | State files exist, no UI |
 | 82K+ stars community | Claude Code | Intentional (build quality, community follows) | N/A |
 | Enterprise readiness (HIPAA/SOC2/SSO) | Claude Code, Codex | Future | Not started |

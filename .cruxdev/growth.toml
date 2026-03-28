@@ -55,6 +55,20 @@ methodology_docs = [
     "DEVELOPMENT_PATTERNS_PADL.md",
 ]
 
+[geo]
+target_queries = [
+    "autonomous convergence harness",
+    "AI coding harness",
+    "convergence engine for AI development",
+    "cruxdev",
+    "cruxdev.dev",
+    "harness engineering tools",
+    "AI agent harness comparison",
+    "cursor alternative for code quality",
+    "claude code convergence",
+]
+check_interval_days = 7
+
 [ecosystem]
 projects = ["crux", "cruxdev", "cruxcli", "cruxvibe"]
 shared_typefully = true
