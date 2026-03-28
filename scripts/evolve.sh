@@ -32,3 +32,6 @@ export PATH="$HOME/.cargo/bin:$PATH"
 #     2>> "${LOG_FILE}"
 
 echo "[$(date)] Evolution cycle complete." >> "${LOG_FILE}"
+
+# Sync stream to web server for live terminal viewer
+"${PROJECT_DIR}/scripts/sync-stream.sh" 2>/dev/null
