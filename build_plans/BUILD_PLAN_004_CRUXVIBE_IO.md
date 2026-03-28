@@ -1,7 +1,7 @@
 # BUILD_PLAN_004: cruxvibe.io — CruxCLI Terminal Agent Website
 
 **Created:** 2026-03-22
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Goal:** Build the marketing and download site for CruxCLI — the terminal-first AI coding agent with native Crux intelligence.
 **Methodology:** Follow `docs/WEBSITE_PLANNING.md`. SEO details in `docs/SEO_AND_GEO_REFERENCE.md`.
 

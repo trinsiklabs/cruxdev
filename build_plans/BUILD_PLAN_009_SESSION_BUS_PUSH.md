@@ -1,7 +1,7 @@
 # BUILD_PLAN_009: Session Bus Push Notifications
 
 **Created:** 2026-03-23
-**Status:** NOT STARTED
+**Status:** CONVERGED
 **Goal:** Messages sent via the session bus are delivered to recipients in real-time, not just when they poll. Sessions process incoming messages without being told to check.
 
 **Problem:** Currently the bus is write-to-SQLite (sender) + read-from-SQLite (recipient). Messages sit unread until the recipient calls `check_inbox()` or runs `/inbox`. There is no push mechanism.
