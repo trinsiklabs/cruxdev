@@ -1,6 +1,6 @@
 # BUILD_PLAN_093: cruxdev.dev Internationalization
 
-**Status:** NOT STARTED
+**Status:** SUPERSEDED by BP109 (Full Site i18n — 8 languages, auto-detect, language switcher)
 **Priority:** High (global market access)
 **Depends on:** I18N_PATTERNS.md (researching)
 

@@ -1,6 +1,6 @@
 # BUILD_PLAN_091: Content Strategy Expansion — Tools, Types, Personas, Competitive Pages
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS (345 pages deployed — tools, types, personas, patterns, vs/ all exist. Depth needed.)
 **Priority:** High (SEO/GEO growth driver)
 
 ## Context
