@@ -126,6 +126,8 @@ tags: ["convergence", "automation", "quality"]
 
 **Author field:** Use organization name, not personal names. Depersonalization prevents lock-in to individuals and is better for ecosystem-neutral positioning.
 
+**Timezone handling:** Store dates in ISO 8601 format without timezone offset (`2026-03-28T18:30`). Render with client-side JavaScript using `toLocaleDateString(undefined, ...)` and `toLocaleTimeString(undefined, ...)` — the `undefined` locale parameter tells the browser to use the visitor's local timezone and date format. For SSG sites (Astro, Hugo, Next.js static), render ISO strings into `<time datetime="...">` elements and localize on page load. This avoids hardcoding the server's timezone (common BIP bug: all posts show EST because the CI server is in US-East).
+
 **Full schema (all optional fields):**
 
 ```yaml
