@@ -313,7 +313,7 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 | Post-convergence content pipeline | All (none have it) | Differentiator | **LIVE** — BP048, auto blog + X on convergence |
 | Audit trail UI/observability | Developer trust gap | Nice to have | convergence_report MCP tool (BP088) |
 | 82K+ stars community | Claude Code | Intentional (build quality, community follows) | N/A |
-| Enterprise readiness (HIPAA/SOC2/SSO) | Claude Code, Codex | Future | Not started |
+| Enterprise readiness (HIPAA/SOC2/SSO) | Claude Code, Codex | Future | Roadmap documented (BP090) |
 
 ---
 
