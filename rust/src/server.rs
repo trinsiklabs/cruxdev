@@ -1960,47 +1960,10 @@ impl CruxDevServer {
             &p.competitor_name, &p.competitor_url, &p.competitor_research,
         );
 
-        // Generate comparison content
-        let slug = p.competitor_name.to_lowercase().replace(' ', "-");
+        let (slug, markdown) = crate::competitors::runner::generate_comparison_page(
+            &p.our_name, &features, &profile,
+        );
         let title = format!("{} vs {}", p.our_name, p.competitor_name);
-
-        let mut lines = vec![
-            format!("---"),
-            format!("title: \"{title}\""),
-            format!("slug: \"/vs/{slug}\""),
-            format!("---"),
-            String::new(),
-            format!("# {title}"),
-            String::new(),
-            format!("## Feature Comparison"),
-            String::new(),
-            format!("| Feature | {} | {} |", p.our_name, p.competitor_name),
-            format!("|---|---|---|"),
-        ];
-
-        for feat in &features {
-            let comp_has = profile.features.iter().any(|f| f.name.to_lowercase() == feat.to_lowercase() && f.has_feature);
-            lines.push(format!("| {} | Y | {} |", feat, if comp_has { "Y" } else { "N" }));
-        }
-        lines.push(String::new());
-
-        if !profile.strengths.is_empty() {
-            lines.push(format!("## {} Strengths", p.competitor_name));
-            for s in &profile.strengths {
-                lines.push(format!("- {s}"));
-            }
-            lines.push(String::new());
-        }
-
-        if !profile.weaknesses.is_empty() {
-            lines.push(format!("## {} Weaknesses", p.competitor_name));
-            for w in &profile.weaknesses {
-                lines.push(format!("- {w}"));
-            }
-            lines.push(String::new());
-        }
-
-        let markdown = lines.join("\n");
 
         serde_json::json!({
             "slug": slug,
