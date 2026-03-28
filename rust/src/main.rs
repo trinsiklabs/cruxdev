@@ -14,6 +14,7 @@ pub mod install;
 pub mod normalize;
 pub mod research;
 pub mod server;
+pub mod stream;
 pub mod status;
 
 use clap::Parser;

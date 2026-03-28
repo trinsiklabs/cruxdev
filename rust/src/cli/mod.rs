@@ -37,6 +37,15 @@ enum Commands {
         #[arg(long, default_value_t = 10)]
         limit: usize,
     },
+    /// Stream terminal output via SSE for live viewer
+    Stream {
+        /// Log file to tail (default: .cruxdev/evolution/cron.log)
+        #[arg(long, default_value = ".cruxdev/evolution/cron.log")]
+        log_file: String,
+        /// Port to listen on (default: 8765)
+        #[arg(long, default_value_t = 8765)]
+        port: u16,
+    },
     /// Run an autonomous evolution cycle (gather → evaluate → integrate → post → engage)
     Evolve {
         /// Project directory (default: current)
@@ -76,6 +85,9 @@ impl Cli {
             Some(Commands::Install { project_dir }) => {
                 let result = crate::install::install(&project_dir);
                 println!("{}", serde_json::to_string_pretty(&result).unwrap_or_default());
+            }
+            Some(Commands::Stream { log_file, port }) => {
+                crate::stream::run_sse_server(log_file, port).await;
             }
             Some(Commands::Prioritize { project_dir, repo, limit }) => {
                 let items = crate::engine::priority::scan_work_sources(&project_dir, &repo);
