@@ -87,7 +87,12 @@ loop {
 
 Leverage CruxCLI's existing provider infrastructure (Anthropic, OpenAI, OpenRouter, local LLM).
 
-- [ ] 1.1 Import provider architecture from CruxCLI: API key management, model routing, auth
+- [ ] 1.1 Rust rewrite of CruxCLI's provider architecture (reference design, not import):
+  - API key management (env vars, config file, keychain)
+  - Provider abstraction (Anthropic, OpenAI, OpenRouter, Ollama/local)
+  - Model routing (provider + model + tier mapping)
+  - Auth flows per provider
+  - CruxCLI TypeScript source at `/Users/user/personal/cruxcli/packages/cruxcli/src/auth/` as reference
 - [ ] 1.2 Model optimization by task tier:
   - **Core loop** (CHECK/PRIORITIZE/REFLECT): local LLM or cheapest (Haiku, Gemini Flash, local Llama)
   - **Auditing**: standard (Sonnet) — workhorse
