@@ -1,6 +1,6 @@
 # BUILD_PLAN_083: Full Blog System — Apply Blog Patterns to cruxdev.dev
 
-**Status:** NOT STARTED
+**Status:** IN PROGRESS
 **Priority:** High
 **Depends on:** Blog patterns docs (BLOG_PATTERNS.md, BLOG_PAGINATION_PATTERNS.md, BLOG_POST_PATTERNS.md, BLOG_TAGGING_PATTERNS.md)
 
