@@ -86,23 +86,23 @@ CruxVibe Platform
 
 - [x] 0.1 Phoenix project: `mix phx.new cruxvibe --live --no-dashboard`
 - [x] 0.2 Add deps: ash, ash_postgres, ash_authentication, ash_phoenix, oban, stripity_stripe
-- [ ] 0.3 Configure Ash domains, Ecto repos, tenant context
-- [ ] 0.4 Multi-tenant setup per MULTI_TENANT_PATTERNS.md (shared DB + tenant_id + RLS)
-- [ ] 0.5 Stripe Connect setup per STRIPE_CONNECT_PATTERNS.md (Express accounts)
+- [x] 0.3 Configure Ash domains, Ecto repos, tenant context
+- [x] 0.4 Multi-tenant setup per MULTI_TENANT_PATTERNS.md (shared DB + tenant_id + RLS)
+- [x] 0.5 Stripe Connect setup per STRIPE_CONNECT_PATTERNS.md (Express accounts)
 - [ ] 0.6 Integrate BP002 recipe lifecycle (issues, voting, versioning, auto-evolution)
 
 **Reference patterns:** MULTI_TENANT_PATTERNS.md, STRIPE_CONNECT_PATTERNS.md, SUBSCRIPTION_BILLING_PATTERNS.md, DEVELOPMENT_PATTERNS_PETAL.md
 
 ## Phase 1: Core Platform
 
-- [ ] 1.1 Recipe specification format (what a recipe contains, how recipes compose)
-- [ ] 1.2 Patreon Recipe v1 (Elixir/Phoenix/Ash/LiveView)
+- [x] 1.1 Recipe specification format (what a recipe contains, how recipes compose)
+- [x] 1.2 Patreon Recipe v1 (Elixir/Phoenix/Ash/LiveView)
   - Subscription tiers (define N tiers with prices)
   - Stripe integration (checkout, billing portal, webhooks)
   - Member management (who has access to what)
   - Content gating (chapters visible per tier)
   - Dashboard (subscriber count, revenue, churn)
-- [ ] 1.3 ePublishing Recipe v1
+- [x] 1.3 ePublishing Recipe v1
   - Manuscript → .epub generation (from markdown)
   - .mobi generation (Kindle-compatible)
   - .pdf generation (print-ready)
