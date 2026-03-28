@@ -1,6 +1,9 @@
 {
   "permissions": {
     "allow": [
+      "Bash(*)",
+      "Write(/Users/user/personal/cruxdev-dev/**)",
+      "Edit(/Users/user/personal/cruxdev-dev/**)",
       "WebFetch(domain:runcrux.io)",
       "Bash(gh repo:*)",
       "Bash(gh api:*)",
