@@ -10,6 +10,7 @@ pub mod persistence;
 pub mod plan_status;
 pub mod plan_validator;
 pub mod priority;
+pub mod report;
 pub mod router;
 pub mod state;
 pub mod test_runner;

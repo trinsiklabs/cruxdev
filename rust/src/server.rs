@@ -2842,7 +2842,25 @@ impl CruxDevServer {
         }).to_string()
     }
 
-    // 59. check_competitive_impact
+    // 59. convergence_report
+    #[tool(description = "Generate a human-readable convergence report. Shows phases, rounds, findings by dimension, timeline. Available as JSON or markdown.")]
+    async fn convergence_report(&self, params: Parameters<ConvergenceIdParam>) -> String {
+        let sp = self.resolve_state_path(&params.0.convergence_id);
+        match persistence::load_state(&sp) {
+            Ok(state) => {
+                let report = crate::engine::report::generate_report(&state);
+                let markdown = crate::engine::report::to_markdown(&report);
+                serde_json::json!({
+                    "convergence_id": params.0.convergence_id,
+                    "report": report,
+                    "markdown": markdown,
+                }).to_string()
+            }
+            Err(e) => serde_json::json!({"error": format!("{e}")}).to_string(),
+        }
+    }
+
+    // 60. check_competitive_impact
     #[tool(description = "Check whether a build plan changes the competitive landscape. Returns: impact type (differentiator/gap_closure/parity/none), affected gaps, and recommended actions.")]
     async fn check_competitive_impact(&self, params: Parameters<CheckCompetitiveImpactParam>) -> String {
         let p = &params.0;

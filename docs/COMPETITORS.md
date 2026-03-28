@@ -311,7 +311,7 @@ CruxDev is the only **autonomous convergence harness** — a harness that drives
 | Cross-model validation (audit with different LLM) | COCO paper | Should close | Patterns doc written (BP057) |
 | Regression detection between passes | IEEE paper | Should close | Patterns doc written (BP058) |
 | Post-convergence content pipeline | All (none have it) | Differentiator | **LIVE** — BP048, auto blog + X on convergence |
-| Audit trail UI/observability | Developer trust gap | Nice to have | State files exist, no UI |
+| Audit trail UI/observability | Developer trust gap | Nice to have | convergence_report MCP tool (BP088) |
 | 82K+ stars community | Claude Code | Intentional (build quality, community follows) | N/A |
 | Enterprise readiness (HIPAA/SOC2/SSO) | Claude Code, Codex | Future | Not started |
 
