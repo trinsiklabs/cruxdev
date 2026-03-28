@@ -192,7 +192,8 @@ fn scan_competitive_gaps(project_dir: &str) -> Vec<WorkItem> {
         // Skip completed gaps
         let status_lower = status.to_lowercase();
         if status_lower.contains("done") || status_lower.contains("converged")
-            || status_lower.contains("closed") || status_lower.contains("live") {
+            || status_lower.contains("closed") || status_lower.contains("live")
+            || status_lower.contains("patterns doc written") {
             continue;
         }
 
