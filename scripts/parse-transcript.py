@@ -3,6 +3,16 @@
 import sys, json
 from datetime import datetime
 
+# Words that cause the entire containing message to be dropped from the stream
+BLACKLIST = [
+    "truemirror",
+    # Add more as needed
+]
+
+def is_blacklisted(text):
+    lower = text.lower()
+    return any(word in lower for word in BLACKLIST)
+
 lines = []
 
 for raw in sys.stdin:
@@ -15,6 +25,10 @@ for raw in sys.stdin:
         continue
 
     msg_type = d.get('type', '')
+
+    # Check entire raw entry against blacklist — skip the whole message if matched
+    if is_blacklisted(raw):
+        continue
 
     if msg_type == 'assistant':
         content = d.get('message', {}).get('content', [])
