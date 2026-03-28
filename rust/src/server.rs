@@ -1006,6 +1006,9 @@ impl CruxDevServer {
         let wrapped = serde_json::json!({"findings": raw});
         router::submit_result(&mut state, &sp, &wrapped);
 
+        // Save checkpoint after every round for crash recovery
+        let _ = persistence::save_checkpoint(&state, &sp);
+
         let next = router::get_next_task(&mut state, &sp, None, None, None);
 
         let mut content_drafts: Option<serde_json::Value> = None;
@@ -1058,6 +1061,7 @@ impl CruxDevServer {
                 "consecutive_clean": state.consecutive_clean,
                 "terminal": convergence::is_terminal(state.phase),
                 "wal_events": wal::event_count(&sp),
+                "checkpoints": persistence::checkpoint_count(&sp),
             }).to_string(),
             Err(e) => serde_json::json!({"error": format!("{e}")}).to_string(),
         }
