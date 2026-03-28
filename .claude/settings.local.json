@@ -2,8 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(*)",
-      "Write(/Users/user/personal/cruxdev-dev/**)",
-      "Edit(/Users/user/personal/cruxdev-dev/**)",
+      "Write(*)",
+      "Edit(*)",
       "WebFetch(domain:runcrux.io)",
       "Bash(gh repo:*)",
       "Bash(gh api:*)",
@@ -118,8 +118,8 @@
       "Bash(/Users/user/personal/cruxdev/rust/target/release/cruxdev mcp:*)",
       "Bash(/Users/user/personal/cruxdev/rust/target/debug/cruxdev prioritize:*)",
       "mcp__cruxdev__prioritize_work",
-      "Write(/Users/user/personal/cruxdev-dev/**)",
-      "Edit(/Users/user/personal/cruxdev-dev/**)",
+      "Write(*)",
+      "Edit(*)",
       "Bash(*)",
       "Bash(rsync -avz --delete -e \"ssh -i ~/.ssh/cruxdev_deploy -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new\" dist/ cruxdev.dev@vh1.trinsik.io:~/public_html/)",
       "Bash(source ~/.zshenv)",
