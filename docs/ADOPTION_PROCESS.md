@@ -170,9 +170,144 @@ Every project website must have:
 - [ ] XML sitemap
 - [ ] WCAG 2.1 AA accessibility compliance
 - [ ] Core Web Vitals: LCP < 2.5s, INP < 200ms, CLS < 0.1
-- [ ] HTTPS with security headers (CSP, HSTS)
+- [ ] HTTPS with security headers (CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy)
 - [ ] Responsive/mobile-first design
 - [ ] Privacy policy (if collecting any data)
+- [ ] No hardcoded secrets in source (API keys, tokens, passwords)
+- [ ] CSRF protection on all state-changing forms
+
+**These standards are verified PER PAGE, not at the project level. See Step 5.5.**
+
+---
+
+## Step 5.5: Page-Level Audit (Mandatory for Web Projects)
+
+**This step exists because project-level audits rubber-stamp.** An agent reads the codebase, sees form components exist, sees they use the right CSS classes, and says "PASS." It never actually checks whether `/visit/westlake-select` has fields floating left, missing labels, or white text on a light background. Page-level auditing closes this gap.
+
+### When This Applies
+
+Any project with user-facing web pages: marketing sites, web apps, admin panels, docs sites.
+
+### 5.5A. Route Inventory
+
+Enumerate EVERY page/route in the application. No exceptions, no sampling.
+
+| Stack | How to Inventory |
+|-------|-----------------|
+| **Astro** | Scan `src/pages/` — every `.astro`, `.md`, `.mdx` file is a route |
+| **Next.js** | Scan `app/` for `page.tsx` files; scan `pages/` for `.tsx` files |
+| **Phoenix/LiveView** | Parse `router.ex` for all `get`, `live`, `post` routes |
+| **Rails** | Parse `routes.rb` or run `rails routes` |
+| **Django** | Parse all `urls.py` files |
+| **Nuxt** | Scan `pages/` directory |
+| **SvelteKit** | Scan `src/routes/` for `+page.svelte` files |
+| **Static HTML** | Scan for all `.html` files |
+| **Any deployed site** | Fetch and parse the XML sitemap; crawl from root if no sitemap |
+
+**Output:** A complete list of routes, each classified by type:
+
+| Route Type | Applicable Pattern Docs |
+|-----------|------------------------|
+| **Form page** | FORM_PATTERNS.md (17 dimensions), COLOR_CONTRAST_PATTERNS.md, MOBILE_WEB_PATTERNS.md, WCAG AA |
+| **Content page** | COLOR_CONTRAST_PATTERNS.md, MOBILE_WEB_PATTERNS.md, WCAG AA |
+| **Dashboard** | DASHBOARD_PATTERNS.md, COLOR_CONTRAST_PATTERNS.md, MOBILE_WEB_PATTERNS.md, WCAG AA |
+| **Auth page** | FORM_PATTERNS.md, Security (CSRF, rate limiting), COLOR_CONTRAST_PATTERNS.md |
+| **API endpoint** | Input validation, error responses, auth, rate limiting |
+| **Blog/article** | SEO_AND_GEO_REFERENCE.md, COLOR_CONTRAST_PATTERNS.md, MOBILE_WEB_PATTERNS.md |
+
+### 5.5B. Per-Page Audit
+
+For EACH page in the inventory, audit against ALL applicable dimensions. The agent must read the SPECIFIC source file for that page, not just the shared components.
+
+**Form Audit (per form, per page):**
+- [ ] Single-column layout (not side-by-side for aesthetic reasons)
+- [ ] Labels above inputs with explicit `<label for="...">` — not placeholder-as-label
+- [ ] Optional fields marked "(optional)" — required fields NOT marked with asterisks
+- [ ] Validation: on-submit for short forms, on-blur-after-first-submit for long forms
+- [ ] Error messages: inline, specific, above or beside the field
+- [ ] Input types: correct `type` attribute (email, tel, url, number, date)
+- [ ] Autocomplete: correct `autocomplete` attribute on name, email, address, card fields
+- [ ] Textarea for multi-line input (not `input type="text"` for comments/messages)
+- [ ] Submit button: descriptive text (not just "Submit"), full-width on mobile
+- [ ] Touch targets: minimum 44x44px
+- [ ] Focus states: visible focus ring on all interactive elements
+- [ ] Tab order: logical, no focus traps (except modals)
+- [ ] Error summary: for forms with 3+ fields, summary at top linking to each error
+- [ ] Loading state: submit button shows loading, prevents double-submit
+- [ ] Success state: clear confirmation, not just form disappearing
+- [ ] Field sizing: inputs sized to expected content (zip code narrower than address)
+- [ ] Required field count: justify every field — can any be eliminated?
+
+**Contrast Audit (per page):**
+- [ ] Body text: minimum 4.5:1 ratio against actual background
+- [ ] Secondary text: minimum 4.5:1 (not just "uses a semantic token")
+- [ ] Links: 4.5:1 against background AND distinguishable from surrounding text
+- [ ] UI components (buttons, inputs, icons): minimum 3:1
+- [ ] Verified on the RENDERED page, not just by reading CSS variables
+- [ ] Both light and dark mode checked (if applicable)
+
+**Mobile Audit (per page):**
+- [ ] Navigation accessible on mobile (hamburger menu, bottom nav, or equivalent)
+- [ ] No horizontal scroll at 320px viewport width
+- [ ] Touch targets: minimum 44x44px with 8px spacing
+- [ ] Text readable without zooming (minimum 16px body text)
+- [ ] Forms usable on mobile (keyboard types, no tiny inputs)
+- [ ] Images responsive (no overflow, appropriate srcset)
+- [ ] Interactive elements reachable with one hand (bottom-of-screen preference)
+
+**Link Validation (per page):**
+- [ ] Every internal link resolves to an existing route
+- [ ] No broken anchor links
+- [ ] External links have `rel="noopener noreferrer"` on `target="_blank"`
+
+**SEO (per page):**
+- [ ] Unique `<title>` (not duplicated from another page)
+- [ ] Unique `<meta description>` (not duplicated)
+- [ ] Heading hierarchy: single `<h1>`, logical nesting
+- [ ] Image alt text on all non-decorative images
+
+**Security (per page):**
+- [ ] No hardcoded API keys, tokens, or passwords in source
+- [ ] CSRF token on every state-changing form
+- [ ] No `dangerouslySetInnerHTML` / `{!! !!}` / `| safe` with user-supplied data
+- [ ] Auth-protected pages actually check auth (not just hidden nav links)
+
+### 5.5C. Live Site Verification (GTV on Rendered Output)
+
+For deployed sites, source code audit is necessary but NOT sufficient. The agent must also verify the rendered output.
+
+1. **Fetch each page via HTTP** and check the response:
+   - HTTP 200 (not redirect loops, not soft 404s)
+   - Correct `Content-Type` header
+   - Security headers present (CSP, HSTS, X-Content-Type-Options, X-Frame-Options)
+2. **Check rendered HTML** against source expectations:
+   - Are form labels actually above inputs in the DOM? (CSS can rearrange)
+   - Is the mobile nav functional? (JS-dependent features may not work)
+   - Are contrast values correct in rendered output? (CSS specificity can override)
+3. **Compare source claims vs rendered reality:**
+   - Source says "responsive" — does it actually work at 320px?
+   - Source says "accessible" — does the rendered form have proper ARIA?
+   - Source says "dark mode" — does switching actually maintain contrast?
+
+### 5.5D. Convergence Gate
+
+**Adoption cannot pass Step 5.5 until ALL of the following are true:**
+
+1. Every route in the inventory has been individually audited
+2. Every form on every page passes all 17 form dimensions
+3. Every page passes contrast, mobile, link, SEO, and security checks
+4. For deployed sites: live verification confirms source code claims
+5. Findings are reported PER PAGE (not "the project passes"):
+
+```
+/visit/westlake-select:    4 findings (label_positioning, textarea_usage, input_sizing, contrast)
+/chapters/westlake-select: 2 findings (color_contrast, text_sizing)
+/dashboard:                0 findings (clean)
+/auth/login:               1 finding (missing_loading_state)
+TOTAL: 7 findings across 4 pages — NOT CONVERGED
+```
+
+**A single finding on a single page blocks convergence.** "The project" does not pass — individual pages pass or fail.
 
 ---
 
@@ -227,6 +362,8 @@ Phase 7: E2E Test Suite
 
 Phase 8: Convergence Verification
   - Full codebase audit (8 code + 5 doc dimensions) — ENTIRE codebase, not just changed files
+  - Page-level audit: every page passes every applicable dimension (forms, contrast, mobile, links, SEO, security)
+  - Live site verification: fetch deployed pages, verify rendered output matches source claims
   - Two consecutive independent clean passes
   - Before/after comparison against Phase 1 baseline
 
@@ -319,3 +456,8 @@ If the adoption exposed a pattern that affects ALL future adoptions, file a GitH
 | E2E Patterns | `/Users/user/personal/cruxdev/docs/E2E_TEST_PATTERNS.md` |
 | Website Planning | `/Users/user/personal/cruxdev/docs/WEBSITE_PLANNING.md` |
 | SEO/GEO Reference | `/Users/user/personal/cruxdev/docs/SEO_AND_GEO_REFERENCE.md` |
+| Form Patterns | `/Users/user/personal/cruxdev/docs/FORM_PATTERNS.md` |
+| Color/Contrast Patterns | `/Users/user/personal/cruxdev/docs/COLOR_CONTRAST_PATTERNS.md` |
+| Mobile Web Patterns | `/Users/user/personal/cruxdev/docs/MOBILE_WEB_PATTERNS.md` |
+| Post-Deployment Patterns | `/Users/user/personal/cruxdev/docs/POST_DEPLOYMENT_PATTERNS.md` |
+| Dashboard Patterns | `/Users/user/personal/cruxdev/docs/DASHBOARD_PATTERNS.md` |

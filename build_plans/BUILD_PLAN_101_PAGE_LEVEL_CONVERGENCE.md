@@ -69,9 +69,9 @@ The LLM rubber-stamps project-level audits because it can't see every page at on
 
 ## Phase 5: Adoption Integration
 
-- [ ] 5.1 Update ADOPTION_PROCESS.md: Phase 8 (Convergence Verification) must include per-page audit
-- [ ] 5.2 Update ADOPTION_PLAYBOOK.md: add "page inventory" step before convergence
-- [ ] 5.3 The convergence gate: "all pages pass" not "project passes"
+- [x] 5.1 Update ADOPTION_PROCESS.md: Phase 8 (Convergence Verification) must include per-page audit — DONE: Added Step 5.5 (Page-Level Audit) with full per-page form/contrast/mobile/link/SEO/security audit, live site verification, and GTV requirements
+- [x] 5.2 Update ADOPTION_PLAYBOOK.md: add "page inventory" step before convergence — DONE: Phase 2 now includes route inventory (2.1b, 2.1c, 2.1d), Phase 8 rewritten with 8C (page-level), 8D (live site), 8E (GTV)
+- [x] 5.3 The convergence gate: "all pages pass" not "project passes" — DONE: Phase 8F explicitly requires all pages pass all dimensions, checklist items 8.5-8.18
 
 ## Phase 6: Live Site Verification (GTV for Pages)
 

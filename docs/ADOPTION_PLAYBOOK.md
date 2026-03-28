@@ -23,7 +23,7 @@ Phase 4: Code Hardening                  ← Safety, security, resilience
 Phase 5: Test Suite Build-Out            ← Unit + integration to 100%
 Phase 6: Documentation Convergence       ← Docs match code
 Phase 7: E2E Test Suite                  ← User-facing journey coverage
-Phase 8: Convergence Verification        ← Full audit to two clean passes
+Phase 8: Convergence Verification        ← Full audit to two clean passes (code + docs + EVERY PAGE)
 Phase 9: Methodology Handoff             ← Patterns file + CLAUDE.md
 ```
 
@@ -62,7 +62,7 @@ The agent runs autonomously EXCEPT when (per DEVELOPMENT_PATTERNS_CRUXDEV.md Sec
 |----------------|---------------------|---------------|
 | 1-2 | Phase A (Plan Convergence) | `planning`, `viability-assessment` |
 | 3-7 | Phase B (Execution) | Phase-specific skills (see phase headers) + cross-cutting: `executing`, `subagent-delegation`, `git-worktrees`, `systematic-debugging` |
-| 8 | Phase C (Code+Doc Convergence) | `auditing`, `convergence-driving`, `honest-tracking` (spans both CODE_CONVERGENCE and DOC_CONVERGENCE engines) |
+| 8 | Phase C (Code+Doc+Page Convergence) | `auditing`, `convergence-driving`, `honest-tracking` (spans CODE_CONVERGENCE, DOC_CONVERGENCE, and PAGE_CONVERGENCE engines) |
 | 9 | Phase D (Patterns Update) | `patterns-capture` |
 
 ---
@@ -116,6 +116,13 @@ Doc staleness:      (manual assessment: fresh / stale / absent)
 Atomic writes:      N of M critical file writes use write-then-rename
 Connection safety:  N of M connections in context managers / try-finally
 Input validation:   N of M boundary functions validate input
+Pages/routes:       N total pages (N form, N content, N dashboard, N auth, N API)
+Forms:              N total forms across all pages
+Broken links:       N (from link scan)
+Contrast failures:  N pages with issues (from initial scan)
+Mobile failures:    N pages with issues (from initial viewport check)
+Security headers:   present / missing (from HTTP check if deployed)
+Hardcoded secrets:  N (from grep scan)
 ```
 
 These become the "before" numbers for the Phase 8 before/after comparison.
@@ -128,7 +135,7 @@ These become the "before" numbers for the Phase 8 before/after comparison.
 - [ ] 1.4 Test directory structure exists
 - [ ] 1.5 CI coverage gate configured
 - [ ] 1.6 E2E test triggers configured per E2E_TEST_PATTERNS.md Section 11
-- [ ] 1.7 Baseline measurements recorded (all rows including atomic writes, connections, validation)
+- [ ] 1.7 Baseline measurements recorded (all rows including atomic writes, connections, validation, page counts, form counts, broken links, contrast failures, mobile failures, security headers, hardcoded secrets)
 - [ ] 1.8 Git commit: "chore: install CruxDev infrastructure"
 
 ---
@@ -147,11 +154,13 @@ Map the codebase:
 |------|-----------------|
 | Module map | Every source file, its purpose, its dependencies |
 | Entry points | CLI commands, API endpoints, scheduled jobs, hooks |
+| **Page/route inventory** | **Every user-facing page/route — classified by type (form, content, dashboard, auth, API). See ADOPTION_PROCESS.md Step 5.5A for stack-specific inventory methods.** |
 | Data stores | Databases, JSON files, config files — which are authoritative? |
 | External integrations | APIs, webhooks, OAuth, email/SMS |
 | State machines | Any system with explicit states and transitions |
 | File I/O | Which files are written, how, by what code paths |
 | Test infrastructure | Test framework, existing fixtures, mocking approach, CI test commands |
+| **Templates/components** | **Shared templates, layout files, component libraries — which exist, which are missing for this stack?** |
 
 ### 2B. Standards Gap Analysis
 
@@ -209,7 +218,11 @@ The assessment is audited against these dimensions (not the standard 8 code dime
 ### Checklist — Phase 2
 
 - [ ] 2.1 Architecture inventory complete (including test infrastructure)
+- [ ] 2.1b Page/route inventory complete (every page enumerated and classified by type — form, content, dashboard, auth, API)
+- [ ] 2.1c Applicable pattern docs mapped per page type (FORM_PATTERNS, COLOR_CONTRAST_PATTERNS, MOBILE_WEB_PATTERNS, DASHBOARD_PATTERNS, WCAG AA)
+- [ ] 2.1d Template/component inventory: all required templates for this stack identified, missing ones flagged
 - [ ] 2.2 Standards gap analysis per module
+- [ ] 2.2b Standards gap analysis per page (each page checked against its applicable pattern docs)
 - [ ] 2.3 Prioritized remediation list
 - [ ] 2.4 Viability assessment passed (tools, deps, CI, test accounts)
 - [ ] 2.5 Assessment document written (lives in plan file)
@@ -355,12 +368,17 @@ For any operation that takes > 1 second or processes multiple items:
 
 | Check | Standard |
 |-------|----------|
-| No hardcoded credentials | Credentials from env vars or config files only |
+| No hardcoded credentials | Credentials from env vars or config files only. Grep for API keys, tokens, passwords in source. Check `.env` files are gitignored. |
 | No path traversal | All user-supplied paths validated and canonicalized |
 | No command injection | Subprocess calls use list args, never `shell=True` with user input |
 | No SQL injection | Parameterized queries, never f-string SQL |
 | Sensitive data in logs | Sanitize before logging, never log credentials/tokens |
 | File permissions | Config files 0o600, directories 0o700 |
+| **CSRF protection** | **Every state-changing form has a CSRF token. Framework CSRF middleware enabled.** |
+| **Security headers** | **CSP, HSTS, X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy configured in the web server or framework middleware.** |
+| **XSS prevention** | **No raw HTML injection with user data (`dangerouslySetInnerHTML`, `{!! !!}`, `| safe`). Output escaped by default.** |
+| **Auth verification** | **Auth-protected pages checked server-side, not just hidden in the UI. Middleware/guards enforced.** |
+| **Dependency vulnerabilities** | **Run `npm audit` / `pip-audit` / `mix audit` / `cargo audit`. No known critical vulnerabilities.** |
 
 ### Checklist — Phase 4
 
@@ -370,7 +388,9 @@ For any operation that takes > 1 second or processes multiple items:
 - [ ] 4.4 All bare `except:` replaced with specific exception handling
 - [ ] 4.5 All long-running operations have crash-resilient state files
 - [ ] 4.6 All idempotency requirements met (safe to re-run)
-- [ ] 4.7 Security hardening checklist passed
+- [ ] 4.7 Security hardening checklist passed (including CSRF, security headers, XSS, auth, dependency audit)
+- [ ] 4.7b No hardcoded secrets in source (grep verified, not assumed)
+- [ ] 4.7c Security headers configured and verified (CSP, HSTS, X-Content-Type-Options, X-Frame-Options)
 - [ ] 4.8 All existing tests still pass
 - [ ] 4.9 Code hardening audited (two consecutive clean passes)
 
@@ -525,7 +545,7 @@ Per E2E_TEST_PATTERNS.md:
 
 ## Phase 8: Convergence Verification
 
-**Purpose:** Full-codebase audit across all dimensions. This is the final quality gate — the adopted codebase must survive the same audit rigor as code built from scratch with CruxDev.
+**Purpose:** Full-codebase audit across all dimensions PLUS per-page audit of every user-facing page. This is the final quality gate — the adopted codebase must survive the same audit rigor as code built from scratch with CruxDev. **Project-level "PASS" is not convergence. Every individual page must pass every applicable dimension.**
 
 **Loads skills:** `auditing`, `convergence-driving`, `honest-tracking`
 
@@ -546,11 +566,163 @@ Run the standard 8-dimension code audit from DEVELOPMENT_PATTERNS_CRUXDEV.md Sec
 
 Run the standard 5-dimension doc audit from Section 3C across ALL documentation.
 
-### 8C. Convergence Criterion
+### 8C. Page-Level Audit (Web Projects)
 
-Two consecutive independent clean passes across all dimensions. The second pass must come from a fresh agent context.
+**This is the audit that prevents rubber-stamping.** For every project with user-facing web pages, run the full per-page audit from ADOPTION_PROCESS.md Step 5.5. This is NOT optional and NOT a sampling exercise.
 
-### 8D. Before/After Comparison
+#### 8C.1 Route Inventory Verification
+
+Re-verify the route inventory from Phase 2. New routes may have been added during Phases 3-7. The inventory must be current.
+
+#### 8C.2 Per-Page Form Audit
+
+For EACH form on EACH page, audit all 17 form dimensions from FORM_PATTERNS.md. Read the SPECIFIC source file for that page — not just shared form components.
+
+**The audit question is NOT:** "Does this project have form components that follow patterns?"
+**The audit question IS:** "On `/visit/westlake-select`, is the email field's label above the input, does it have `autocomplete="email"`, is the textarea correctly sized, and are touch targets 44x44px?"
+
+Every form field on every page must pass. Document findings per form, per page.
+
+#### 8C.3 Per-Page Contrast Audit
+
+For EACH page, verify contrast ratios on RENDERED output — not by reading CSS variables or semantic tokens.
+
+| Check | Method |
+|-------|--------|
+| Body text contrast | Read the actual hex values used on this page, compute ratio |
+| Secondary text | Same — do not assume "uses text-gray-600" means it passes |
+| Links | Verify against the actual background color on this page |
+| UI components | Buttons, inputs, icons — 3:1 minimum |
+| Dark mode | If the site has dark mode, check BOTH modes per page |
+
+**Tool:** Use `check_contrast` MCP tool or manual hex-pair computation. "Semantic tokens are defined" is not evidence of per-page compliance.
+
+#### 8C.4 Per-Page Mobile Audit
+
+For EACH page, verify mobile usability against MOBILE_WEB_PATTERNS.md:
+
+- [ ] Navigation accessible at mobile viewport (not just "hamburger component exists" — does THIS page render it?)
+- [ ] No horizontal scroll at 320px width
+- [ ] All touch targets 44x44px with 8px spacing
+- [ ] Body text 16px+ (not just "the CSS variable is set")
+- [ ] Forms usable on mobile (correct keyboard types, adequate input sizing)
+- [ ] Images responsive (no overflow)
+
+#### 8C.5 Per-Page Link Validation
+
+For EACH page, verify:
+
+- [ ] Every internal link resolves to an existing route in the route inventory
+- [ ] No broken anchor links (`#section` points to an element with that ID)
+- [ ] External links use `rel="noopener noreferrer"` on `target="_blank"`
+- [ ] No links to non-existent pages (404s)
+
+**Method:** Parse all `<a href="...">` in each page's rendered output. Cross-reference internal links against the route inventory. For deployed sites, HTTP HEAD each link.
+
+#### 8C.6 Per-Page Security Audit
+
+For EACH page:
+
+- [ ] No hardcoded API keys, tokens, or passwords visible in source or rendered HTML
+- [ ] CSRF token present on every state-changing form
+- [ ] No raw user data in `dangerouslySetInnerHTML` / `{!! !!}` / `| safe`
+- [ ] Auth-protected pages enforce auth server-side
+- [ ] No sensitive data in HTML comments or hidden fields
+
+#### 8C.7 Per-Page SEO Audit
+
+For EACH page:
+
+- [ ] Unique `<title>` (not duplicated from another page)
+- [ ] Unique `<meta name="description">` (not duplicated)
+- [ ] Single `<h1>`, logical heading hierarchy
+- [ ] All non-decorative images have alt text
+- [ ] Open Graph tags present (og:title, og:description, og:image)
+- [ ] Canonical URL set
+
+#### 8C.8 Pattern Doc Coverage Verification
+
+Verify that ALL applicable pattern docs were checked during the adoption. Cross-reference:
+
+| Pattern Doc | Checked During Phase | Verified Per-Page |
+|------------|---------------------|-------------------|
+| FORM_PATTERNS.md | Phase 8C.2 | Yes — per form, per page |
+| COLOR_CONTRAST_PATTERNS.md | Phase 8C.3 | Yes — per page |
+| MOBILE_WEB_PATTERNS.md | Phase 8C.4 | Yes — per page |
+| DASHBOARD_PATTERNS.md | Phase 8C.2 (dashboard pages) | Yes — per dashboard page |
+| E2E_TEST_PATTERNS.md | Phase 7 | Yes — per journey |
+| WEBSITE_PLANNING.md | Step 5 | Yes — per page for applicable sections |
+| SEO_AND_GEO_REFERENCE.md | Phase 8C.7 | Yes — per page |
+| POST_DEPLOYMENT_PATTERNS.md | Phase 8E | Yes — live verification |
+| I18N_PATTERNS.md | Phase 8C (if applicable) | Yes — per page if multi-language |
+| DRY_UI_COMPONENT_PATTERNS.md | Phase 3 | Yes — component reuse verified |
+| BLOG_PATTERNS.md / BLOG_POST_PATTERNS.md | Phase 8C (if blog) | Yes — per blog page |
+
+If ANY pattern doc applies to the project but was NOT checked, that is a gap. Fix it before convergence.
+
+### 8D. Live Site Verification (Deployed Projects)
+
+For projects with a deployed site, source code audit alone is NOT sufficient. Verify the live site.
+
+#### 8D.1 HTTP Verification
+
+Fetch each page and verify:
+
+- [ ] HTTP 200 response (not redirect loops, not soft 404s)
+- [ ] Correct `Content-Type` header
+- [ ] Security headers present:
+  - `Strict-Transport-Security` (HSTS)
+  - `Content-Security-Policy` (CSP)
+  - `X-Content-Type-Options: nosniff`
+  - `X-Frame-Options: DENY` or `SAMEORIGIN`
+  - `Referrer-Policy`
+  - `Permissions-Policy`
+- [ ] HTTPS enforced (HTTP redirects to HTTPS)
+- [ ] No mixed content warnings
+
+#### 8D.2 Rendered vs Source Comparison
+
+For a representative sample of pages (minimum: all form pages + homepage + one content page):
+
+- [ ] Fetch the rendered HTML
+- [ ] Verify form labels are above inputs in the DOM (not just in source)
+- [ ] Verify mobile nav is functional (JS-dependent nav must actually work)
+- [ ] Verify contrast values in rendered CSS match expectations
+- [ ] Verify no server-side errors leaked into HTML
+
+#### 8D.3 Performance Spot-Check
+
+- [ ] Core Web Vitals (LCP < 2.5s, INP < 200ms, CLS < 0.1) — use PageSpeed Insights or `check_pagespeed` MCP tool
+- [ ] Time to First Byte < 800ms
+- [ ] No render-blocking resources that could be deferred
+
+### 8E. GTV on Every Adoption Claim
+
+**Every "PASS" in the adoption audit must be verifiable.** This means:
+
+| Claim | NOT Acceptable Evidence | Acceptable Evidence |
+|-------|------------------------|---------------------|
+| "Forms follow patterns" | "Form components exist and use Tailwind" | "On `/contact`, the name field has `<label for='name'>` above the input, `autocomplete='name'`, 44px touch target" |
+| "Contrast passes WCAG AA" | "Uses semantic color tokens" | "On `/about`, body text #111827 on background #FAFAFA = 15.4:1 ratio" |
+| "Mobile responsive" | "Uses responsive CSS classes" | "At 320px viewport, `/pricing` has no horizontal scroll, nav shows hamburger, touch targets are 48px" |
+| "No security issues" | "Framework handles security" | "Grepped for API keys: 0 matches. CSRF middleware enabled in `middleware.py`. All forms have `{% csrf_token %}`" |
+| "Links work" | "Internal links use relative paths" | "Parsed 47 internal links across 12 pages. All resolve to routes in the inventory. 0 broken." |
+| "SEO complete" | "Meta tags exist" | "Each of 12 pages has unique title and description. No duplicates. All images have alt text." |
+
+**If you cannot produce the specific evidence column, the claim is not verified.**
+
+### 8F. Convergence Criterion
+
+Two consecutive independent clean passes across all dimensions INCLUDING the per-page audit. The second pass must come from a fresh agent context.
+
+**Convergence means:**
+- ALL code dimensions pass (8 dimensions, entire codebase)
+- ALL doc dimensions pass (5 dimensions, all documentation)
+- ALL pages pass (every page, every applicable dimension)
+- ALL live site checks pass (if deployed)
+- ALL claims have GTV evidence
+
+### 8G. Before/After Comparison
 
 Compare against Phase 1 baseline:
 
@@ -564,6 +736,13 @@ Connection safety:  B/J       J/J
 Input validation:   C/L       L/L
 Doc accuracy:       stale     converged
 E2E journeys:       0         P (all CRITICAL+HIGH)
+Pages audited:      0         R/R (all pages, all dimensions)
+Forms passing:      ?/T       T/T (every form, every dimension)
+Contrast passing:   ?/R       R/R (every page)
+Mobile passing:     ?/R       R/R (every page)
+Broken links:       ?         0
+Security issues:    ?         0
+Live site verified: no        yes (all pages, all headers)
 ```
 
 ### Checklist — Phase 8
@@ -572,10 +751,20 @@ E2E journeys:       0         P (all CRITICAL+HIGH)
 - [ ] 8.2 Full code audit pass 2 (independent, clean)
 - [ ] 8.3 Full doc audit pass 1
 - [ ] 8.4 Full doc audit pass 2 (independent, clean)
-- [ ] 8.5 Before/after comparison documented
-- [ ] 8.6 All tests pass (unit + integration + E2E)
-- [ ] 8.7 Coverage at 100%
-- [ ] 8.8 Known Gaps reconciled (all deferred items from earlier phases resolved or explicitly accepted)
+- [ ] 8.5 Page-level form audit: every form on every page passes 17 dimensions
+- [ ] 8.6 Page-level contrast audit: every page passes WCAG AA on rendered output
+- [ ] 8.7 Page-level mobile audit: every page works at 320px viewport
+- [ ] 8.8 Page-level link validation: every internal link resolves, 0 broken links
+- [ ] 8.9 Page-level SEO audit: unique title/description per page, heading hierarchy, alt text
+- [ ] 8.10 Page-level security audit: no hardcoded secrets, CSRF on all forms, no XSS vectors
+- [ ] 8.11 Pattern doc coverage: every applicable pattern doc was checked, no gaps
+- [ ] 8.12 Live site verification (if deployed): HTTP checks, security headers, rendered output
+- [ ] 8.13 GTV evidence documented for every "PASS" claim
+- [ ] 8.14 Before/after comparison documented (including page-level metrics)
+- [ ] 8.15 All tests pass (unit + integration + E2E)
+- [ ] 8.16 Coverage at 100%
+- [ ] 8.17 Known Gaps reconciled (all deferred items from earlier phases resolved or explicitly accepted)
+- [ ] 8.18 Two consecutive clean passes on ALL of the above (code + docs + pages + live site)
 
 ---
 
@@ -643,7 +832,9 @@ After adoption, ALL future development on this project follows DEVELOPMENT_PATTE
 ┌──────────────────────────────────────────────────────────────┐
 │ Phase 2: ASSESSMENT + VIABILITY                              │
 │   Architecture inventory (including test infrastructure),    │
-│   standards gap analysis, prioritized remediation list       │
+│   PAGE/ROUTE INVENTORY (every page, classified by type),     │
+│   standards gap analysis (per module AND per page),          │
+│   template/component inventory, prioritized remediation list │
 │   Viability check: tools, deps, CI, test accounts            │
 │   → Audit to convergence (two clean passes, 4 dimensions)   │
 └────────────────────────┬─────────────────────────────────────┘
@@ -689,6 +880,10 @@ After adoption, ALL future development on this project follows DEVELOPMENT_PATTE
 ┌──────────────────────────────────────────────────────────────┐
 │ Phase 8: CONVERGENCE VERIFICATION                            │
 │   Full 8+5 dimension audit across ENTIRE codebase            │
+│   Per-page audit: forms, contrast, mobile, links, SEO,      │
+│   security — every page, every applicable dimension          │
+│   Live site verification: fetch pages, check rendered output │
+│   GTV on every "PASS" — specific evidence, not assumptions   │
 │   Two consecutive independent clean passes                   │
 │   Before/after comparison against Phase 1 baseline           │
 └────────────────────────┬─────────────────────────────────────┘
@@ -746,3 +941,9 @@ Phases 1, 5, 8. Install infrastructure, close coverage gaps to 100%, verify. For
 | Skipping viability assessment | Plan fails on first step due to missing deps | Phase 2D verifies plan is executable before Phase 3 starts |
 | No brainstorming gate for architecture decisions | Wrong structure chosen, expensive to reverse | Phase 3.0 requires 2-3 approach proposals before deciding |
 | Hardening code that should be deleted | Wasted effort on dead code | Phase 2 should identify modules for deletion, not just remediation. Phase 3 removes them before hardening. |
+| **Project-level auditing for page-level concerns** | **"Project has forms → PASS" while individual pages have broken forms** | **Phase 8 audits EACH page against EACH applicable dimension. "The project" does not pass — individual pages pass or fail.** |
+| **Trusting CSS variables as contrast proof** | **"Uses semantic color tokens → PASS" while rendered pages have low contrast** | **Phase 8C.3 computes actual contrast ratios on rendered output per page.** |
+| **Trusting component existence as mobile proof** | **"Hamburger component exists → PASS" while specific pages don't render it** | **Phase 8C.4 checks each page at mobile viewport, not just shared components.** |
+| **Skipping live site verification** | **Source code looks correct but deployed site has missing headers, broken JS, stale cache** | **Phase 8D fetches the deployed site and verifies rendered output matches source claims.** |
+| **Accepting unverifiable claims** | **"PASS" without specific evidence, agent hallucinating compliance** | **Phase 8E requires GTV: specific hex values, specific line numbers, specific URLs, specific dimensions. Not "looks good."** |
+| **Skipping pattern doc coverage check** | **FORM_PATTERNS exists but was never checked during adoption** | **Phase 8C.8 cross-references every applicable pattern doc against what was actually audited.** |
