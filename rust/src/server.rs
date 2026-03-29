@@ -89,6 +89,12 @@ pub struct InventoryRoutesParam {
 }
 
 #[derive(Deserialize, JsonSchema)]
+pub struct AuditPatternPackageParam {
+    /// Path to the pattern package directory (e.g., "patterns/form_patterns")
+    pub pattern_dir: String,
+}
+
+#[derive(Deserialize, JsonSchema)]
 pub struct GtvScanContentParam {
     /// Path to the file to scan for claims
     pub file_path: String,
@@ -3040,6 +3046,120 @@ impl CruxDevServer {
                 "api": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Api).count(),
                 "index": pages.iter().filter(|p| p.page_type == crate::engine::page_audit::PageType::Index).count(),
             }
+        }).to_string()
+    }
+
+    // 66. audit_pattern_package
+    #[tool(description = "Validate a pattern package has all required artifacts: pattern.md, LLM guide, automation analysis, scripts/, fixtures/, CONVERGENCE_LOG.md, Research Sources section.")]
+    async fn audit_pattern_package(&self, params: Parameters<AuditPatternPackageParam>) -> String {
+        let dir = std::path::Path::new(&params.0.pattern_dir);
+        let mut findings = Vec::new();
+
+        // Helper to add a finding
+        let mut add = |rule: &str, status: &str, evidence: &str| {
+            findings.push(serde_json::json!({
+                "rule": rule,
+                "status": status,
+                "evidence": evidence,
+            }));
+        };
+
+        // Check pattern.md exists (any *_PATTERN*.md or *_PATTERNS*.md file)
+        let has_pattern = std::fs::read_dir(dir).ok()
+            .map(|entries| entries
+                .filter_map(|e| e.ok())
+                .any(|e| {
+                    let name = e.file_name().to_string_lossy().to_uppercase();
+                    name.ends_with(".MD") && (name.contains("PATTERN") || name.contains("PATTERNS"))
+                        && !name.contains("LLM_GUIDE") && !name.contains("AUTOMATION_ANALYSIS")
+                }))
+            .unwrap_or(false);
+        if has_pattern {
+            add("pattern_md_exists", "pass", "Pattern markdown found");
+        } else {
+            add("pattern_md_exists", "fail", "No pattern markdown file found");
+        }
+
+        // Check LLM guide exists
+        let has_guide = std::fs::read_dir(dir).ok()
+            .map(|entries| entries
+                .filter_map(|e| e.ok())
+                .any(|e| e.file_name().to_string_lossy().to_uppercase().contains("LLM_GUIDE")))
+            .unwrap_or(false);
+        if has_guide {
+            add("llm_guide_exists", "pass", "LLM guide found");
+        } else {
+            add("llm_guide_exists", "fail", "No LLM guide file found");
+        }
+
+        // Check automation analysis exists
+        let has_analysis = std::fs::read_dir(dir).ok()
+            .map(|entries| entries
+                .filter_map(|e| e.ok())
+                .any(|e| e.file_name().to_string_lossy().to_uppercase().contains("AUTOMATION_ANALYSIS")))
+            .unwrap_or(false);
+        if has_analysis {
+            add("automation_analysis_exists", "pass", "Automation analysis found");
+        } else {
+            add("automation_analysis_exists", "fail", "No automation analysis file found");
+        }
+
+        // Check scripts/ directory exists with .go files
+        let scripts_dir = dir.join("scripts");
+        if scripts_dir.is_dir() {
+            let has_go = std::fs::read_dir(&scripts_dir).ok()
+                .map(|entries| entries
+                    .filter_map(|e| e.ok())
+                    .any(|e| e.path().extension().is_some_and(|ext| ext == "go")))
+                .unwrap_or(false);
+            if has_go {
+                add("scripts_dir_has_go", "pass", "scripts/ contains .go files");
+            } else {
+                add("scripts_dir_has_go", "warn", "scripts/ exists but contains no .go files");
+            }
+        } else {
+            add("scripts_dir_exists", "fail", "scripts/ directory not found");
+        }
+
+        // Check CONVERGENCE_LOG.md exists
+        let has_log = dir.join("CONVERGENCE_LOG.md").exists();
+        if has_log {
+            add("convergence_log_exists", "pass", "CONVERGENCE_LOG.md found");
+        } else {
+            add("convergence_log_exists", "fail", "CONVERGENCE_LOG.md not found");
+        }
+
+        // Check Research Sources in pattern file
+        let pattern_files: Vec<_> = std::fs::read_dir(dir).ok()
+            .map(|entries| entries
+                .filter_map(|e| e.ok())
+                .filter(|e| {
+                    let name = e.file_name().to_string_lossy().to_uppercase();
+                    name.ends_with(".MD") && (name.contains("PATTERN") || name.contains("PATTERNS"))
+                        && !name.contains("LLM_GUIDE") && !name.contains("AUTOMATION_ANALYSIS")
+                })
+                .map(|e| e.path())
+                .collect())
+            .unwrap_or_default();
+
+        for pf in &pattern_files {
+            if let Ok(content) = std::fs::read_to_string(pf) {
+                if content.contains("## Research Sources") {
+                    add("research_sources_section", "pass", &format!("{} has Research Sources", pf.file_name().unwrap_or_default().to_string_lossy()));
+                } else {
+                    add("research_sources_section", "fail", &format!("{} missing Research Sources section", pf.file_name().unwrap_or_default().to_string_lossy()));
+                }
+            }
+        }
+
+        let fail_count = findings.iter().filter(|f| f["status"] == "fail").count();
+        let status = if fail_count == 0 { "pass" } else { "fail" };
+
+        serde_json::json!({
+            "status": status,
+            "findings": findings,
+            "total_checks": findings.len(),
+            "failures": fail_count,
         }).to_string()
     }
 }
