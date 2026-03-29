@@ -9,6 +9,7 @@ This is the successor to DEVELOPMENT_PATTERNS.md. The core methodology is identi
 - **CRUX_ECOSYSTEM_PLAN.md** — the current master plan (what to build, in what order).
 - **CruxDev.md** — the CruxDev design document (architecture, skills, engine specs).
 - **DEVELOPMENT_PATTERNS.md** — the original methodology. This file extends it for the Crux ecosystem. Both remain valid. Use the original for projects that don't need the Crux ecosystem context.
+- **PATTERN_CREATION_PATTERNS.md** — how patterns themselves are created, hardened, and packaged. 7-gate convergence lifecycle. Use when creating or updating any pattern doc.
 - **This file is living.** Updated at the end of each planning session.
 
 **When to read this file:**

@@ -236,14 +236,112 @@ The convergence engine's router detects the pattern package and:
 3. LLM only evaluates judgment checks
 4. Combined findings submitted to convergence
 
+## MCP Tool: `create_pattern`
+
+The pattern creation lifecycle is an MCP tool invoked via the `/cruxdev-create-pattern` skill.
+
+### Tool: `create_pattern`
+
+```
+Params:
+  pattern_name: string (required)   — e.g., "form_patterns"
+  topic: string (required)          — research topic, e.g., "web form UX and accessibility"
+  project_dir: string (optional)    — project to analyze for context
+  skip_code: bool (optional)        — skip Gates 3-4 if <30% mechanical
+
+Flow:
+  Gate 1: Research → writes docs/{PATTERN_NAME}.md, runs convergence
+  Gate 2: Automation analysis → classifies checks, writes script specs
+  Gate 3: Build plan → writes build_plans/BUILD_PLAN_NNN_{PATTERN_NAME}_CODE.md
+  Gate 4: Code → builds Go scripts through CruxBot sandbox
+  Gate 5: LLM guide → writes docs/{PATTERN_NAME}_LLM_GUIDE.md
+  Gate 6: Integration test → validates package against fixtures
+  Gate 7: Package → moves to patterns/{pattern_name}/
+
+Returns:
+  {
+    "pattern_name": "form_patterns",
+    "status": "converged",
+    "gates_passed": 7,
+    "package_path": "patterns/form_patterns/",
+    "checks_total": 17,
+    "checks_mechanical": 10,
+    "checks_judgment": 7,
+    "scripts": ["audit_form_patterns"]
+  }
+```
+
+### Skill: `/cruxdev-create-pattern`
+
+```
+Usage: /cruxdev-create-pattern <pattern_name> <topic>
+
+Example: /cruxdev-create-pattern api_security "REST API security patterns"
+
+The skill orchestrates the full 7-gate lifecycle:
+1. Researches the topic to convergence
+2. Analyzes checks for automation potential
+3. Writes build plan for Go audit scripts
+4. Converges the code through CruxBot sandbox
+5. Writes the LLM usage guide
+6. Runs integration tests
+7. Packages and adds to pattern library
+
+Each gate requires two consecutive clean passes. The skill does not
+stop between gates — it runs to completion or escalates on failure.
+```
+
+### Tool: `audit_pattern_package`
+
+```
+Params:
+  pattern_dir: string (required)    — path to pattern package directory
+
+Checks:
+  - Required files present (pattern.md, LLM guide, scripts/, fixtures/)
+  - Scripts compile and follow I/O contract
+  - Scripts pass on good fixtures, fail on bad fixtures
+  - LLM guide references all scripts
+  - CONVERGENCE_LOG.md lists all gates
+
+Returns:
+  { "status": "pass|fail", "findings": [...] }
+```
+
+## Pattern Library Location
+
+Converged pattern packages live in the project's `patterns/` directory:
+
+```
+patterns/
+  form_patterns/
+    FORM_PATTERNS.md
+    FORM_PATTERNS_LLM_GUIDE.md
+    scripts/
+      audit_form_patterns.go
+      audit_form_patterns           # compiled binary
+      audit_form_patterns_test.go
+    fixtures/
+      good/                         # known-good test fixtures
+      bad/                          # known-bad test fixtures
+    CONVERGENCE_LOG.md              # which gates passed, when
+  seo_patterns/
+    ...
+```
+
+Draft patterns (not yet through all gates) stay in `docs/` as standalone markdown files. A pattern moves to `patterns/` only after Gate 7.
+
 ## Integration with Convergence Router
 
-The router in `rust/src/engine/router.rs` assembles dimensions for each audit phase. When a pattern has a compiled script, the router:
+The router in `rust/src/engine/router.rs` discovers pattern scripts via directory convention:
 
-1. Adds the pattern's dimensions to the audit task
-2. Includes the script path in the task metadata
-3. The LLM (or CruxBot) runs the script before making judgment calls
-4. Script findings are pre-populated — the LLM adds only judgment findings
+1. **Discovery**: Router scans `{project_dir}/patterns/*/scripts/` for compiled binaries matching `audit_*`
+2. **Matching**: Script name maps to dimension set (e.g., `audit_form_patterns` → `FORM_DIMENSIONS`)
+3. **Invocation**: Router adds script path to task metadata: `{"pattern_script": "patterns/form_patterns/scripts/audit_form_patterns"}`
+4. **Execution**: The LLM (or CruxBot) runs the script first, then evaluates only judgment checks
+5. **Merging**: Script findings (mechanical) + LLM findings (judgment) are combined and submitted
+
+The router detects pattern packages by checking for the directory structure above. No config file needed — convention over configuration.
 
 This reduces LLM token usage by 40-60% per convergence cycle (based on the automation analysis: 68 of 146 checks are mechanical).
 
@@ -268,6 +366,54 @@ When updating an existing pattern:
 3. Run the automation analysis on the updated pattern
 4. If new mechanical checks identified: add to the script
 5. Re-run integration tests — the package must re-converge after any change
+
+## Self-Application: This Pattern Through Its Own Gates
+
+This pattern must pass its own lifecycle. Current status:
+
+### Gate 1: Pattern Document — CONVERGING
+- This file. 7-stage lifecycle, 10 auditable checks, concrete examples.
+
+### Gate 2: Automation Analysis
+6 of 10 checks are mechanical (60%):
+
+| Check | Classification | Script |
+|---|---|---|
+| Pattern package has all required files | MECHANICAL | `audit_pattern_package.go` |
+| Script follows I/O contract (JSON, exit codes) | MECHANICAL | `audit_pattern_package.go` |
+| LLM guide references correct script names | MECHANICAL | `audit_pattern_package.go` |
+| Script passes on good fixtures | MECHANICAL | `audit_pattern_package.go` |
+| Script fails on bad fixtures | MECHANICAL | `audit_pattern_package.go` |
+| All 7 gates documented in CONVERGENCE_LOG.md | MECHANICAL | `audit_pattern_package.go` |
+| Every check phrased as verifiable statement | JUDGMENT | LLM evaluation |
+| LLM guide separates mechanical vs judgment | JUDGMENT | LLM evaluation |
+| Mechanical checks correctly classified | JUDGMENT | LLM evaluation |
+| Integration test covers end-to-end | JUDGMENT | LLM evaluation |
+
+### Gate 3: Build Plan
+Script: `audit_pattern_package.go`
+```
+Input: -dir {pattern_package_dir}
+Checks:
+  - pattern.md exists and is non-empty
+  - *_LLM_GUIDE.md exists and is non-empty
+  - scripts/ directory exists with at least one .go file
+  - scripts/ contains at least one compiled binary (no extension)
+  - fixtures/good/ and fixtures/bad/ directories exist
+  - CONVERGENCE_LOG.md exists and lists all 7 gates
+  - Every script outputs valid JSON array to stdout
+  - Every script exits 0 on good fixtures, 1 on bad fixtures
+  - LLM guide mentions every script name found in scripts/
+Output: JSON findings array
+Exit: 0 all pass, 1 any fail
+Complexity: simple (1 day)
+```
+
+### Gates 4-7: Pending
+- Gate 4 (Code): Build `audit_pattern_package.go` through CruxBot sandbox
+- Gate 5 (LLM Guide): Write PATTERN_CREATION_PATTERNS_LLM_GUIDE.md
+- Gate 6 (Integration): Create good/bad fixture packages, validate end-to-end
+- Gate 7 (Library): Move to `patterns/pattern_creation/` after all gates pass
 
 ## The Standard
 
