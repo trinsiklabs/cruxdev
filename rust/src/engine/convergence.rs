@@ -5,6 +5,8 @@ use super::state::*;
 /// Phase execution order (excludes terminal states).
 pub const PHASE_ORDER: &[ConvergencePhase] = &[
     ConvergencePhase::Planning,
+    ConvergencePhase::PatternAssessment,
+    ConvergencePhase::PatternOrchestration,
     ConvergencePhase::PlanAuditing,
     ConvergencePhase::DocAlignment,
     ConvergencePhase::Viability,
@@ -99,14 +101,16 @@ mod tests {
 
     #[test]
     fn phase_order_length() {
-        assert_eq!(PHASE_ORDER.len(), 11);
+        assert_eq!(PHASE_ORDER.len(), 13);
         assert_eq!(PHASE_ORDER[0], ConvergencePhase::Planning);
-        assert_eq!(PHASE_ORDER[10], ConvergencePhase::Converged);
+        assert_eq!(PHASE_ORDER[12], ConvergencePhase::Converged);
     }
 
     #[test]
     fn advance_phase_normal() {
-        assert_eq!(advance_phase(ConvergencePhase::Planning), ConvergencePhase::PlanAuditing);
+        assert_eq!(advance_phase(ConvergencePhase::Planning), ConvergencePhase::PatternAssessment);
+        assert_eq!(advance_phase(ConvergencePhase::PatternAssessment), ConvergencePhase::PatternOrchestration);
+        assert_eq!(advance_phase(ConvergencePhase::PatternOrchestration), ConvergencePhase::PlanAuditing);
         assert_eq!(advance_phase(ConvergencePhase::CodeAuditing), ConvergencePhase::DocAuditing);
     }
 

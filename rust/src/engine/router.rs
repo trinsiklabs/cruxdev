@@ -264,6 +264,41 @@ fn detect_media_project(project_dir: &str) -> bool {
     markers.iter().any(|m| root.join(m).exists() || root.join(m).is_dir())
 }
 
+/// Detect available patterns in the project's pattern library + docs.
+fn detect_pattern_library(project_dir: &str) -> Vec<String> {
+    let root = Path::new(project_dir);
+    let mut patterns = Vec::new();
+
+    // Check patterns/ directory for converged packages
+    let patterns_dir = root.join("patterns");
+    if patterns_dir.is_dir() {
+        if let Ok(entries) = std::fs::read_dir(&patterns_dir) {
+            for entry in entries.flatten() {
+                if entry.path().is_dir() {
+                    patterns.push(format!("package:{}", entry.file_name().to_string_lossy()));
+                }
+            }
+        }
+    }
+
+    // Check docs/ for standalone pattern files
+    let docs_dir = root.join("docs");
+    if docs_dir.is_dir() {
+        if let Ok(entries) = std::fs::read_dir(&docs_dir) {
+            for entry in entries.flatten() {
+                let name = entry.file_name().to_string_lossy().to_uppercase();
+                if name.contains("PATTERN") && name.ends_with(".MD")
+                    && !name.contains("AUDIT") && !name.contains("CREATION")
+                {
+                    patterns.push(format!("doc:{}", entry.file_name().to_string_lossy()));
+                }
+            }
+        }
+    }
+
+    patterns
+}
+
 /// Detect if project makes LLM calls (has LLM client, API keys, or LLM architecture docs).
 fn detect_llm_calls(project_dir: &str) -> bool {
     let root = Path::new(project_dir);
@@ -339,7 +374,7 @@ pub fn get_next_task(
     match state.phase {
         ConvergencePhase::Planning => {
             if check_convergence(state) {
-                advance_to(state, state_path, ConvergencePhase::PlanAuditing);
+                advance_to(state, state_path, ConvergencePhase::PatternAssessment);
                 return get_next_task(state, state_path, source_files, doc_files, test_command);
             }
             Task {
@@ -348,6 +383,39 @@ pub fn get_next_task(
                 files: vec![state.plan_file.clone()],
                 dimensions: vec![], finding: None, test_command: None,
                 metadata: None, recommended_tier: Some("standard".into()),
+            }
+        }
+
+        ConvergencePhase::PatternAssessment => {
+            if check_convergence(state) {
+                advance_to(state, state_path, ConvergencePhase::PatternOrchestration);
+                return get_next_task(state, state_path, source_files, doc_files, test_command);
+            }
+            let proj_dir = resolve_proj_dir(state);
+            let patterns_available = detect_pattern_library(&proj_dir);
+            Task {
+                task_type: "audit".into(),
+                description: format!("Assess pattern coverage for this plan (round {}). What patterns are needed? What gaps exist?", state.round),
+                files: vec![state.plan_file.clone()],
+                dimensions: vec!["pattern_coverage".into(), "domain_detection".into(), "gap_identification".into()],
+                finding: None, test_command: None,
+                metadata: Some(json!({"patterns_available": patterns_available})),
+                recommended_tier: Some("standard".into()),
+            }
+        }
+
+        ConvergencePhase::PatternOrchestration => {
+            if check_convergence(state) {
+                advance_to(state, state_path, ConvergencePhase::PlanAuditing);
+                return get_next_task(state, state_path, source_files, doc_files, test_command);
+            }
+            Task {
+                task_type: "audit".into(),
+                description: format!("Review pattern orchestration (round {}). Which patterns apply at which convergence phase?", state.round),
+                files: vec![state.plan_file.clone()],
+                dimensions: vec!["orchestration_completeness".into(), "phase_mapping_accuracy".into()],
+                finding: None, test_command: None, metadata: None,
+                recommended_tier: Some("standard".into()),
             }
         }
 

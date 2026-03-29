@@ -9,6 +9,8 @@ use std::collections::HashMap;
 #[serde(rename_all = "snake_case")]
 pub enum ConvergencePhase {
     Planning,
+    PatternAssessment,
+    PatternOrchestration,
     PlanAuditing,
     DocAlignment,
     Viability,
