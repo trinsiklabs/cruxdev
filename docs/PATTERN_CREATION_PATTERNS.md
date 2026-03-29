@@ -118,6 +118,36 @@ The output is a pattern file with concrete, auditable checks. Not principles. No
 
 **Quality gate**: Every check in the pattern must be phrased as a verifiable statement. "Forms should be accessible" fails. "Every form input has an associated label element or aria-label attribute" passes — because code can verify it.
 
+**Sources gate**: Every pattern file MUST end with a `## Research Sources` section documenting all sources used during the 5-pass research. This is not optional. A pattern without documented sources is not a pattern — it's an opinion.
+
+```markdown
+## Research Sources
+
+Sources verified via `verify_research_sources()` during research session {session_id}.
+
+### Pass 1: Broad Survey
+- [Source title](URL) — what was learned, date accessed
+- [Source title](URL) — what was learned, date accessed
+
+### Pass 2: Academic/Standards
+- [W3C WCAG 2.2](URL) — specific sections referenced
+- [Research paper title](URL) — key findings applied
+
+### Pass 3: Practitioner
+- [Blog post title](URL) — real-world implementation details
+- [Conference talk](URL) — practitioner insights
+
+### Pass 4: Contrarian
+- [Counter-argument source](URL) — when this pattern fails
+- [Failure case study](URL) — limitations documented
+
+### Pass 5: Primary (Crux Ecosystem)
+- Tested against: {project_name} — findings
+- Tested against: {project_name} — findings
+```
+
+Every URL must have been validated by `verify_research_sources()`. Dead links are findings. Sources without URLs (e.g., "common knowledge" or "LLM training data") are not sources — they must be replaced with verifiable citations or the claim must be marked as unverified.
+
 ## Step 2: Automation Analysis
 
 For each check in the pattern, classify:
@@ -437,6 +467,8 @@ This pattern must pass its own lifecycle. Current status:
 | Script passes on good fixtures | MECHANICAL | `audit_pattern_package.go` |
 | Script fails on bad fixtures | MECHANICAL | `audit_pattern_package.go` |
 | All 7 gates documented in CONVERGENCE_LOG.md | MECHANICAL | `audit_pattern_package.go` |
+| Research Sources section exists at end of pattern.md | MECHANICAL | `audit_pattern_package.go` |
+| All source URLs return 200 | MECHANICAL | `audit_pattern_package.go` |
 | Every check phrased as verifiable statement | JUDGMENT | LLM evaluation |
 | LLM guide separates mechanical vs judgment | JUDGMENT | LLM evaluation |
 | Mechanical checks correctly classified | JUDGMENT | LLM evaluation |
@@ -448,6 +480,9 @@ Script: `audit_pattern_package.go`
 Input: -dir {pattern_package_dir}
 Checks:
   - pattern.md exists and is non-empty
+  - pattern.md ends with ## Research Sources section
+  - Research Sources section has at least one URL per pass (5 passes minimum)
+  - All source URLs return HTTP 200 (verified, not just listed)
   - *_LLM_GUIDE.md exists and is non-empty
   - scripts/ directory exists with at least one .go file
   - scripts/ contains at least one compiled binary (no extension)
