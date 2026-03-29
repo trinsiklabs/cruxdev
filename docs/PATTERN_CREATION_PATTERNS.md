@@ -80,13 +80,39 @@ Every stage produces artifacts that go through convergence (two consecutive inde
 
 ## Step 1: Research to Convergence
 
-The pattern markdown is created through the standard research methodology (see RESEARCH_PATTERNS.md):
+Research MUST use the CruxDev research tools — not ad hoc web searches or LLM knowledge. The tools enforce the 5-pass methodology, track convergence, and persist findings.
 
-- **Pass 1**: Domain survey — what exists, what's the state of the art
-- **Pass 2**: Gap analysis — what's missing, what's wrong with current approaches
-- **Pass 3**: Synthesis — combine into actionable pattern with specific checks
-- **Pass 4**: Validation — verify against real projects, fix gaps
-- **Pass 5**: Convergence — two consecutive clean audit passes
+### Required Tool Flow
+
+```
+1. research_topic(topic, sub_questions)
+   → Creates research session with session_id
+   → Returns 5-pass instructions
+
+2. For each pass (broad, academic, practitioner, contrarian, primary):
+   a. Execute web searches using the pass's methodology
+   b. verify_research_sources(sources) — validate citations, check for dead links
+   c. Submit findings to the research session
+
+3. research_status(session_id)
+   → Check convergence: are all passes complete? Quality score?
+
+4. When converged: synthesize into pattern document
+   → Write to docs/PATTERN_NAME.md
+   → Run through start_convergence() for audit
+```
+
+### The 5-Pass Research Methodology (via RESEARCH_PATTERNS.md)
+
+- **Pass 1 (Broad)**: Domain survey — what exists, what's the state of the art
+- **Pass 2 (Academic)**: Research papers, formal specifications, established standards
+- **Pass 3 (Practitioner)**: Blog posts, conference talks, real-world implementations
+- **Pass 4 (Contrarian)**: Counter-arguments, failure cases, when NOT to use this pattern
+- **Pass 5 (Primary)**: Test against real projects in the Crux ecosystem
+
+Each pass uses `verify_research_sources()` to validate citations before they enter the pattern.
+
+### Output Requirements
 
 The output is a pattern file with concrete, auditable checks. Not principles. Not guidelines. Checks.
 
@@ -278,14 +304,40 @@ Usage: /cruxdev-create-pattern <pattern_name> <topic>
 
 Example: /cruxdev-create-pattern api_security "REST API security patterns"
 
-The skill orchestrates the full 7-gate lifecycle:
-1. Researches the topic to convergence
-2. Analyzes checks for automation potential
-3. Writes build plan for Go audit scripts
-4. Converges the code through CruxBot sandbox
-5. Writes the LLM usage guide
-6. Runs integration tests
-7. Packages and adds to pattern library
+The skill orchestrates the full 7-gate lifecycle using CruxDev tools:
+
+Gate 1 — Research:
+  1. research_topic(topic, sub_questions) → session_id
+  2. For each of 5 passes: web search → verify_research_sources() → submit
+  3. research_status(session_id) → confirm convergence
+  4. Synthesize into docs/PATTERN_NAME.md
+  5. start_convergence(pattern.md) → audit to two clean passes
+
+Gate 2 — Automation Analysis:
+  6. Classify every check: MECHANICAL / JUDGMENT / HYBRID
+  7. Write script specs for mechanical checks
+  8. start_convergence(analysis) → audit classification accuracy
+
+Gate 3 — Build Plan:
+  9. create_plan_template() → BUILD_PLAN_NNN_PATTERN_CODE.md
+  10. start_convergence(plan) → audit feasibility + testability
+
+Gate 4 — Code:
+  11. CruxBot sandbox: write Go scripts → test → compile
+  12. start_convergence(code) → audit correctness + I/O contract
+
+Gate 5 — LLM Guide:
+  13. Write PATTERN_NAME_LLM_GUIDE.md (mechanical → code, judgment → LLM)
+  14. start_convergence(guide) → audit accuracy against code
+
+Gate 6 — Integration Test:
+  15. Create good/bad fixture packages
+  16. Run scripts against fixtures, validate findings
+  17. start_convergence(integration) → audit end-to-end
+
+Gate 7 — Package:
+  18. Move to patterns/{pattern_name}/ with all artifacts
+  19. audit_pattern_package() → final validation
 
 Each gate requires two consecutive clean passes. The skill does not
 stop between gates — it runs to completion or escalates on failure.
